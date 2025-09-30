@@ -1,0 +1,47 @@
+.body {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 2em 0;
+}
+
+.inner-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.date-area {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.memo-price-area {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.category-area {
+  margin: 0 auto;
+}
+
+.categories {
+  display: flex;
+  gap: 0 2em;
+}
+
+.category1 {
+  text-align: center;
+}
+
+.category2 {
+  text-align: center;
+}
+
+.button {
+  text-align: center;
+}
+
+.inner-footer {
+  display: flex;
+  justify-content: space-between;
+}
