@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Wallet, TrendingUp, Clock, Tag, Plus, Upload, Camera, List, Bell, User } from "lucide-react"; //React用のアイコンをインポート 後で消す
-import "../index.css";
-import "../styles/DataInput/ManualInput.css";
+import "../../index.css";
+import "../../styles/DataInput/ManualInput.css";
 
 const ManualInput = () => {
   const [activeTab, setActiveTab] = useState("expense");
