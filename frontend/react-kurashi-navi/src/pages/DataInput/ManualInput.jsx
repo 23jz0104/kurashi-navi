@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { Wallet, TrendingUp, Clock, Tag, Plus, Upload, Camera, List, Bell, User } from "lucide-react"; //React用のアイコンをインポート 後で消す
+import { Wallet, TrendingUp, Clock, Tag, Plus, Upload, Camera } from "lucide-react"; //React用のアイコンをインポート 後で消す
 import "../../index.css";
 import "../../styles/DataInput/ManualInput.css";
+import Layout from "../../components/common/Layout";
+import TabButton from "../../components/common/TabButton";
 
 const ManualInput = () => {
   const [activeTab, setActiveTab] = useState("expense");
@@ -11,6 +13,11 @@ const ManualInput = () => {
     amount: "",
     category: ""
   });
+
+  const tabs = [
+    { id: "expense", label: "支出", icon: <Wallet size={20} /> },
+    { id: "income", label: "収入", icon: <TrendingUp size={20} /> }
+  ];
 
   const categories = {
     expense: [
@@ -61,31 +68,15 @@ const ManualInput = () => {
   }
 
   return (
-    <div className="container">
-      <header className="header">
-        <div className="tab-container">
-          <button
-            onClick={() => handleTabChange("expense")}
-            className={`tab-button ${activeTab == "expense" ? "tab-active" : ""}`}
-          >
-            <Wallet size={20} />
-            支出
-          </button>
-          <button
-            onClick={() => handleTabChange("income")}
-            className={`tab-button ${activeTab == "income" ? "tab-active" : ""}`}
-          >
-            <TrendingUp size={20} />
-            収入
-          </button>
-        </div>
-      </header>
-
-      <main className="main-container">
+    <Layout 
+      headerContent={<TabButton tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} />}
+      mainContent={
         <div className="form-container">
+
           <div className="ocr-container">
             {renderOcrButton()}
           </div>
+
           {/* 日付入力 */}
           <div className="input-section">
             <label className="input-label">
@@ -105,15 +96,15 @@ const ManualInput = () => {
               <label className="input-label">
                 金額 <span className="required">*</span>
               </label>
-              <div className="amount-input-container">
-                <input
-                  type="number"
-                  value={formData.amount}
-                  placeholder="0円"
-                  min="0"
-                  className="input-field amount-input"
-                />
-              </div>
+            <div className="amount-input-container">
+              <input
+                type="number"
+                value={formData.amount}
+                placeholder="0円"
+                min="0"
+                className="input-field amount-input"
+              />
+            </div>
             </div>
 
             <div className="input-group">
@@ -122,7 +113,7 @@ const ManualInput = () => {
                 type="text"
                 value={formData.memo}
                 placeholder="未入力"
-                className="input-field"
+               className="input-field"
               />
             </div>
           </div>
@@ -141,8 +132,8 @@ const ManualInput = () => {
                   onClick={() => handleCategorySelect(category.id)}
                   className={`category-button ${
                     formData.category == category.id
-                     ? "category-button-selected"
-                     : ""
+                    ? "category-button-selected"
+                    : ""
                   }`}
                 >
                   <span className="category-icon">{category.icon}</span>
@@ -161,29 +152,8 @@ const ManualInput = () => {
             追加
           </button>
         </div>
-      </main>
-
-      <footer className="footer">
-        <nav className="footer-nav">
-          <a href="#" className="nav-item">
-            <List className="nav-icon" size={20}/>
-            <span className="nav-label">履歴</span>
-          </a>
-          <a href="#" className="nav-item">
-            <Wallet className="nav-icon" size={20}/>
-            <span className="nav-label">予算</span>
-          </a>
-          <a href="#" className="nav-item">
-            <Bell className="nav-icon" size={20}/>
-            <span className="nav-label">通知</span>
-          </a>
-          <a href="#" className="nav-item">
-            <User className="nav-icon" size={20}/>
-            <span className="nav-label">マイページ</span>
-          </a>
-        </nav>
-      </footer>
-    </div>
+      }
+    />
   )
 }
 
