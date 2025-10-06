@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Wallet, TrendingUp, Clock, Tag, Plus, Upload, Camera, List, Bell, User } from "lucide-react"; //React用のアイコンをインポート 後で消す
 import "../index.css";
-import "../styles/DataInput.css";
+import "../styles/DataInput/ManualInput.css";
 
-const DataInput = () => {
+const ManualInput = () => {
   const [activeTab, setActiveTab] = useState("expense");
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
@@ -187,4 +187,4 @@ const DataInput = () => {
   )
 }
 
-export default DataInput;
+export default ManualInput;
