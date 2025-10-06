@@ -1,4 +1,3 @@
-import React from "react";
 import { Camera, ArrowLeft } from "lucide-react";
 import "../../index.css"
 import "../../styles/DataInput/CameraInput.css";

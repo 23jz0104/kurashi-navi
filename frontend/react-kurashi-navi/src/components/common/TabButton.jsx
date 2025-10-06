@@ -13,7 +13,7 @@ const TabButton = ({ tabs, activeTab, onTabChange }) => {
           {tab.icon}
           {tab.label}
         </button>
-      ))};
+      ))}
     </div>
   )
 }

@@ -19,6 +19,7 @@ const ManualInput = () => {
     { id: "income", label: "収入", icon: <TrendingUp size={20} /> }
   ];
 
+  //仮のカテゴリデータ
   const categories = {
     expense: [
       { id: "food", name: "食費", icon: "🍽️" },
