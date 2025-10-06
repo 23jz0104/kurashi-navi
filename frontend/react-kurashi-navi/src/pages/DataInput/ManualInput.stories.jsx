@@ -1,5 +1,5 @@
 import React from "react";
-import ManualInput from "./ManualInput"
+import ManualInput from "./ManualInput";
 
 export default {
   title: 'DataInput/ManualInput',
