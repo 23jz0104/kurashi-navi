@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Wallet, TrendingUp, Clock, Tag, Plus, Upload, Camera } from "lucide-react"; //React用のアイコンをインポート 後で消す
+import { Wallet, TrendingUp, Clock, Tag, Plus, Upload, Camera } from "lucide-react";
 import "../../index.css";
-import "../../styles/DataInput/ManualInput.css";
+import styles from "../../styles/DataInput/ManualInput.module.css";
 import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";
 
@@ -55,14 +55,14 @@ const ManualInput = () => {
     if(activeTab !== "expense") return null;
 
     return (
-      <div className="ocr-buttons">
-        <button className="ocr-button">
+      <div className={styles["ocr-buttons"]}>
+        <button className={styles["ocr-button"]}>
           <Upload size={20}/>
-          <span className="ocr-button-text">アップロード</span>
+          <span className={styles["ocr-button-text"]}>アップロード</span>
         </button>
-        <button className="ocr-button">
+        <button className={styles["ocr-button"]}>
           <Camera size={20}/>
-          <span className="ocr-button-text">読み取り</span>
+          <span className={styles["ocr-button-text"]}>読み取り</span>
         </button>
       </div>
     )
@@ -72,73 +72,73 @@ const ManualInput = () => {
     <Layout 
       headerContent={<TabButton tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} />}
       mainContent={
-        <div className="form-container">
+        <div className={styles["form-container"]}>
 
-          <div className="ocr-container">
+          <div className={styles["ocr-container"]}>
             {renderOcrButton()}
           </div>
 
           {/* 日付入力 */}
-          <div className="input-section">
-            <label className="input-label">
-              <Clock className="label-icon" size={16} />
+          <div className={styles["input-section"]}>
+            <label className={styles["input-label"]}>
+              <Clock className={styles["label-icon"]} size={16} />
               日付
             </label>
             <input
               type="date"
               value={formData.date}
-              className="input-field"
+              className={styles["input-field"]}
             />
           </div>
 
           {/* 金額とメモ */}
-          <div className="input-section">
-            <div className="input-group">
-              <label className="input-label">
-                金額 <span className="required">*</span>
+          <div className={styles["input-section"]}>
+            <div className={styles["input-group"]}>
+              <label className={styles["input-label"]}>
+                金額 <span className={styles["required"]}>*</span>
               </label>
-            <div className="amount-input-container">
+            <div className={styles["amount-input-container"]}>
               <input
                 type="number"
                 value={formData.amount}
                 placeholder="0円"
                 min="0"
-                className="input-field amount-input"
+                className={`${styles["input-field"]} ${styles["amount-input"]}`}
               />
             </div>
             </div>
 
-            <div className="input-group">
+            <div className={styles["input-group"]}>
               <label>メモ</label>
               <input
                 type="text"
                 value={formData.memo}
                 placeholder="未入力"
-               className="input-field"
+               className={styles["input-field"]}
               />
             </div>
           </div>
 
           {/* カテゴリ選択 */}
-          <div className="input-section">
-            <label className="input-label">
+          <div className={styles["input-section"]}>
+            <label className={styles["input-label"]}>
               <Tag size={16}/>
-              カテゴリ <span className="required">*</span>
+              カテゴリ <span className={styles["required"]}>*</span>
             </label>
-            <div className="category-grid">
+            <div className={styles["category-grid"]}>
               {categories[activeTab].map((category) => (
                 <button
                   key={category.id}
                   type="button"
                   onClick={() => handleCategorySelect(category.id)}
-                  className={`category-button ${
+                  className={`${styles["category-button"]} ${
                     formData.category == category.id
-                    ? "category-button-selected"
+                    ? styles["category-button-selected"]
                     : ""
                   }`}
                 >
-                  <span className="category-icon">{category.icon}</span>
-                  <span className="category-name">{category.name}</span>
+                  <span className={styles["category-icon"]}>{category.icon}</span>
+                  <span className={styles["category-name"]}>{category.name}</span>
                 </button>
               ))}
             </div>
@@ -147,7 +147,7 @@ const ManualInput = () => {
           {/* 追加ボタン */}
           <button
             type="button"
-            className="submit-button"
+            className={styles["submit-button"]}
           >
             <Plus size={20} />
             追加
