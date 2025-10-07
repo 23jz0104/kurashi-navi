@@ -1,29 +1,29 @@
 import React from "react";
 import { Wallet, List, Bell, User } from "lucide-react";
-import "./Layout.css";
+import styles from "./Layout.module.css";
 
 const Layout = ({headerContent, mainContent}) => {
   return(
-    <div className="container">
-      <header className="header">{headerContent}</header>
-      <main className="main">{mainContent}</main>
-      <footer className="footer">
-        <nav className="footer-nav">
-          <a href="#" className="nav-item">
-            <List className="nav-icon" size={20}/>
-            <span className="nav-label">履歴</span>
+    <div className={styles.container}>
+      <header className={styles.header}>{headerContent}</header>
+      <main className={styles.main}>{mainContent}</main>
+      <footer className={styles.footer}>
+        <nav className={styles["footer-nav"]}>
+          <a href="#" className={styles["nav-item"]}>
+            <List className={styles["nav-icon"]} size={20}/>
+            <span className={styles["nav-label"]}>履歴</span>
           </a>
-          <a href="#" className="nav-item">
-            <Wallet className="nav-icon" size={20}/>
-            <span className="nav-label">予算</span>
+          <a href="#" className={styles["nav-item"]}>
+            <Wallet className={styles["nav-icon"]} size={20}/>
+            <span className={styles["nav-label"]}>予算</span>
           </a>
-          <a href="#" className="nav-item">
-            <Bell className="nav-icon" size={20}/>
-            <span className="nav-label">通知</span>
+          <a href="#" className={styles["nav-item"]}>
+            <Bell className={styles["nav-icon"]} size={20}/>
+            <span className={styles["nav-label"]}>通知</span>
           </a>
-          <a href="#" className="nav-item">
-            <User className="nav-icon" size={20}/>
-            <span className="nav-label">マイページ</span>
+          <a href="#" className={styles["nav-item"]}>
+            <User className={styles["nav-icon"]} size={20}/>
+            <span className={styles["nav-label"]}>マイページ</span>
             </a>
         </nav>
       </footer>
