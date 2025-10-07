@@ -1,0 +1,143 @@
+.ocr-container {
+  display: flex;
+  justify-content: end;
+  min-height: 2rem;
+  align-items: center;
+}
+
+.ocr-buttons {
+  display: flex;
+  justify-content: end;
+  gap: 1rem;
+  margin-right: 0.75rem;
+}
+
+.ocr-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: none;
+  background: none;
+  color: #2563eb;
+}
+
+.ocr-button-text {
+  font-size: 0.5rem;
+}
+
+.form-container {
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.input-section {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 1rem;
+}
+
+.input-group {
+  margin-bottom: 1rem;
+}
+
+.input-group:last-child {
+  margin-bottom: 0;
+}
+
+.input-label {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.label-icon {
+  margin-right: 0.5rem;
+  font-size: 1rem;
+}
+
+.required {
+  color: #ef4444;
+  margin-left: 0.5rem;
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.input-field:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.category-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-button:hover {
+  border-color: #d1d5db;
+  background-color: #f9fafb;
+}
+
+.category-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.category-name {
+  font-size: 0.75rem;
+  text-align: center;
+  color: #374151;
+}
+
+.category-button-selected { 
+  font-weight: 600;
+  border-color: #2563eb;
+  background-color: #eff6ff;
+}
+
+.submit-button { 
+  width: 100%;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #2563eb;
+}
+
+.submit-button:active {
+  transform: scale(0.99);
+}
