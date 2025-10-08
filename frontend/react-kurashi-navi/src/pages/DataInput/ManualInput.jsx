@@ -4,6 +4,8 @@ import "../../index.css";
 import styles from "../../styles/DataInput/ManualInput.module.css";
 import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";
+import SubmitButton from "../../components/common/SubmitButton";
+import InputSection from "../../components/common/InputSection";
 
 const ManualInput = () => {
   const [activeTab, setActiveTab] = useState("expense");
@@ -19,7 +21,7 @@ const ManualInput = () => {
     { id: "income", label: "収入", icon: <TrendingUp size={20} /> }
   ];
 
-  //仮のカテゴリデータ
+  // 仮のカテゴリデータ
   const categories = {
     expense: [
       { id: "food", name: "食費", icon: "🍽️" },
@@ -49,24 +51,24 @@ const ManualInput = () => {
       ...prev,
       category: categoryId
     }));
-  }
+  };
 
   const renderOcrButton = () => {
-    if(activeTab !== "expense") return null;
+    if (activeTab !== "expense") return null;
 
     return (
       <div className={styles["ocr-buttons"]}>
         <button className={styles["ocr-button"]}>
-          <Upload size={20}/>
+          <Upload size={20} />
           <span className={styles["ocr-button-text"]}>アップロード</span>
         </button>
         <button className={styles["ocr-button"]}>
-          <Camera size={20}/>
+          <Camera size={20} />
           <span className={styles["ocr-button-text"]}>読み取り</span>
         </button>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <Layout 
@@ -79,83 +81,56 @@ const ManualInput = () => {
           </div>
 
           {/* 日付入力 */}
-          <div className={styles["input-section"]}>
-            <label className={styles["input-label"]}>
-              <Clock className={styles["label-icon"]} size={16} />
-              日付
-            </label>
-            <input
-              type="date"
-              value={formData.date}
-              className={styles["input-field"]}
-            />
-          </div>
+          <InputSection 
+            fields={{
+              label: <><Clock size={16}/>日付</>,
+              contents: <input type="date" />
+            }}
+          />
 
-          {/* 金額とメモ */}
-          <div className={styles["input-section"]}>
-            <div className={styles["input-group"]}>
-              <label className={styles["input-label"]}>
-                金額 <span className={styles["required"]}>*</span>
-              </label>
-            <div className={styles["amount-input-container"]}>
-              <input
-                type="number"
-                value={formData.amount}
-                placeholder="0円"
-                min="0"
-                className={`${styles["input-field"]} ${styles["amount-input"]}`}
-              />
-            </div>
-            </div>
+          <InputSection
+            fields={[
+              {
+                label: <>金額<span className={styles["required"]}>*</span></>,
+                contents: <input type="number" placeholder="0円" min="0" />
+              },
+              {
+                label: "メモ",
+                contents: <input type="text" placeholder="未入力" />
+              }
+            ]}
+          />
 
-            <div className={styles["input-group"]}>
-              <label>メモ</label>
-              <input
-                type="text"
-                value={formData.memo}
-                placeholder="未入力"
-               className={styles["input-field"]}
-              />
-            </div>
-          </div>
+          <InputSection 
+            fields={{
+              label: <><Tag size={16}/>カテゴリ<span className={styles.required}>*</span></>,
+              contents: (
+                <div className={styles["category-grid"]}>
+                  {categories[activeTab].map((category) => (
+                    <button
+                      key={category.id}
+                      type="button"
+                      onClick={() => handleCategorySelect(category.id)}
+                      className={`${styles["category-button"]} ${
+                        formData.category == category.id
+                          ? styles["category-button-selected"]
+                          : ""
+                      }`}
+                    >
+                      <span className={styles["category-icon"]}>{category.icon}</span>
+                      <span className={styles["category-name"]}>{category.name}</span>
+                    </button>
+                  ))}
+                </div>
+              )
+            }}
+          />
 
-          {/* カテゴリ選択 */}
-          <div className={styles["input-section"]}>
-            <label className={styles["input-label"]}>
-              <Tag size={16}/>
-              カテゴリ <span className={styles["required"]}>*</span>
-            </label>
-            <div className={styles["category-grid"]}>
-              {categories[activeTab].map((category) => (
-                <button
-                  key={category.id}
-                  type="button"
-                  onClick={() => handleCategorySelect(category.id)}
-                  className={`${styles["category-button"]} ${
-                    formData.category == category.id
-                    ? styles["category-button-selected"]
-                    : ""
-                  }`}
-                >
-                  <span className={styles["category-icon"]}>{category.icon}</span>
-                  <span className={styles["category-name"]}>{category.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* 追加ボタン */}
-          <button
-            type="button"
-            className={styles["submit-button"]}
-          >
-            <Plus size={20} />
-            追加
-          </button>
+          <SubmitButton text={<><Plus size={20}/>追加</>} />
         </div>
       }
     />
-  )
-}
+  );
+};
 
 export default ManualInput;
