@@ -6,6 +6,7 @@ import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";
 import SubmitButton from "../../components/common/SubmitButton";
 import InputSection from "../../components/common/InputSection";
+import CustomDatePicker from "../../components/common/CustomDatePicker";
 
 const ManualInput = () => {
   const [activeTab, setActiveTab] = useState("expense");
@@ -84,7 +85,7 @@ const ManualInput = () => {
           <InputSection 
             fields={{
               label: <><Clock size={16}/>日付</>,
-              contents: <input type="date" />
+              contents: <CustomDatePicker />
             }}
           />
 

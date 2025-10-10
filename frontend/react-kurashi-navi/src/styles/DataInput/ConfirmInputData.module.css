@@ -7,3 +7,52 @@
   gap: 1rem;
 }
 
+.total-amount {
+  margin-left: 0.5rem;
+}
+
+.item-row {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+  color: #6b7280;
+  border: none;
+  background: none;
+  width: 100%;
+  border-bottom: 1px solid #eee;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.item-row:hover {
+  background-color: #f3f4f6;
+}
+
+.item-row:last-child {
+  border-bottom: none;
+}
+
+.category-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: pink;
+  color: white;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+}
+
+.item-row span:nth-child(2) {
+  flex: 1;
+  margin-left: 0.5rem;
+}
+
+.item-row span:nth-child(3) {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 300;
+  color: #6b7280;
+  margin-left: auto;
+}
