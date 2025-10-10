@@ -34,64 +34,73 @@ const ConfirmInputData = () => {
 
   //状態を管理
   const [loading, setLoading] = useState(true);
-  const [ocrResult, setOcrResult] = useState([]); //解析結果を格納
+  const [ocrResult, setOcrResult] = useState({ storeName: "", items: [] }); //解析結果を格納
+  const [totalAmount, setTotalAmount] = useState(0);
 
   useEffect(() => {
     if (!file) return;
 
     const ai = new GoogleGenAI({ apiKey: 'AIzaSyCTwHtOa-oONrcYrLoakJRNXpwCKJq-5W0' });
 
-    async function fetchOcrResult() {
+    async function fetchOcrResult(prompt) {
       const myfile = await ai.files.upload({
-        file,
+        file: file,
+        config: { mimeType: file.type },
       });
 
       const result = await ai.models.generateContent({
         model: "gemini-2.5-flash",
         contents: createUserContent([
           createPartFromUri(myfile.uri, myfile.mimeType),
-          "画像の文字をJSON形式て出力してください。JSONに持たせる属性はid, categoryid, productName, priceの4つで、idを先頭にして順に出力してください。" +
-          "また、それ以外の属性は不要なため出力内容に含めないで下さい。上記指定の属性で一つのオブジェクトとします。" +
-          "複数の商品がある場合は、オブジェクトを複数個持つ配列形式で出力してください。"
+          prompt,
         ]),
         config: {
           responseMimeType: "application/json",
           responseSchema: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                id: {
-                  type: Type.INTEGER,
+            type: Type.OBJECT,
+            properties: {
+              storeName: { type: Type.STRING },
+              items: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: {
+                    categoryId: { type: Type.INTEGER },
+                    productName: { type: Type.STRING },
+                    price: { type: Type.NUMBER }
+                  },
+                  required: ["categoryId", "productName", "price"],
                 },
-                categoryId: {
-                  type: Type.INTEGER,
-                },
-                productName: {
-                  type: Type.STRING,
-                },
-                price: {
-                  type: Type.INTEGER,
-                }
-              }
-            }
-          }
-        }
+              },
+            },
+            required: ["storeName", "items"],
+          },
+        },
       });
 
-      try {
-        console.log(result.text);
-        const parsedResult = JSON.parse(result.text);
-        console.log(parsedResult);
-        setOcrResult(parsedResult);
-      } catch (error) {
-        console.error("JSONのパースに失敗しました:", error);
-        setOcrResult([]);
-      }
+      const parsedResult = JSON.parse(result.text);
+      setOcrResult(parsedResult);
       setLoading(false);
     };
 
-    fetchOcrResult();
+    const prompt = `
+      あなたはレシート画像を解析するAIです。
+
+      次のルールに従って、店舗名と商品リストを抽出してください。
+      出力はJSONのみで行います（説明文やコメントは禁止）。
+
+      【ルール】
+      - storeNameはレシート上部の店舗名。不明なら "不明"。
+      - categoryIdは以下の分類ルールに従い、1〜4 の整数で出力する。
+        レシート内の数値と関係なし。
+        1: 飲食物（食品、飲料、弁当など）
+        2: 日用品（洗剤、ティッシュ、文房具など）
+        3: 趣味・娯楽（本、ゲーム、スポーツ用品など）
+        4: その他（上記以外）
+      - 小計・合計・お預かり金などは含めない。
+    `;
+
+    fetchOcrResult(prompt);
   }, [file]);
 
   if(loading) {
@@ -112,7 +121,7 @@ const ConfirmInputData = () => {
           
           <InputSection
             fields={{
-              label:<><Clock size={16} />日付</>,
+              label: <><Clock size={16} />日付</>,
               contents: <CustomDatePicker />
             }}
           />
@@ -120,7 +129,16 @@ const ConfirmInputData = () => {
           <InputSection 
             fields={{
               label: <><Store size={16} />店舗名</>,
-              contents: <input type="text" placeholder="未入力" />
+              contents: (
+                <input 
+                  type="text" 
+                  placeholder="未入力" 
+                  value={ocrResult.storeName} 
+                  onChange={(e) => 
+                    setOcrResult({...ocrResult, storeName: e.target.value})
+                  }
+                />
+              ) 
             }}
           />
 
@@ -128,16 +146,15 @@ const ConfirmInputData = () => {
             fields={{
               label: <>合計金額:<span className={styles["total-amount"]}>¥0</span></>,
               contents: (
-                // <div className={styles["item-list"]}>
-                //   {recieptItems.map((item) => (
-                //     <button key={item.id} className={styles["item-row"]}>
-                //       <span className={styles["category-icon"]}>{getCategoryIcon(item.categoryId)}</span>
-                //       <span>{item.productName}</span>
-                //       <span>¥{item.price}<ChevronRight size={16}/></span>
-                //     </button>
-                //   ))}
-                // </div>
-                <div>{JSON.stringify(ocrResult)}</div>
+                <div className={styles["item-list"]}>
+                  {ocrResult.items.map((item, index) => (
+                    <button key={index} className={styles["item-row"]}>
+                      <span className={styles["category-icon"]}>{getCategoryIcon(item.categoryId)}</span>
+                      <span>{item.productName}</span>
+                      <span>¥{item.price}<ChevronRight size={16}/></span>
+                    </button>
+                  ))}
+                </div>
               ),
             }}
           />

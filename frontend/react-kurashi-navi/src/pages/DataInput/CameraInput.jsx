@@ -10,7 +10,7 @@ const CameraInput = () => {
   const navigate = useNavigate();
 
   const handleCameraClick = () => {
-    fileInputRef.current.click();
+    fileInputRef.current?.click();
   };
 
   const handleCameraChange = (event) => {
