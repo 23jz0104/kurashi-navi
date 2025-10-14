@@ -1,11 +1,12 @@
 import React, { useEffect, useState }from "react";
 import { useLocation } from "react-router-dom";
-import { Clock, Store, Utensils, ChevronRight } from "lucide-react";
+import { Clock, Store, Utensils, ChevronRight, Plus, TicketCheck } from "lucide-react";
 import Layout from "../../components/common/Layout";
 import InputSection from "../../components/common/InputSection";
 import styles from "../../styles/DataInput/ConfirmInputData.module.css";
 import SubmitButton from "../../components/common/SubmitButton";
 import CustomDatePicker from "../../components/common/CustomDatePicker";
+import Loader from "../../components/common/Loader";
 
 //Google GenAIのインポート レシート解析に使う
 import { GoogleGenAI, createUserContent, createPartFromUri, Type} from "../../../node_modules/@google/genai/dist/web/index.mjs";
@@ -21,11 +22,16 @@ const recieptItems = [
 
 //仮のカテゴリアイコン
 const categoryIcons = {
-  1: { name: "食費", icon: <Utensils size={16}/>},
+  1: { name: "食費", icon: <Utensils size={16}/>, color: "#F2A9A9"},
+  5: { name: "割引金額", icon: <TicketCheck size={16}/>, color: "#A9D0F2"},
 }
 
 const getCategoryIcon = (categoryId) => {
   return categoryIcons[categoryId].icon;
+}
+
+const getCategoryColor = (categoryId) => {
+  return categoryIcons[categoryId].color;
 }
 
 const ConfirmInputData = () => {
@@ -35,6 +41,12 @@ const ConfirmInputData = () => {
   //状態を管理
   const [loading, setLoading] = useState(true);
   const [ocrResult, setOcrResult] = useState({ storeName: "", items: [] }); //解析結果を格納
+
+  useEffect(() => {
+    const total = ocrResult.items.reduce((sum, item) => sum + (item.price || 0), 0);
+    setTotalAmount(total);
+  }, [ocrResult.items]);
+
   const [totalAmount, setTotalAmount] = useState(0);
 
   useEffect(() => {
@@ -83,6 +95,12 @@ const ConfirmInputData = () => {
       setLoading(false);
     };
 
+    const updateItemPrice = (index, newPrice) => {
+      const updateItems = [...ocrResult.items];
+      updateItems[index].price = Number(newPrice);
+      setOcrResult({ ...ocrResult, items: updateItems });
+    }
+
     const prompt = `
       あなたはレシート画像を解析するAIです。
 
@@ -91,12 +109,14 @@ const ConfirmInputData = () => {
 
       【ルール】
       - storeNameはレシート上部の店舗名。不明なら "不明"。
-      - categoryIdは以下の分類ルールに従い、1〜4 の整数で出力する。
-        レシート内の数値と関係なし。
+      - productNameは商品名。（割引金額の場合は "値引" とのみ表示する）
+      - categoryIdは以下の分類ルールに従い、1〜5 の整数で出力する。
         1: 飲食物（食品、飲料、弁当など）
         2: 日用品（洗剤、ティッシュ、文房具など）
         3: 趣味・娯楽（本、ゲーム、スポーツ用品など）
-        4: その他（上記以外）
+        4: 交通費（電車、バス、タクシーなど）
+        5: 割引金額（クーポン、ポイント利用など）
+        6: その他（上記以外）
       - 小計・合計・お預かり金などは含めない。
     `;
 
@@ -107,7 +127,9 @@ const ConfirmInputData = () => {
     return (
       <Layout 
         headerContent={<p className={styles.headerContent}>入力データ確認</p>}
-        mainContent={<p>解析中</p>}
+        mainContent={
+          <Loader text="解析中"/>
+        }
       />
     )
   }
@@ -144,16 +166,30 @@ const ConfirmInputData = () => {
 
           <InputSection 
             fields={{
-              label: <>合計金額:<span className={styles["total-amount"]}>¥0</span></>,
+              label: <>合計金額:<span className={styles["total-amount"]}>¥{totalAmount.toLocaleString()}</span></>,
               contents: (
                 <div className={styles["item-list"]}>
                   {ocrResult.items.map((item, index) => (
                     <button key={index} className={styles["item-row"]}>
-                      <span className={styles["category-icon"]}>{getCategoryIcon(item.categoryId)}</span>
+                      <span 
+                        className={styles["category-icon"]}
+                        style={{backgroundColor: getCategoryColor(item.categoryId)}}
+                        >
+                        {getCategoryIcon(item.categoryId)}
+                      </span>
                       <span>{item.productName}</span>
                       <span>¥{item.price}<ChevronRight size={16}/></span>
                     </button>
                   ))}
+                  <button className={styles["item-row"]}>
+                    <span 
+                      className={styles["category-icon"]}
+                      style={{backgroundColor: "#C0C0C0"}}
+                    >
+                      <Plus size={16}/>
+                    </span>
+                    <span>項目を追加する</span>
+                  </button>
                 </div>
               ),
             }}
