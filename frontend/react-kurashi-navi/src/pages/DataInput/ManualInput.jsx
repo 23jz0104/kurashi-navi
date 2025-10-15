@@ -7,6 +7,7 @@ import TabButton from "../../components/common/TabButton";
 import SubmitButton from "../../components/common/SubmitButton";
 import InputSection from "../../components/common/InputSection";
 import CustomDatePicker from "../../components/common/CustomDatePicker";
+import Categories from "../../components/common/Categories";
 
 const ManualInput = () => {
   const [activeTab, setActiveTab] = useState("expense");
@@ -105,25 +106,7 @@ const ManualInput = () => {
           <InputSection 
             fields={{
               label: <><Tag size={16}/>カテゴリ<span className={styles.required}>*</span></>,
-              contents: (
-                <div className={styles["category-grid"]}>
-                  {categories[activeTab].map((category) => (
-                    <button
-                      key={category.id}
-                      type="button"
-                      onClick={() => handleCategorySelect(category.id)}
-                      className={`${styles["category-button"]} ${
-                        formData.category == category.id
-                          ? styles["category-button-selected"]
-                          : ""
-                      }`}
-                    >
-                      <span className={styles["category-icon"]}>{category.icon}</span>
-                      <span className={styles["category-name"]}>{category.name}</span>
-                    </button>
-                  ))}
-                </div>
-              )
+              contents: <Categories activeTab={activeTab}/>
             }}
           />
 

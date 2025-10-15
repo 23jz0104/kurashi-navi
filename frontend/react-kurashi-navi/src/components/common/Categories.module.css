@@ -1,0 +1,39 @@
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.category-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.category-button:hover {
+  border-color: #d1d5db;
+  background-color: #f9fafb;
+}
+
+.category-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.category-name {
+  font-size: 0.75rem;
+  text-align: center;
+  color: #374151;
+}
+
+.category-button-selected { 
+  font-weight: 600;
+  border-color: #2563eb;
+  background-color: #eff6ff;
+}
