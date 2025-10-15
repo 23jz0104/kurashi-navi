@@ -27,7 +27,7 @@
   margin-right: 0.5rem;
 }
 
-.input-group input {
+.input-group > input {
   width: 100%;
   padding: 0.75rem 1rem;
   color: #374151;
