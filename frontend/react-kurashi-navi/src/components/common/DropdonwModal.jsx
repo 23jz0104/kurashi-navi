@@ -27,11 +27,9 @@ const DropdownModal = ( { title = "タイトル", children = "要素"}) => {
         {title}
       </button>
         
-      {isOpen && (
-        <div className={styles["dropdown-menu"]}>
-          {children}
-        </div>
-      )}
+      <div className={`${styles["dropdown-menu"]} ${isOpen ? styles["open"] : ""}`}>
+        {children}
+      </div>
     </div>
   );
 };
