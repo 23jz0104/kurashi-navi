@@ -8,18 +8,30 @@ const DropdownModal = ( { title = "タイトル", children = "要素"}) => {
   // 外側をクリックしたら閉じる
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      const target = event.target;
+      const isOutSide = dropdownRef.current && !dropdownRef.current.contains(target);
+      const isCloseButton = target.closest("[data-close='true']");
+
+      if(isOutSide) {
         setIsOpen(false);
+      } else if(isCloseButton) {
+        setTimeout(() => setIsOpen(false), 0);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    if(isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isOpen]);
 
   const handleToggle = () => {
     setIsOpen(!isOpen);
   };
+
+  const closeModal = () => {
+    setIsOpen(false);
+  }
 
   return (
     <div className={styles["dropdown-container"]} ref={dropdownRef}>
@@ -28,7 +40,7 @@ const DropdownModal = ( { title = "タイトル", children = "要素"}) => {
       </button>
         
       <div className={`${styles["dropdown-menu"]} ${isOpen ? styles["open"] : ""}`}>
-        {children}
+        {typeof children === 'function' ? children(closeModal) : children}
       </div>
     </div>
   );

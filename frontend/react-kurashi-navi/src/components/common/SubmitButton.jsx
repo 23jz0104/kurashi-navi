@@ -1,12 +1,13 @@
 import React from "react";
 import styles from "./SubmitButton.module.css";
 
-const SubmitButton = ({ text, onClick }) => {
+const SubmitButton = ({ text, onClick, ...restProps}) => {
   return (
     <button
       type="button"
       className={styles["submit-button"]}
       onClick={onClick}
+      {...restProps}
     >
       {text || "送信"}
     </button>

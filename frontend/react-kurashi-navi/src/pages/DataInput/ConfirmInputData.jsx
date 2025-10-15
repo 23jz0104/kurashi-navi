@@ -43,7 +43,9 @@ const ConfirmInputData = () => {
   const [newProductName, setNewProductName] = useState("");
   const [newProductPrice, setNewProductPrice] = useState();
   const [editingItems, setEditingItems] = useState({});
+  const [editingCategoryId, setEditingCategoryId] = useState({});
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [totalAmount, setTotalAmount] = useState(0);
 
   useEffect(() => {
     const total = ocrResult.items.reduce((sum, item) => sum + (item.price || 0), 0);
@@ -51,7 +53,6 @@ const ConfirmInputData = () => {
   }, [ocrResult.items]);
 
   const addItem = (categoryId, productName, price) => {
-
     const newItem = {
       categoryId,
       productName,
@@ -65,7 +66,6 @@ const ConfirmInputData = () => {
   }
 
   const changeItem = (index, updateItem) => {
-
     console.log("changeItem関数実行")
 
     setOcrResult(prev => {
@@ -75,19 +75,15 @@ const ConfirmInputData = () => {
     })
   }
 
-  const [totalAmount, setTotalAmount] = useState(0);
-
   useEffect(() => {
     if (!file) return;
 
     {/* 自分のAPIキー: AIzaSyCTwHtOa-oONrcYrLoakJRNXpwCKJq-5W0 */}
     {/* 鄭君のAPIキー: AIzaSyDaE9IGHmBNnFgSETBDcqZKv93_W2Q5azI */}
     
-
     const ai = new GoogleGenAI({ apiKey: 'AIzaSyDaE9IGHmBNnFgSETBDcqZKv93_W2Q5azI' });
 
     async function fetchOcrResult(prompt) {
-
       console.log("fetchOcrResultが実行されました。")
 
       const myfile = await ai.files.upload({
@@ -161,7 +157,7 @@ const ConfirmInputData = () => {
         mainContent={
           <>
             <Loader text="解析中"/>
-            {/* <button onClick={(e) => setLoading(!loading)}>切り替え</button> */}
+            <button onClick={(e) => setLoading(!loading)}>切り替え</button>
           </>
         }
       />
@@ -218,18 +214,41 @@ const ConfirmInputData = () => {
                           <span className={styles["product-price"]}>¥{item.price.toLocaleString()}<ChevronRight size={16}/></span>
                         </>
                       }
-                      children={
+                    >
+                      {(closeModal) => (
                         <div className={styles["product-detail"]}>
-                          <input type="text" className={styles["input-product-name"]} defaultValue={item.productName}
-                            onChange={(e) => setEditingItems(prev => ({ ...prev, [index]: {...prev[index], productName: e.target.value}}))}
+                          <input 
+                            type="text" 
+                            className={styles["input-product-name"]} 
+                            defaultValue={item.productName}
+                            onChange={(e) => setEditingItems(prev => ({ 
+                              ...prev, 
+                              [index]: {...prev[index], productName: e.target.value}
+                            }))}
                             placeholder="商品名"
                           />
-                          <input type="number" className={styles["input-product-price"]} defaultValue={item.price}
-                            onChange={(e) => setEditingItems(prev => ({...prev, [index]: {...prev[index], price: Number(e.target.value)}}))}
+                          <input 
+                            type="number" 
+                            className={styles["input-product-price"]} 
+                            defaultValue={item.price}
+                            onChange={(e) => setEditingItems(prev => ({
+                              ...prev, 
+                              [index]: {...prev[index], price: Number(e.target.value)}
+                            }))}
                             placeholder="金額"
                           />
-                          <Categories />
-                          <SubmitButton text={"変更"}
+                          <Categories
+                            selectedCategory={editingCategoryId[index] ?? item.categoryId}
+                            onSelected={(categoryId) => {
+                              setEditingCategoryId(prev => ({ ...prev, [index]: categoryId }));
+                              setEditingItems(prev => ({
+                                ...prev,
+                                [index]: {...prev[index], categoryId}
+                              }));
+                            }}
+                          />
+                          <SubmitButton 
+                            text={"変更"}
                             onClick={() => {
                               const updates = editingItems[index];
                               if(updates) {
@@ -238,13 +257,14 @@ const ConfirmInputData = () => {
                                   const newState = {...prev};
                                   delete newState[index];
                                   return newState;
-                                })
+                                });
+                                closeModal(); // 変更成功後にモーダルを閉じる
                               }
                             }}
                           />
                         </div>
-                      }
-                    />
+                      )}
+                    </DropdownModal>
                   ))}
 
                   <DropdownModal 
@@ -259,38 +279,58 @@ const ConfirmInputData = () => {
                         <span className={styles["product-name"]}>項目を追加する</span>
                       </>
                     }
-                    children={
+                  >
+                    {(closeModal) => (
                       <div className={styles["product-detail"]}>
-                        <input type="text" className={styles["input-product-name"]} value={newProductName} onChange={(e) => setNewProductName(e.target.value)} placeholder="商品名" />
-                        <input type="number" className={styles["input-product-price"]} value={newProductPrice} onChange={(e) => setNewProductPrice(Number(e.target.value))} placeholder="0"/>
-                        <Categories onSelected={(categoryId) => {
+                        <input 
+                          type="text" 
+                          className={styles["input-product-name"]} 
+                          value={newProductName} 
+                          onChange={(e) => setNewProductName(e.target.value)} 
+                          placeholder="商品名" 
+                        />
+                        <input 
+                          type="number" 
+                          className={styles["input-product-price"]} 
+                          value={newProductPrice} 
+                          onChange={(e) => setNewProductPrice(Number(e.target.value))} 
+                          placeholder="0"
+                        />
+                        <Categories 
+                          selectedCategory={selectedCategoryId}
+                          onSelected={(categoryId) => {
                             setSelectedCategoryId(categoryId);
                             console.log("選択されたカテゴリID : " + categoryId)
                           }}
                         />
-                        <SubmitButton text={"追加"} onClick={() => {
+                        <SubmitButton 
+                          text={"追加"} 
+                          onClick={() => {
+                            // バリデーションチェック
+                            if(!selectedCategoryId || !newProductName || !newProductPrice) {
+                              alert("未入力の項目があります。");
+                              return; // エラー時はモーダルを閉じない
+                            }
 
-                          if(!selectedCategoryId || !newProductName || !newProductPrice) {
-                            alert("未入力の項目があります。");
-                            return;
-                          }
+                            console.log("現在のselectedCategoryId", selectedCategoryId);
 
-                          console.log("現在のselectedCategoryId", selectedCategoryId);
-
-                          addItem(selectedCategoryId, newProductName, newProductPrice);
-                          setSelectedCategoryId(null);
-                          setNewProductName("");
-                          setNewProductPrice(0);
-                        }}/>
+                            addItem(selectedCategoryId, newProductName, newProductPrice);
+                            setSelectedCategoryId(null);
+                            setNewProductName("");
+                            setNewProductPrice(0);
+                            
+                            closeModal(); // 追加成功後にモーダルを閉じる
+                          }}
+                        />
                       </div>
-                    }
-                  />
+                    )}
+                  </DropdownModal>
                 </div>
               ),
             }}
           />
           <SubmitButton text={"追加"}/>
-          {/* <button onClick={(e) => setLoading(!loading)}>切り替え</button> */}
+          <button onClick={(e) => setLoading(!loading)}>切り替え</button>
         </div>
       }
     />
