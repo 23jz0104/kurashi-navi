@@ -1,12 +1,13 @@
 import React, { useEffect, useState }from "react";
 import { useLocation } from "react-router-dom";
-import { Clock, Store, Utensils, ChevronRight, Plus, TicketCheck } from "lucide-react";
+import { Clock, Store, Utensils, ChevronRight, Plus, TicketCheck, CircleQuestionMark } from "lucide-react";
 import Layout from "../../components/common/Layout";
 import InputSection from "../../components/common/InputSection";
 import styles from "../../styles/DataInput/ConfirmInputData.module.css";
 import SubmitButton from "../../components/common/SubmitButton";
 import CustomDatePicker from "../../components/common/CustomDatePicker";
 import Loader from "../../components/common/Loader";
+import DropdownModal from "../../components/common/DropdonwModal";
 
 //Google GenAIのインポート レシート解析に使う
 import { GoogleGenAI, createUserContent, createPartFromUri, Type} from "../../../node_modules/@google/genai/dist/web/index.mjs";
@@ -21,17 +22,20 @@ const recieptItems = [
 ];
 
 //仮のカテゴリアイコン
-const categoryIcons = {
-  1: { name: "食費", icon: <Utensils size={16}/>, color: "#F2A9A9"},
-  5: { name: "割引金額", icon: <TicketCheck size={16}/>, color: "#A9D0F2"},
-}
+const categoryIcons = [
+  { id: 1, name: "食費", icon: <Utensils size={16}/>, color: "#F2A9A9" },
+  { id: 5, name: "割引金額", icon: <TicketCheck size={16}/>, color: "#A9D0F2" },
+  { id: 99, name: "未定義", icon: <CircleQuestionMark size={16}/>, color: "gray" },
+];
 
 const getCategoryIcon = (categoryId) => {
-  return categoryIcons[categoryId].icon;
+  const category = categoryIcons.find(c => c.id === categoryId);
+  return category ? category.icon : categoryIcons.find(c => c.id === 99).icon;
 }
 
 const getCategoryColor = (categoryId) => {
-  return categoryIcons[categoryId].color;
+  const category = categoryIcons.find(c => c.id === categoryId);
+  return category ? category.color : categoryIcons.find(c => c.id === 99).color;
 }
 
 const ConfirmInputData = () => {
@@ -95,12 +99,6 @@ const ConfirmInputData = () => {
       setLoading(false);
     };
 
-    const updateItemPrice = (index, newPrice) => {
-      const updateItems = [...ocrResult.items];
-      updateItems[index].price = Number(newPrice);
-      setOcrResult({ ...ocrResult, items: updateItems });
-    }
-
     const prompt = `
       あなたはレシート画像を解析するAIです。
 
@@ -119,10 +117,17 @@ const ConfirmInputData = () => {
         6: その他（上記以外）
       - 小計・合計・お預かり金などは含めない。
       - 5番カテゴリは最後の出力とする。
+      - 5番カテゴリが複数存在する場合、合計の金額をPythonを用いて計算し、一つの値引として出力すること。
     `;
 
     fetchOcrResult(prompt);
   }, [file]);
+
+  const updateItemPrice = (index, newPrice) => {
+    const updateItems = [...ocrResult.items];
+    updateItems[index].price = Number(newPrice);
+    setOcrResult({ ...ocrResult, items: updateItems });
+  }
 
   if(loading) {
     return (
@@ -170,19 +175,52 @@ const ConfirmInputData = () => {
               label: <>合計金額:<span className={styles["total-amount"]}>¥{totalAmount.toLocaleString()}</span></>,
               contents: (
                 <div className={styles["item-list"]}>
-                  {ocrResult.items.map((item, index) => (
-                    <button key={index} className={styles["item-row"]}>
-                      <span 
-                        className={styles["category-icon"]}
-                        style={{backgroundColor: getCategoryColor(item.categoryId)}}
-                        >
-                        {getCategoryIcon(item.categoryId)}
-                      </span>
-                      <span>{item.productName}</span>
-                      <span>¥{item.price}<ChevronRight size={16}/></span>
-                    </button>
+                  {ocrResult.items.map((item) => (
+                    <DropdownModal 
+                      title={
+                        <>
+                          <span 
+                            className={styles["category-icon"]}
+                            style={{backgroundColor: getCategoryColor(item.categoryId)}}
+                          >
+                            {getCategoryIcon(item.categoryId)}
+                          </span>
+                          <span className={styles["product-name"]}>{item.productName}</span>
+                          <span className={styles["product-price"]}>¥{item.price}<ChevronRight size={16}/></span>
+                        </>
+                      }
+                      children={
+                        <>
+                        </>
+                      }
+                    />
+                    // <button key={index} className={styles["item-row"]}>
+                    //   <span 
+                    //     className={styles["category-icon"]}
+                    //     style={{backgroundColor: getCategoryColor(item.categoryId)}}
+                    //     >
+                    //     {getCategoryIcon(item.categoryId)}
+                    //   </span>
+                    //   <span>{item.productName}</span>
+                    //   <span>¥{item.price}<ChevronRight size={16}/></span>
+                    // </button>
                   ))}
-                  <button className={styles["item-row"]}>
+
+                  <DropdownModal 
+                    title={
+                      <>
+                        <span
+                          className={styles["category-icon"]}
+                          style={{backgroundColor: "#C0C0C0"}}
+                        >
+                          <Plus size={16}/>
+                        </span>
+                        <span className={styles["product-name"]}>項目を追加する</span>
+                      </>
+                    }
+                  />
+
+                  {/* <button className={styles["item-row"]}>
                     <span 
                       className={styles["category-icon"]}
                       style={{backgroundColor: "#C0C0C0"}}
@@ -190,7 +228,7 @@ const ConfirmInputData = () => {
                       <Plus size={16}/>
                     </span>
                     <span>項目を追加する</span>
-                  </button>
+                  </button> */}
                 </div>
               ),
             }}
