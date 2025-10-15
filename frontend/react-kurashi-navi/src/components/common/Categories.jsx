@@ -1,9 +1,7 @@
 import React, { useState } from "react";
 import styles from "./Categories.module.css";
 
-const Categories = ({ activeTab = "expense", onSelected }) => {
-
-  const [selected, setSelected] = useState(null);
+const Categories = ({ activeTab = "expense", selectedCategory, onSelected }) => {
 
    // 仮のカテゴリデータ
   const categories = {
@@ -23,7 +21,6 @@ const Categories = ({ activeTab = "expense", onSelected }) => {
   };
 
   const handleSelected = (categoryId) => {
-    setSelected(categoryId);
     onSelected?.(categoryId);
   }
 
@@ -37,7 +34,7 @@ const Categories = ({ activeTab = "expense", onSelected }) => {
             onClick={() => handleSelected(category.id)}
             className={`
               ${styles["category-button"]}
-              ${selected === category.id ? styles["selected"] : ""}
+              ${selectedCategory === category.id ? styles["selected"] : ""}
             `}
           >
             <span className={styles["category-icon"]}>{category.icon}</span>
