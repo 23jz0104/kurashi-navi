@@ -13,10 +13,10 @@ const Categories = ({ activeTab = "expense", selectedCategory, onSelected }) => 
       { id: 5, name: "その他", icon: "📦" }
     ],
     income: [
-      { id: "salary", name: "給与", icon: "💼" },
-      { id: "bonus", name: "賞与", icon: "🎁" },
-      { id: "side", name: "副業", icon: "💻" },
-      { id: "other", name: "その他", icon: "💰" }
+      { id: 11, name: "給与", icon: "💼" },
+      { id: 12, name: "賞与", icon: "🎁" },
+      { id: 13, name: "副業", icon: "💻" },
+      { id: 14, name: "その他", icon: "💰" }
     ]
   };
 
