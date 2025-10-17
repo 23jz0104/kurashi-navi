@@ -19,10 +19,43 @@
   border-bottom: 1px solid #eee;
 }
 
+.delete-container {
+  min-height: 1.5rem;
+}
+
 .product-detail {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+}
+
+.product-detail-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #d1d5db;
+}
+
+.product-detail-title {
+  color: #6b7280;
+}
+
+.delete-button {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  color: #ED1A3D;
+  transition: all 0.2s ease;
+}
+
+.delete-button:hover {
+  color: #811d2d;
+}
+
+.delete-button:active {
+  transform: scale(0.95);
 }
 
 .category-icon {

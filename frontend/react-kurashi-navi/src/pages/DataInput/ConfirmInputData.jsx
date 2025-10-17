@@ -1,6 +1,6 @@
 import React, { useEffect, useState }from "react";
 import { useLocation } from "react-router-dom";
-import { Clock, Store, Utensils, ChevronRight, Plus, TicketCheck, CircleQuestionMark, TrainFront, Lightbulb, Volleyball  } from "lucide-react";
+import { Clock, Store, Utensils, ChevronRight, Plus, TicketCheck, CircleQuestionMark, TrainFront, Lightbulb, Volleyball, Trash2  } from "lucide-react";
 import Layout from "../../components/common/Layout";
 import InputSection from "../../components/common/InputSection";
 import styles from "../../styles/DataInput/ConfirmInputData.module.css";
@@ -73,6 +73,18 @@ const ConfirmInputData = () => {
       newItem[index] = {...newItem[index], ...updateItem};
       return { ...prev, items: newItem };
     })
+  }
+
+  const deleteItem = (index) => {
+    console.log("deleteItem()が実行されました");
+
+    setOcrResult(prev => {
+      const deletedResult = [...prev.items];
+      deletedResult.splice(index, 1);
+      return {...prev, items: deletedResult};
+    });
+
+    console.log("現在のocrResult : ", ocrResult);
   }
 
   useEffect(() => {
@@ -157,7 +169,7 @@ const ConfirmInputData = () => {
         mainContent={
           <>
             <Loader text="解析中"/>
-            <button onClick={(e) => setLoading(!loading)}>切り替え</button>
+            {/* <button onClick={(e) => setLoading(!loading)}>切り替え</button> */}
           </>
         }
       />
@@ -217,6 +229,19 @@ const ConfirmInputData = () => {
                     >
                       {(closeModal) => (
                         <div className={styles["product-detail"]}>
+                          <div className={styles["product-detail-header"]}>
+                            <span className={styles["product-detail-title"]}>変更</span>
+                            <button 
+                              className={styles["delete-button"]}
+                              onClick={() => {
+                                const item = ocrResult.items[index];
+                                console.log("デバッグ用 選択された削除対象アイテム : ", item);
+                                deleteItem(index);
+                                closeModal();
+                              }}>
+                              <Trash2 size={18}/>
+                            </button>
+                          </div>
                           <input 
                             type="text" 
                             className={styles["input-product-name"]} 
@@ -282,6 +307,9 @@ const ConfirmInputData = () => {
                   >
                     {(closeModal) => (
                       <div className={styles["product-detail"]}>
+                        <div className={styles["product-detail-header"]}>
+                          <span className={styles["product-detail-title"]}>追加</span>
+                        </div>
                         <input 
                           type="text" 
                           className={styles["input-product-name"]} 
@@ -330,7 +358,7 @@ const ConfirmInputData = () => {
             }}
           />
           <SubmitButton text={"追加"}/>
-          <button onClick={(e) => setLoading(!loading)}>切り替え</button>
+          {/* <button onClick={(e) => setLoading(!loading)}>切り替え</button> */} 
         </div>
       }
     />
