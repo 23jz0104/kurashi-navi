@@ -1,0 +1,50 @@
+.calculator-container {
+  position: relative;
+}
+
+.calculator-overlay {
+  position: fixed;
+  top: 50%;
+  width: 100%;
+  left: 0;
+  height: 50vh;
+  opacity:0;
+  pointer-events: none;
+  background-color: red;
+  z-index: 1000;
+}
+
+.calculator-overlay.is-active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.calculator {
+  height: 100%;
+  background-color: blue;
+  padding: 0.25rem;
+}
+
+.calculator-buttons {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 0.25rem;
+  height: 100%;
+}
+
+.span-2-column {
+  grid-column: span 2;
+}
+
+.span-2-rows {
+  grid-row: span 2;
+}
+
+.calculator-button {
+  background-color: aqua;
+}
+
+.calculator-button.selected {
+  background-color: red;
+}

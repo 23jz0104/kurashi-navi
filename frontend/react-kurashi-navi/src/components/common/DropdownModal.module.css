@@ -16,7 +16,7 @@
 
 .dropdown-menu {
   position: absolute;
-  width: 100%;
+  width: 95%;
   left: 50%;
   transform: translateX(-50%);
   padding: 1rem;
