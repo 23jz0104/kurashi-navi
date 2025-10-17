@@ -8,9 +8,12 @@ import SubmitButton from "../../components/common/SubmitButton";
 import InputSection from "../../components/common/InputSection";
 import CustomDatePicker from "../../components/common/CustomDatePicker";
 import Categories from "../../components/common/Categories";
+import Modal from "../../components/common/Toast";
 
 const ManualInput = () => {
   const [activeTab, setActiveTab] = useState("expense");
+  const [isVisible, setIsVisible] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     memo: "",
@@ -31,6 +34,10 @@ const ManualInput = () => {
     }));
   };
 
+  const handleCategorySelect = (categoryId) => {
+    setSelectedCategory(categoryId);
+  }
+
   const renderOcrButton = () => {
     if (activeTab !== "expense") return null;
 
@@ -46,6 +53,10 @@ const ManualInput = () => {
         </button>
       </div>
     );
+  };
+
+  const showToast = () => {
+    setIsVisible(true);
   };
 
   return (
@@ -82,11 +93,26 @@ const ManualInput = () => {
           <InputSection 
             fields={{
               label: <><Tag size={16}/>カテゴリ<span className={styles.required}>*</span></>,
-              contents: <Categories activeTab={activeTab}/>
+              contents: (
+                <Categories 
+                  activeTab={activeTab}
+                  selectedCategory={selectedCategory}
+                  onSelected={handleCategorySelect}
+                />
+              )
             }}
           />
 
-          <SubmitButton text={<><Plus size={20}/>追加</>} />
+          <SubmitButton 
+            text={<><Plus size={20}/>追加</>}
+            onClick={showToast}
+          />
+
+          <Modal 
+            message="データを入力しました"
+            isVisible={isVisible}
+            onClose={() => setIsVisible(false)}
+          />
         </div>
       }
     />
