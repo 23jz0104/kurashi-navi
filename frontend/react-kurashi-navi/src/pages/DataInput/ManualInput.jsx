@@ -8,7 +8,8 @@ import SubmitButton from "../../components/common/SubmitButton";
 import InputSection from "../../components/common/InputSection";
 import CustomDatePicker from "../../components/common/CustomDatePicker";
 import Categories from "../../components/common/Categories";
-import Modal from "../../components/common/Toast";
+import Toast from "../../components/common/Toast";
+import Calculator from "../../components/common/Calculator";
 
 const ManualInput = () => {
   const [activeTab, setActiveTab] = useState("expense");
@@ -81,7 +82,7 @@ const ManualInput = () => {
             fields={[
               {
                 label: <>金額<span className={styles["required"]}>*</span></>,
-                contents: <input type="number" placeholder="0円" min="0" />
+                contents: <Calculator />
               },
               {
                 label: "メモ",
@@ -108,7 +109,7 @@ const ManualInput = () => {
             onClick={showToast}
           />
 
-          <Modal 
+          <Toast
             message="データを入力しました"
             isVisible={isVisible}
             onClose={() => setIsVisible(false)}

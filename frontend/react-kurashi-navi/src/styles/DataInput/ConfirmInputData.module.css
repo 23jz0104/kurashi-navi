@@ -85,11 +85,21 @@
   margin-left: auto;
 }
 
-.input-product-name, .input-product-price {
+.input-product-name, .input-product-price, .input-product-quantity {
+  width: 80%;
   color: #505255;
   padding: 0.5rem 0.75rem;
   border-radius: 0.5rem;
   outline: none;
   border: 1px solid #d1d5db;
   transition: all 0.2s ease;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #6b7280;
 }

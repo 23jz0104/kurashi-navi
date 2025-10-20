@@ -26,7 +26,6 @@
   background-color: white;
   padding: 1.5rem 2rem;
   border-radius: 0.75rem;
-  pointer-events: auto;
   
   /* アニメーション（控えめ） */
   transform: scale(0.95);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState }from "react";
+import React, { useEffect, useState, useId }from "react";
 import { useLocation } from "react-router-dom";
 import { Clock, Store, Utensils, ChevronRight, Plus, TicketCheck, CircleQuestionMark, TrainFront, Lightbulb, Volleyball, Trash2  } from "lucide-react";
 import Layout from "../../components/common/Layout";
@@ -42,6 +42,7 @@ const ConfirmInputData = () => {
   const [ocrResult, setOcrResult] = useState({ storeName: "", items: [] }); //解析結果を格納
   const [newProductName, setNewProductName] = useState("");
   const [newProductPrice, setNewProductPrice] = useState();
+  const [newProductQuantity, setNewProductQuantity] = useState();
   const [editingItems, setEditingItems] = useState({});
   const [editingCategoryId, setEditingCategoryId] = useState({});
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
@@ -52,11 +53,19 @@ const ConfirmInputData = () => {
     setTotalAmount(total);
   }, [ocrResult.items]);
 
-  const addItem = (categoryId, productName, price) => {
+  const productNameId = useId();
+  const productPriceId = useId();
+  const productQuantityId = useId();
+  const newProductNameId = useId();
+  const newProductPriceId = useId();
+  const newProductQuantityId = useId();
+
+  const addItem = (categoryId, productName, price, quantity) => {
     const newItem = {
       categoryId,
       productName,
       price,
+      quantity,
     };
 
     setOcrResult(prev => ({
@@ -122,9 +131,10 @@ const ConfirmInputData = () => {
                   properties: {
                     categoryId: { type: Type.INTEGER },
                     productName: { type: Type.STRING },
-                    price: { type: Type.NUMBER }
+                    price: { type: Type.NUMBER },
+                    quantity: { type: Type.NUMBER },
                   },
-                  required: ["categoryId", "productName", "price"],
+                  required: ["categoryId", "productName", "price", "quantity"],
                 },
               },
             },
@@ -145,8 +155,11 @@ const ConfirmInputData = () => {
       出力はJSONのみで行います（説明文やコメントは禁止）。
 
       【ルール】
+      - 計算が発生する場合はPythonを用いて実行すること。
       - storeNameはレシート上部の店舗名。不明なら "不明"。
       - productNameは商品名。（割引金額の場合は "値引" とのみ表示する）
+      - quantityは数量。解析に当たり数量が検出できない場合は1としてカウント。
+      - priceは単価。productNameに対応する金額が合計金額の場合はpriceをquantityで割る。
       - categoryIdは以下の分類ルールに従い、1〜5 の整数で出力する。
         1: 飲食物（食品、飲料、弁当など）
         2: 日用品（洗剤、ティッシュ、文房具など）
@@ -156,7 +169,7 @@ const ConfirmInputData = () => {
         6: 割引金額（クーポン、ポイント利用など）
       - 小計・合計・お預かり金などは含めない。
       - 6番カテゴリは最後の出力とする。
-      - 6番カテゴリが複数存在する場合、合計の金額をPythonを用いて計算し、一つの値引として出力すること。
+      - 6番カテゴリが複数存在する場合、合計を計算して一つの値引として出力すること。
     `;
 
     fetchOcrResult(prompt);
@@ -169,7 +182,7 @@ const ConfirmInputData = () => {
         mainContent={
           <>
             <Loader text="解析中"/>
-            {/* <button onClick={(e) => setLoading(!loading)}>切り替え</button> */}
+            <button onClick={(e) => setLoading(!loading)}>切り替え</button>
           </>
         }
       />
@@ -195,6 +208,7 @@ const ConfirmInputData = () => {
               label: <><Store size={16} />店舗名</>,
               contents: (
                 <input 
+                  className={styles["store-name"]}
                   type="text" 
                   placeholder="未入力" 
                   value={ocrResult.storeName} 
@@ -242,26 +256,48 @@ const ConfirmInputData = () => {
                               <Trash2 size={18}/>
                             </button>
                           </div>
-                          <input 
-                            type="text" 
-                            className={styles["input-product-name"]} 
-                            defaultValue={item.productName}
-                            onChange={(e) => setEditingItems(prev => ({ 
-                              ...prev, 
-                              [index]: {...prev[index], productName: e.target.value}
-                            }))}
-                            placeholder="商品名"
-                          />
-                          <input 
-                            type="number" 
-                            className={styles["input-product-price"]} 
-                            defaultValue={item.price}
-                            onChange={(e) => setEditingItems(prev => ({
-                              ...prev, 
-                              [index]: {...prev[index], price: Number(e.target.value)}
-                            }))}
-                            placeholder="金額"
-                          />
+                          <div className={styles["input-group"]}>
+                            <label htmlFor={productNameId}>商品名</label>
+                            <input
+                              id={productNameId} 
+                              type="text" 
+                              className={styles["input-product-name"]} 
+                              defaultValue={item.productName}
+                              onChange={(e) => setEditingItems(prev => ({ 
+                                ...prev, 
+                                [index]: {...prev[index], productName: e.target.value}
+                              }))}
+                              placeholder="商品名"
+                            />
+                          </div>
+                          <div className={styles["input-group"]}>
+                            <label htmlFor={productPriceId}>金額</label>
+                            <input 
+                              id={productPriceId}
+                              type="number" 
+                              className={styles["input-product-price"]} 
+                              defaultValue={item.price}
+                              onChange={(e) => setEditingItems(prev => ({
+                                ...prev, 
+                                [index]: {...prev[index], price: Number(e.target.value)}
+                              }))}
+                              placeholder="金額"
+                            />
+                          </div>
+                          <div className={styles["input-group"]}>
+                            <label htmlFor={productQuantityId}>数量</label>
+                            <input 
+                              id={productQuantityId}
+                              type="number"
+                              className={styles["input-product-quantity"]}
+                              defaultValue={item.quantity}
+                              onChange={(e) => setEditingItems(prev => ({
+                                ...prev,
+                                [index]: {...prev[index], price: Number(e.target.value)}
+                              }))}
+                              placeholder="数量"
+                            />
+                          </div>
                           <Categories
                             selectedCategory={editingCategoryId[index] ?? item.categoryId}
                             onSelected={(categoryId) => {
@@ -324,6 +360,13 @@ const ConfirmInputData = () => {
                           onChange={(e) => setNewProductPrice(Number(e.target.value))} 
                           placeholder="0"
                         />
+                        <input 
+                          type="number"
+                          className={styles["input-product-quantity"]}
+                          value={newProductQuantity}
+                          onChange={(e) => setNewProductQuantity(Number(e.target.value))}
+                          placeholder="0"
+                        />
                         <Categories 
                           selectedCategory={selectedCategoryId}
                           onSelected={(categoryId) => {
@@ -335,14 +378,14 @@ const ConfirmInputData = () => {
                           text={"追加"} 
                           onClick={() => {
                             // バリデーションチェック
-                            if(!selectedCategoryId || !newProductName || !newProductPrice) {
+                            if(!selectedCategoryId || !newProductName || !newProductPrice || !newProductQuantity) {
                               alert("未入力の項目があります。");
                               return; // エラー時はモーダルを閉じない
                             }
 
                             console.log("現在のselectedCategoryId", selectedCategoryId);
 
-                            addItem(selectedCategoryId, newProductName, newProductPrice);
+                            addItem(selectedCategoryId, newProductName, newProductPrice, newProductQuantity);
                             setSelectedCategoryId(null);
                             setNewProductName("");
                             setNewProductPrice(0);
@@ -358,7 +401,7 @@ const ConfirmInputData = () => {
             }}
           />
           <SubmitButton text={"追加"}/>
-          {/* <button onClick={(e) => setLoading(!loading)}>切り替え</button> */} 
+          <button onClick={(e) => setLoading(!loading)}>切り替え</button> 
         </div>
       }
     />
