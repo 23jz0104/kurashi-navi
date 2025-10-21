@@ -10,6 +10,57 @@ const Calculator = () => {
   const inputRef = useRef(null);
   const calculatorOverlayRef = useRef(null);
 
+  const calculate = (expr) => {
+    if(!expr || typeof expr !== "string") return "0";
+
+    const operatorMatch = expr.match(/[+\-*/]/);
+    if(!operatorMatch) {
+      const num = parseInt(expr);
+      return isNaN(num) ? "0" : String(num);
+    }
+
+    const operator = operatorMatch[0];
+    const operatorIndex = expr.indexOf(operator);
+
+    let leftStr;
+    let rightStr;
+
+    //負の値の場合の計算
+    if(operator === "-" && operatorIndex === 0) {
+      const nextOperatorMatch = expr.slice(1).match(/[+\-*/]/); //最初の-を除いた式がnextOperatorMatchに代入される
+
+      if(!nextOperatorMatch) {
+        const num = parseInt(expr);
+        return isNaN(num) ? "0" : String(num); 
+      }
+
+      const realOperatorIndex = 1 + expr.slice(1).indexOf(nextOperatorMatch[0]);
+      leftStr = expr.slice(0, realOperatorIndex);
+      rightStr = expr.slice(realOperatorIndex + 1);
+    } else {
+      leftStr = expr.slice(0, operatorIndex);
+      rightStr = expr.slice(operatorIndex + 1);
+    }
+
+    const left = parseInt(leftStr);
+    const right = parseInt(rightStr);
+
+    if(isNaN(left) || isNaN(right)) return String(left);
+
+    switch(operator === "-" && operatorIndex === 0 ? expr.slice(1).match(/[+\-*/]/)?.[0] : operator) {
+      case "+":
+        return String(left + right);
+      case "-":
+        return String(left - right);
+      case "*":
+        return String(left * right);
+      case "/":
+        return right === 0 ? "0" : String(Math.floor(left / right)); //零徐算の場合は0を返す
+      default:
+        return "0";
+    }
+  };
+
   const formatNumberWithCommas = (value) => {
     if (value === "Error" || value === "") return value;
     
@@ -70,6 +121,7 @@ const Calculator = () => {
 
     //演算子が選択されている場合は
     if(isAfterOperator) {
+      num = num === "00" ? "0" : num;
       setDisplayValue(num); //演算子の後に入力された数値のみを表示
       setExpression(expression + num); //内部的には前の数字と演算子を保持する
       setIsAfterOperator(false);
@@ -82,9 +134,9 @@ const Calculator = () => {
     } else if (displayValue === "0") {
       setDisplayValue(num);
       setExpression(expression.slice(0, -1) + num);
-    } else if (displayValue === "00") {
-      setDisplayValue(num);
-      setExpression(expression.slice(0, -2) + num);
+    } else if (displayValue !== "0" && expression === "") {
+      setDisplayValue(displayValue + num);
+      setExpression(displayValue + num);
     } else {
       setDisplayValue(displayValue + num);
       setExpression(expression + num);
@@ -115,7 +167,7 @@ const Calculator = () => {
     // currentExpressionに演算子が既に含まれている場合は、まず計算を実行
     if(currentExpression && /[+\-*/]/.test(currentExpression)) {
       try {
-        const result = Function('"use strict"; return (' + currentExpression + ')')();
+        const result = calculate(currentExpression);
         const resultStr = String(result);
         
         // 計算結果を表示して、新しい演算子を追加
@@ -139,14 +191,15 @@ const Calculator = () => {
 
   const handleCalculate = () => {
 
-    if(expression === "") {
+    const hasOperator = expression && /[+\-*/]/.test(expression);
+
+    if(expression === "" || !hasOperator) {
       setShowCalculator(false);
       return;
     }
 
     try {
-
-      const result = Function('"use strict"; return (' + expression + ')')();
+      const result = calculate(expression);
       const resultStr = String(result);
       setDisplayValue(resultStr);
       setExpression("");
@@ -233,7 +286,10 @@ const Calculator = () => {
 
               if(btn === "AC") return <button key={btn} className={`${styles["calculator-button"]} ${styles["calculator-button-function"]}`} onClick={handleClear}>{btn}</button>
               if(btn === "Del") return <button key={btn} className={`${styles["calculator-button"]} ${styles["calculator-button-function"]}`} onClick={handleDelete}>{btn}</button>
-              if(btn === "Enter") return <button key={btn} className={`${styles["span-2-rows"]} ${styles["calculator-button"]} ${styles["calculator-button-function"]} `} onClick={handleCalculate}>{expression ? "Enter" : "OK"}</button>
+              if(btn === "Enter") {
+                const hasOperator = expression && /[+\-*/]/.test(expression);
+                return <button key={btn} className={`${styles["span-2-rows"]} ${styles["calculator-button"]} ${styles["calculator-button-function"]} `} onClick={handleCalculate}>{hasOperator ? "Enter" : "OK"}</button>
+              }
             })}
           </div>
         </div>
