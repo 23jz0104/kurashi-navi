@@ -62,28 +62,19 @@ const Calculator = () => {
   };
 
   const formatNumberWithCommas = (value) => {
+    // "Error" や空文字はそのまま返す
     if (value === "Error" || value === "") return value;
-    
+  
     // マイナス符号を保持
     const isNegative = value.startsWith("-");
     const absValue = isNegative ? value.slice(1) : value;
-    
-    // 小数点で分割
-    const parts = absValue.split(".");
-    const integerPart = parts[0];
-    const decimalPart = parts[1];
-    
-    // 整数部分にカンマを追加
-    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    
-    // 小数点がある場合は結合
-    let result = formattedInteger;
-    if (decimalPart !== undefined) {
-      result += "." + decimalPart;
-    }
-    
-    return isNegative ? "-" + result : result;
-  };
+  
+    // 整数部分にカンマを追加（小数点処理は削除）
+    const formattedInteger = absValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  
+    // マイナス符号を戻して返す
+    return isNegative ? "-" + formattedInteger : formattedInteger;
+  };  
 
   //関係のない要素をクリックしたときに電卓を閉じる
   useEffect(() => {
