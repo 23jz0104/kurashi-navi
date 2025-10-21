@@ -1,8 +1,8 @@
 import React, { use, useEffect, useRef, useState } from "react";
-import styles from "./CustomDatePicker.module.css";
+import styles from "./DayPicker.module.css";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
  
-const CustomDatePicker = () => {
+const DayPicker = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showCalendar, setShowCalendar] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date(selectedDate));
@@ -171,4 +171,4 @@ const CustomDatePicker = () => {
   )
 }
 
-export default CustomDatePicker;
+export default DayPicker;

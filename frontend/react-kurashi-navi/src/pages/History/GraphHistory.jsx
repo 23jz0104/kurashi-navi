@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";
-import CustomDatePicker from "../../components/common/CustomDatePicker";
+import CustomDatePicker from "../../components/common/DayPicker";
 import { ChartPie, CalendarDays } from 'lucide-react';
 
 const GraphHistory = () => {
