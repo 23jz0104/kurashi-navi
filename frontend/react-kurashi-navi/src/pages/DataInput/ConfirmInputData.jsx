@@ -5,7 +5,7 @@ import Layout from "../../components/common/Layout";
 import InputSection from "../../components/common/InputSection";
 import styles from "../../styles/DataInput/ConfirmInputData.module.css";
 import SubmitButton from "../../components/common/SubmitButton";
-import CustomDatePicker from "../../components/common/CustomDatePicker";
+import DayPicker from "../../components/common/DayPicker";
 import Loader from "../../components/common/Loader";
 import DropdownModal from "../../components/common/DropdonwModal";
 import Categories from "../../components/common/Categories";
@@ -236,7 +236,7 @@ const ConfirmInputData = () => {
           <InputSection
             fields={{
               label: <><Clock size={16} />日付</>,
-              contents: <CustomDatePicker />
+              contents: <DayPicker />
             }}
           />
 
