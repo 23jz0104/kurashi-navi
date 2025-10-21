@@ -58,6 +58,15 @@
   transform: scale(0.95);
 }
 
+.product-total-price {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 300;
+  color: #6b7280;
+  margin-left: auto;
+}
+
 .category-icon {
   display: flex;
   justify-content: center;
@@ -76,13 +85,15 @@
   font-weight: 400;
 }
 
-.product-price {
+.product-price-info {
   display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-weight: 300;
-  color: #6b7280;
-  margin-left: auto;
+  flex-direction: column;
+}
+
+.product-price-and-quantity {
+  font-size: 0.785rem;
+  color: #999999;
+  font-weight: 200;
 }
 
 .input-product-name, .input-product-price, .input-product-quantity {

@@ -41,15 +41,25 @@ const ConfirmInputData = () => {
   const [loading, setLoading] = useState(true);
   const [ocrResult, setOcrResult] = useState({ storeName: "", items: [] }); //解析結果を格納
   const [newProductName, setNewProductName] = useState("");
-  const [newProductPrice, setNewProductPrice] = useState();
-  const [newProductQuantity, setNewProductQuantity] = useState();
+  const [newProductPrice, setNewProductPrice] = useState(0);
+  const [newProductQuantity, setNewProductQuantity] = useState(1);
   const [editingItems, setEditingItems] = useState({});
   const [editingCategoryId, setEditingCategoryId] = useState({});
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [totalAmount, setTotalAmount] = useState(0);
 
+  // カンマ区切り表示用のstate
+  const [newPriceDisplay, setNewPriceDisplay] = useState("");
+  const [newQuantityDisplay, setNewQuantityDisplay] = useState("");
+  const [editPriceDisplay, setEditPriceDisplay] = useState({});
+  const [editQuantityDisplay, setEditQuantityDisplay] = useState({});
+
   useEffect(() => {
-    const total = ocrResult.items.reduce((sum, item) => sum + (item.price || 0), 0);
+    const total = ocrResult.items.reduce((sum, item) => {
+      const price = item.price || 0;
+      const quantity = item.quantity || 1;
+      return sum + (price * quantity);
+    }, 0);
     setTotalAmount(total);
   }, [ocrResult.items]);
 
@@ -59,6 +69,36 @@ const ConfirmInputData = () => {
   const newProductNameId = useId();
   const newProductPriceId = useId();
   const newProductQuantityId = useId();
+
+  // カンマ区切りフォーマット関数
+  const formatNumberWithCommas = (value) => {
+    if (!value && value !== 0) return '';
+    const strValue = String(value);
+    const isNegative = strValue.startsWith("-");
+    const absValue = isNegative ? strValue.slice(1) : strValue;
+    const formattedInteger = absValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return isNegative ? "-" + formattedInteger : formattedInteger;
+  };
+
+  // 数値入力ハンドラー（共通関数）
+  const handleNumberInput = (input, setDisplayValue, setActualValue) => {
+    const cleaned = input.replace(/[^\d,-]/g, "");
+    const isNegative = cleaned.startsWith("-");
+    const numericString = cleaned.replace(/[,-]/g, "");
+
+    if (numericString === "") {
+      setDisplayValue(isNegative ? "-" : "");
+      setActualValue(isNegative ? "-" : "");
+      return;
+    }
+
+    const withoutLeadingZeros = numericString.replace(/^0+/, "") || "0";
+    const valueWithSign = isNegative ? "-" + withoutLeadingZeros : withoutLeadingZeros;
+    const formatted = formatNumberWithCommas(valueWithSign);
+
+    setDisplayValue(formatted);
+    setActualValue(Number(valueWithSign));
+  };
 
   const addItem = (categoryId, productName, price, quantity) => {
     const newItem = {
@@ -99,9 +139,6 @@ const ConfirmInputData = () => {
   useEffect(() => {
     if (!file) return;
 
-    {/* 自分のAPIキー: AIzaSyCTwHtOa-oONrcYrLoakJRNXpwCKJq-5W0 */}
-    {/* 鄭君のAPIキー: AIzaSyDaE9IGHmBNnFgSETBDcqZKv93_W2Q5azI */}
-    
     const ai = new GoogleGenAI({ apiKey: 'AIzaSyDaE9IGHmBNnFgSETBDcqZKv93_W2Q5azI' });
 
     async function fetchOcrResult(prompt) {
@@ -236,8 +273,22 @@ const ConfirmInputData = () => {
                           >
                             {getCategoryIcon(item.categoryId)}
                           </span>
-                          <span className={styles["product-name"]}>{item.productName}</span>
-                          <span className={styles["product-price"]}>¥{item.price.toLocaleString()}<ChevronRight size={16}/></span>
+                          <span className={styles["product-name"]}>
+                            {item.productName}
+                          </span>
+                          <div className={styles["product-price-info"]}>
+                            <span className={styles["product-total-price"]}>
+                              ¥{(item.price * item.quantity).toLocaleString()}
+                              </span>
+                              {item.quantity >= 2 && (
+                                <div className={styles["product-price-and-quantity"]}>
+                                  <span className={styles["product-quantity"]}>
+                                    ¥{item.price.toLocaleString()} × {item.quantity}個
+                                  </span>
+                                </div>
+                              )}
+                          </div>
+                          <ChevronRight size={16}/>
                         </>
                       }
                     >
@@ -272,29 +323,39 @@ const ConfirmInputData = () => {
                           </div>
                           <div className={styles["input-group"]}>
                             <label htmlFor={productPriceId}>金額</label>
-                            <input 
+                            <input
                               id={productPriceId}
-                              type="number" 
+                              type="text"
+                              inputMode="numeric"
                               className={styles["input-product-price"]} 
-                              defaultValue={item.price}
-                              onChange={(e) => setEditingItems(prev => ({
-                                ...prev, 
-                                [index]: {...prev[index], price: Number(e.target.value)}
-                              }))}
+                              defaultValue={formatNumberWithCommas(item.price)}
+                              onChange={(e) => handleNumberInput(
+                                e.target.value,
+                                (formatted) => setEditPriceDisplay(prev => ({...prev, [index]: formatted})),
+                                (numValue) => setEditingItems(prev => ({
+                                  ...prev, 
+                                  [index]: {...prev[index], price: numValue}
+                                }))
+                              )}
                               placeholder="金額"
                             />
                           </div>
                           <div className={styles["input-group"]}>
                             <label htmlFor={productQuantityId}>数量</label>
-                            <input 
+                            <input
                               id={productQuantityId}
-                              type="number"
+                              type="text"
+                              inputMode="numeric"
                               className={styles["input-product-quantity"]}
-                              defaultValue={item.quantity}
-                              onChange={(e) => setEditingItems(prev => ({
-                                ...prev,
-                                [index]: {...prev[index], price: Number(e.target.value)}
-                              }))}
+                              defaultValue={formatNumberWithCommas(item.quantity)}
+                              onChange={(e) => handleNumberInput(
+                                e.target.value,
+                                (formatted) => setEditQuantityDisplay(prev => ({...prev, [index]: formatted})),
+                                (numValue) => setEditingItems(prev => ({
+                                  ...prev,
+                                  [index]: {...prev[index], quantity: numValue}
+                                }))
+                              )}
                               placeholder="数量"
                             />
                           </div>
@@ -319,7 +380,7 @@ const ConfirmInputData = () => {
                                   delete newState[index];
                                   return newState;
                                 });
-                                closeModal(); // 変更成功後にモーダルを閉じる
+                                closeModal();
                               }
                             }}
                           />
@@ -346,27 +407,49 @@ const ConfirmInputData = () => {
                         <div className={styles["product-detail-header"]}>
                           <span className={styles["product-detail-title"]}>追加</span>
                         </div>
-                        <input 
-                          type="text" 
-                          className={styles["input-product-name"]} 
-                          value={newProductName} 
-                          onChange={(e) => setNewProductName(e.target.value)} 
-                          placeholder="商品名" 
-                        />
-                        <input 
-                          type="number" 
-                          className={styles["input-product-price"]} 
-                          value={newProductPrice} 
-                          onChange={(e) => setNewProductPrice(Number(e.target.value))} 
-                          placeholder="0"
-                        />
-                        <input 
-                          type="number"
-                          className={styles["input-product-quantity"]}
-                          value={newProductQuantity}
-                          onChange={(e) => setNewProductQuantity(Number(e.target.value))}
-                          placeholder="0"
-                        />
+                        <div className={styles["input-group"]}>
+                          <label htmlFor={newProductNameId}>商品名</label>
+                          <input
+                            id={newProductNameId}
+                            type="text" 
+                            className={styles["input-product-name"]} 
+                            value={newProductName} 
+                            onChange={(e) => setNewProductName(e.target.value)} 
+                            placeholder="商品名" 
+                          />
+                        </div>
+                        <div className={styles["input-group"]}>
+                          <label htmlFor={newProductPriceId}>金額</label>
+                          <input
+                            id={newProductPriceId}
+                            type="text"
+                            inputMode="numeric"
+                            className={styles["input-product-price"]} 
+                            value={newPriceDisplay}
+                            onChange={(e) => handleNumberInput(
+                              e.target.value,
+                              setNewPriceDisplay,
+                              setNewProductPrice
+                            )}
+                            placeholder="0"
+                          />
+                        </div>
+                        <div className={styles["input-group"]}>
+                          <label htmlFor={newProductQuantityId}>数量</label>
+                          <input
+                            id={newProductQuantityId}
+                            type="text"
+                            inputMode="numeric"
+                            className={styles["input-product-quantity"]}
+                            value={newQuantityDisplay}
+                            onChange={(e) => handleNumberInput(
+                              e.target.value,
+                              setNewQuantityDisplay,
+                              setNewProductQuantity
+                            )}
+                            placeholder="1"
+                          />
+                        </div>
                         <Categories 
                           selectedCategory={selectedCategoryId}
                           onSelected={(categoryId) => {
@@ -378,9 +461,9 @@ const ConfirmInputData = () => {
                           text={"追加"} 
                           onClick={() => {
                             // バリデーションチェック
-                            if(!selectedCategoryId || !newProductName || !newProductPrice || !newProductQuantity) {
+                            if(!selectedCategoryId || !newProductName || newProductPrice === null || newProductPrice === undefined || newProductQuantity === null || newProductQuantity === undefined) {
                               alert("未入力の項目があります。");
-                              return; // エラー時はモーダルを閉じない
+                              return;
                             }
 
                             console.log("現在のselectedCategoryId", selectedCategoryId);
@@ -389,8 +472,11 @@ const ConfirmInputData = () => {
                             setSelectedCategoryId(null);
                             setNewProductName("");
                             setNewProductPrice(0);
+                            setNewProductQuantity(1);
+                            setNewPriceDisplay("");
+                            setNewQuantityDisplay("");
                             
-                            closeModal(); // 追加成功後にモーダルを閉じる
+                            closeModal();
                           }}
                         />
                       </div>
