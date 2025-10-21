@@ -195,7 +195,7 @@ const ConfirmInputData = () => {
       - 計算が発生する場合はPythonを用いて実行すること。
       - storeNameはレシート上部の店舗名。不明なら "不明"。
       - productNameは商品名。（割引金額の場合は "値引" とのみ表示する）
-      - quantityは数量。解析に当たり数量が検出できない場合は1としてカウント。
+      - quantityは数量。解析にあたり数量が検出できない場合は1としてカウント。
       - priceは単価。productNameに対応する金額が合計金額の場合はpriceをquantityで割る。
       - categoryIdは以下の分類ルールに従い、1〜5 の整数で出力する。
         1: 飲食物（食品、飲料、弁当など）
@@ -219,7 +219,7 @@ const ConfirmInputData = () => {
         mainContent={
           <>
             <Loader text="解析中"/>
-            <button onClick={(e) => setLoading(!loading)}>切り替え</button>
+            {/* <button onClick={(e) => setLoading(!loading)}>切り替え</button> */}
           </>
         }
       />
@@ -487,7 +487,7 @@ const ConfirmInputData = () => {
             }}
           />
           <SubmitButton text={"追加"}/>
-          <button onClick={(e) => setLoading(!loading)}>切り替え</button> 
+          {/* <button onClick={(e) => setLoading(!loading)}>切り替え</button>  */}
         </div>
       }
     />
