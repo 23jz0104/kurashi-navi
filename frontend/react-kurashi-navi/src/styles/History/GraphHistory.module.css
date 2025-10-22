@@ -1,0 +1,51 @@
+.finance-summry {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  gap: 1rem;
+}
+
+.finance-item {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  color: #374151;
+  background-color: white;
+  padding: 0.5rem 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+}
+
+.label {
+  color: #6b7280; /* 中間グレー */
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+.value {
+  color: #1f2937; /* 濃いグレー */
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.graph-container {
+  width: 100%;
+  height: 35vh;
+  position: relative; /* これを追加 */
+  display: flex; /* これを追加 */
+  align-items: center; /* これを追加 */
+  justify-content: center; /* これを追加 */
+  margin: 1rem 0;
+}
+
+.detail {
+  margin: 0 auto;
+}
+
+.flex {
+  display: flex;
+  justify-content: center;
+  border: 1px solid;
+}
