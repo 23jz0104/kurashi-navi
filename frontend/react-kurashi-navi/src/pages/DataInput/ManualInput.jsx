@@ -6,7 +6,7 @@ import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";
 import SubmitButton from "../../components/common/SubmitButton";
 import InputSection from "../../components/common/InputSection";
-import CustomDatePicker from "../../components/common/CustomDatePicker";
+import DayPicker from "../../components/common/DayPicker";
 import Categories from "../../components/common/Categories";
 import Toast from "../../components/common/Toast";
 import Calculator from "../../components/common/Calculator";
@@ -74,7 +74,7 @@ const ManualInput = () => {
           <InputSection 
             fields={{
               label: <><Clock size={16}/>日付</>,
-              contents: <CustomDatePicker />
+              contents: <DayPicker />
             }}
           />
 
