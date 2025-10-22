@@ -13,22 +13,72 @@ const GraphHistory = () => {
   // Chart.js 要素の登録
   Chartjs.register(ArcElement, Tooltip, Legend);
 
-  // グラフデータ
+  const expenseReceiptData = [
+    [{categoryId: 1, productName: "おにぎり ツナマヨ", price: 128, quantity: 2}, {categoryId: 1, productName: "お茶 500ml", price: 108, quantity: 1}, {categoryId: 1, productName: "サラダチキン", price: 238, quantity: 1}],
+    [{categoryId: 1, productName: "牛乳 1L", price: 198, quantity: 1}, {categoryId: 1, productName: "食パン 6枚切り", price: 148, quantity: 1}, {categoryId: 1, productName: "卵 10個入り", price: 228, quantity: 1}, {categoryId: 2, productName: "トイレットペーパー 12ロール", price: 398, quantity: 1}],
+    [{categoryId: 2, productName: "シャンプー 詰替", price: 458, quantity: 1}, {categoryId: 2, productName: "歯ブラシ", price: 158, quantity: 3}, {categoryId: 2, productName: "ティッシュボックス 5箱", price: 298, quantity: 1}],
+    [{categoryId: 1, productName: "カフェラテ", price: 150, quantity: 1}, {categoryId: 1, productName: "チョコレート", price: 118, quantity: 2}, {categoryId: 3, productName: "週刊少年ジャンプ", price: 290, quantity: 1}],
+    [{categoryId: 1, productName: "豚バラ肉 300g", price: 498, quantity: 1}, {categoryId: 1, productName: "キャベツ 1玉", price: 178, quantity: 1}, {categoryId: 1, productName: "にんじん", price: 58, quantity: 3}, {categoryId: 1, productName: "玉ねぎ", price: 48, quantity: 4}],
+    [{categoryId: 1, productName: "ホットコーヒーL", price: 150, quantity: 1}, {categoryId: 1, productName: "サンドイッチ", price: 298, quantity: 1}, {categoryId: 2, productName: "ウェットティッシュ", price: 108, quantity: 1}],
+    [{categoryId: 2, productName: "ボールペン 3色", price: 328, quantity: 1}, {categoryId: 2, productName: "ノート A5", price: 198, quantity: 2}, {categoryId: 3, productName: "スケッチブック", price: 548, quantity: 1}],
+    [{categoryId: 3, productName: "USB充電ケーブル 1m", price: 980, quantity: 1}, {categoryId: 3, productName: "SDカード 64GB", price: 1580, quantity: 1}, {categoryId: 2, productName: "乾電池 単3 4本", price: 398, quantity: 1}],
+    [{categoryId: 4, productName: "電車運賃", price: 220, quantity: 1}, {categoryId: 1, productName: "缶コーヒー", price: 120, quantity: 1}],
+    [{categoryId: 1, productName: "弁当 幕の内", price: 498, quantity: 1}, {categoryId: 1, productName: "野菜ジュース", price: 138, quantity: 1}, {categoryId: 5, productName: "宅配便送料", price: 800, quantity: 1}]
+  ];
+
+  // カテゴリマッピング
+  const categoryMap = {
+    1: "飲食物",
+    2: "日用品",
+    3: "趣味・娯楽",
+    4: "交通費",
+    5: "その他"
+  };
+
+  // カテゴリごとの色設定
+  const categoryColors = {
+    1: "#F2A9A9", // 飲食物
+    2: "#00B16B", // 日用品
+    3: "#FFEF6C", // 趣味・娯楽
+    4: "#8A77B7", // 交通費"
+    5: "#A0A0A0"  // その他
+  };
+
+  //レシートのカテゴリごとの合計金額を求める関数
+  const calculateCategoryTotals = (recpiet) => {
+    const totals = {};
+
+    recpiet.forEach(reciept => {
+      reciept.forEach(item => {
+        const { categoryId, price, quantity} = item;
+        const total = price * quantity;
+
+        if(!totals[categoryId]) {
+          totals[categoryId] = 0;
+        }
+        totals[categoryId] += total;
+      });
+    });
+
+    return totals;
+  };
+
+  const categoryTotals = calculateCategoryTotals(expenseReceiptData);
+
+  //レシートデータをグラフ用に変換
   const data = {
-    labels: ["支出", "収入", "収支"],
+    labels: Object.keys(categoryTotals).map(id => categoryMap[id]),
     datasets: [
       {
-        label: "収支割合",
-        data: [30000, 50000, 20000],
-        backgroundColor: ["#F87171", "#60A5FA", "#FBBF24"],
+        label: "合計金額",
+        data: Object.values(categoryTotals),
+        backgroundColor: Object.keys(categoryTotals).map(id => categoryColors[id]),
         borderWidth: 0,
       },
     ],
   };
 
-	const secondData = {
-		labels: [""]
-	}
+  const totalExpense = Object.values(categoryTotals).reduce((sum, val) => sum + val, 0);
 
   // グラフオプション
   const options = {
