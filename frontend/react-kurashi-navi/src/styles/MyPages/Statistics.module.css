@@ -1,0 +1,202 @@
+*{
+    padding: 0;
+    margin: 0;
+}
+
+.main{
+    width: 100%;
+    height: 100vh;
+  }
+
+  .chart-wrapper {
+    width: 100%;     
+    height: 300px;    
+  }
+  
+
+  .flex-statistics{
+   display: flex;
+   align-items: center;
+   flex-direction: column; 
+  }
+
+  .modoru{
+    padding: 5px 10px;
+    margin: 1% 80% 0 0;
+    font-size: 10%;
+    border: none;
+    border-radius: 5px;
+    background: #656ac6;
+    color: white;
+    cursor: pointer;
+    box-shadow: 5px 5px 5px rgb(143, 155, 188);
+  }
+
+  .modoru svg {
+    width: 15px;   
+    height: 15px;
+  }
+
+  .time{
+    margin-top: 5%;
+  }
+
+  .period{
+    width: 80%;
+    height: auto;
+    margin-top: 1%;
+    background-color:white;
+    border-radius: 15px;
+  }
+
+  .ul{
+    list-style: none;
+    display: flex;
+  }
+
+  .li{
+    width: 50%;
+  }
+
+  .purisetto{
+    width: 100%;
+    font-size: 140%;
+    border-radius: 15px;
+    padding: 1%;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 5px 5px rgb(143, 155, 188);
+  }
+
+  .active{
+    background-color: #656ac6;
+    color: white;
+  }
+
+  .custom{
+    width: 100%;
+    font-size: 140%;
+    padding: 1%;
+    border-radius: 15px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 5px 5px rgb(143, 155, 188);
+  }
+
+  .flex-past{
+    width: 80%;
+    height: auto;
+    margin-top: 10%;
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2列 */
+    gap: 20px; 
+    justify-items: center;
+    align-items: center;
+
+  }
+
+  .past {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .button {
+    display: flex;
+    flex-direction: column;   /* 縦方向に並べる */
+    align-items: center;      /* 中央寄せ */
+    justify-content: center;  /* 縦方向も中央に */
+    gap: 5px;                 /* アイコンと文字の間の余白 */
+    
+    width: 80%;
+    padding: 10px;
+    font-size: 120%;
+    border-radius: 10px;
+    border: none;
+    box-shadow: 3px 3px 5px rgba(0,0,0,0.2);
+    cursor: pointer;
+  }
+
+  .button.active {
+    background-color: #8884d8;
+    color: white;
+  }
+
+  .flex-view{
+    width: 80%;
+    height: auto;
+    /* background-color: #656ac6; */
+    margin-top: 10%;
+    /* display: flex;
+    justify-content: center;
+    align-items: center; */
+  }
+
+  .view{
+    font-size: 150%;
+  }
+
+
+  .download{
+    margin-top: 10%;
+    font-size: 120%;
+    border-radius: 15px;
+    padding: 1%;
+    color: white;
+    border: none;
+    background-color: #656ac6;
+    cursor: pointer;
+    box-shadow: 0 5px 5px rgb(143, 155, 188);
+  }
+
+
+
+  .custom-period{
+    margin-top: 5%;
+    display: flex;
+    flex-direction: column;   
+    align-items: center;     
+    justify-content: center;  
+    gap: 5px;
+    font-size: 120%;
+  }
+
+  .start{
+    width: 120%;
+  }
+
+  .end{
+    width: 120%;
+  }
+
+  .btn-custom{
+    width: 80%;
+    padding: 4px;
+    margin-top: 10%;
+    border-radius: 10px;
+    border: none;
+    box-shadow: 3px 3px 5px rgba(0,0,0,0.2);
+    cursor: pointer;
+  }
+
+  
+
+  /* iPhone SEなど画面幅が狭いとき */
+@media (max-width: 500px) {
+  .flex-past {
+    grid-template-columns: 1fr 1fr; /* 1列表示に変更 */
+    width: 100%;
+  }
+
+  .button {
+    width: 90%;
+    font-size: 100%; 
+    white-space: nowrap; /* 改行しない */
+  }
+
+  .li{
+    width: 90%;
+    font-size: 80%; 
+    white-space: nowrap; 
+  }
+}

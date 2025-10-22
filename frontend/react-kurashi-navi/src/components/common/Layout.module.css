@@ -18,6 +18,12 @@
   height: 4rem;
 }
 
+.header-tabs {　/* バグってたら消す */
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
 .main {
   flex: 1;
   overflow-y: auto;
@@ -50,6 +56,11 @@
   color: #6b7280;
   transition: color 0.2 ease;
   padding: 0.5rem;
+}
+
+.nav-item.active {
+  color: #2563eb;    
+  font-weight: bold;
 }
 
 .nav-item:hover {

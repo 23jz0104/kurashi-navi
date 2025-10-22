@@ -1,0 +1,80 @@
+.container {
+  padding: 20px;
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+}
+
+.itemCard {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 12px;
+}
+
+.itemCard img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.itemName {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.itemPrice {
+  color: #e60023;
+  font-weight: bold;
+}
+
+.shopName {
+  font-size: 14px;
+  color: #555;
+}
+
+.backBtn {
+  padding: 5px 10px;
+  margin: 1% 80% 5% 0;
+  font-size: 12px;
+  border: none;
+  border-radius: 5px;
+  background: #656ac6;
+  color: white;
+  cursor: pointer;
+  box-shadow: 3px 3px 5px rgba(143, 155, 188, 0.6);
+}
+
+
+.sortButtons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.sortButtons button {
+  width: 50%;
+  padding: 6px 12px;
+  border: 1px solid #656ac6;
+  border-radius: 5px;
+  background: white;
+  color: #656ac6;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sortButtons button:hover {
+  background: #656ac6;
+  color: white;
+}
+
+.sortButtons button.active {
+  background: #656ac6;
+  color: white;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+}
