@@ -1,12 +1,20 @@
 import React, { useState } from "react";
-import { Wallet, TrendingUp, Clock, Tag, Plus, Upload, Camera } from "lucide-react"; //React用のアイコンをインポート 後で消す
+import { Wallet, TrendingUp, Clock, Tag, Plus, Upload, Camera } from "lucide-react";
 import "../../index.css";
-import "../../styles/DataInput/ManualInput.css";
+import styles from "../../styles/DataInput/ManualInput.module.css";
 import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";
+import SubmitButton from "../../components/common/SubmitButton";
+import InputSection from "../../components/common/InputSection";
+import CustomDatePicker from "../../components/common/CustomDatePicker";
+import Categories from "../../components/common/Categories";
+import Toast from "../../components/common/Toast";
+import Calculator from "../../components/common/Calculator";
 
 const ManualInput = () => {
   const [activeTab, setActiveTab] = useState("expense");
+  const [isVisible, setIsVisible] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     memo: "",
@@ -19,23 +27,6 @@ const ManualInput = () => {
     { id: "income", label: "収入", icon: <TrendingUp size={20} /> }
   ];
 
-  //仮のカテゴリデータ
-  const categories = {
-    expense: [
-      { id: "food", name: "食費", icon: "🍽️" },
-      { id: "transport", name: "交通費", icon: "🚃" },
-      { id: "bills", name: "光熱費", icon: "💡" },
-      { id: "entertainment", name: "娯楽", icon: "🎮" },
-      { id: "other", name: "その他", icon: "📦" }
-    ],
-    income: [
-      { id: "salary", name: "給与", icon: "💼" },
-      { id: "bonus", name: "賞与", icon: "🎁" },
-      { id: "side", name: "副業", icon: "💻" },
-      { id: "other", name: "その他", icon: "💰" }
-    ]
-  };
-
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setFormData(prev => ({
@@ -45,117 +36,88 @@ const ManualInput = () => {
   };
 
   const handleCategorySelect = (categoryId) => {
-    setFormData(prev => ({
-      ...prev,
-      category: categoryId
-    }));
+    setSelectedCategory(categoryId);
   }
 
   const renderOcrButton = () => {
-    if(activeTab !== "expense") return null;
+    if (activeTab !== "expense") return null;
 
     return (
-      <div className="ocr-buttons">
-        <button className="ocr-button">
-          <Upload size={20}/>
-          <span className="ocr-button-text">アップロード</span>
+      <div className={styles["ocr-buttons"]}>
+        <button className={styles["ocr-button"]}>
+          <Upload size={20} />
+          <span className={styles["ocr-button-text"]}>アップロード</span>
         </button>
-        <button className="ocr-button">
-          <Camera size={20}/>
-          <span className="ocr-button-text">読み取り</span>
+        <button className={styles["ocr-button"]}>
+          <Camera size={20} />
+          <span className={styles["ocr-button-text"]}>読み取り</span>
         </button>
       </div>
-    )
-  }
+    );
+  };
+
+  const showToast = () => {
+    setIsVisible(true);
+  };
 
   return (
     <Layout 
       headerContent={<TabButton tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} />}
       mainContent={
-        <div className="form-container">
+        <div className={styles["form-container"]}>
 
-          <div className="ocr-container">
+          <div className={styles["ocr-container"]}>
             {renderOcrButton()}
           </div>
 
           {/* 日付入力 */}
-          <div className="input-section">
-            <label className="input-label">
-              <Clock className="label-icon" size={16} />
-              日付
-            </label>
-            <input
-              type="date"
-              value={formData.date}
-              className="input-field"
-            />
-          </div>
+          <InputSection 
+            fields={{
+              label: <><Clock size={16}/>日付</>,
+              contents: <CustomDatePicker />
+            }}
+          />
 
-          {/* 金額とメモ */}
-          <div className="input-section">
-            <div className="input-group">
-              <label className="input-label">
-                金額 <span className="required">*</span>
-              </label>
-            <div className="amount-input-container">
-              <input
-                type="number"
-                value={formData.amount}
-                placeholder="0円"
-                min="0"
-                className="input-field amount-input"
-              />
-            </div>
-            </div>
+          <InputSection
+            fields={[
+              {
+                label: <>金額<span className={styles["required"]}>*</span></>,
+                contents: <Calculator />
+              },
+              {
+                label: "メモ",
+                contents: <input type="text" placeholder="未入力" />
+              }
+            ]}
+          />
 
-            <div className="input-group">
-              <label>メモ</label>
-              <input
-                type="text"
-                value={formData.memo}
-                placeholder="未入力"
-               className="input-field"
-              />
-            </div>
-          </div>
+          <InputSection 
+            fields={{
+              label: <><Tag size={16}/>カテゴリ<span className={styles.required}>*</span></>,
+              contents: (
+                <Categories 
+                  activeTab={activeTab}
+                  selectedCategory={selectedCategory}
+                  onSelected={handleCategorySelect}
+                />
+              )
+            }}
+          />
 
-          {/* カテゴリ選択 */}
-          <div className="input-section">
-            <label className="input-label">
-              <Tag size={16}/>
-              カテゴリ <span className="required">*</span>
-            </label>
-            <div className="category-grid">
-              {categories[activeTab].map((category) => (
-                <button
-                  key={category.id}
-                  type="button"
-                  onClick={() => handleCategorySelect(category.id)}
-                  className={`category-button ${
-                    formData.category == category.id
-                    ? "category-button-selected"
-                    : ""
-                  }`}
-                >
-                  <span className="category-icon">{category.icon}</span>
-                  <span className="category-name">{category.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+          <SubmitButton 
+            text={<><Plus size={20}/>追加</>}
+            onClick={showToast}
+          />
 
-          {/* 追加ボタン */}
-          <button
-            type="button"
-            className="submit-button"
-          >
-            <Plus size={20} />
-            追加
-          </button>
+          <Toast
+            message="データを入力しました"
+            isVisible={isVisible}
+            onClose={() => setIsVisible(false)}
+          />
         </div>
       }
     />
-  )
-}
+  );
+};
 
 export default ManualInput;
