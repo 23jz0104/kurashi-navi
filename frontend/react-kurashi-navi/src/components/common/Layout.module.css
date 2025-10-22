@@ -58,6 +58,11 @@
   padding: 0.5rem;
 }
 
+.nav-item.active {
+  color: blue;    
+  font-weight: bold;
+}
+
 .nav-item:hover {
   color: #2563eb;
 }

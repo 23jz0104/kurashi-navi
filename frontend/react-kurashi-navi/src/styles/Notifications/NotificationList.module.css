@@ -1,0 +1,210 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.main {
+  width: 100%;
+  height: 100vh;
+}
+
+.notification-list {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.p {
+  font-size: 150%;
+  margin-top: 10%;
+  opacity: 0.5;
+}
+
+.tsuika {
+  width: 30%;
+  margin-top: 10%;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  background: #656ac6;
+  color: white;
+  cursor: pointer;
+  font-size: 120%;
+  box-shadow: 0px 5px 5px rgb(143, 155, 188);
+}
+
+.notificationList {
+  list-style: none;
+  width: 90%;
+}
+
+.notificationItem {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.notificationWrapper {
+  display: flex;
+  align-items: stretch; /* 縦棒をメッセージの高さに合わせる */
+}
+
+.verticalBar {
+  width: 5px;
+  background-color: rgba(0, 0, 0, 0.3);
+  margin-right: 8px;
+}
+
+.notificationContent {
+  flex: 1;
+  padding-left: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.notificationContent span {
+  display: block;
+  margin-bottom: 6px; /* 行間 */
+}
+
+.date,
+.remaining {
+  font-size: 15px;
+}
+
+.notificationContent svg {
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+  height: 25px;
+  width: 25px;
+  margin-right: 6px;
+}
+
+.refilledDelete {
+  display: flex;
+  margin-top: 10px;
+  width: 100%;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.refilledDelete button {
+  flex: 1;
+  padding: 8px 0;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.refilled {
+  background-color: #37d265;
+  color: white;
+}
+
+.delete {
+  background-color: red;
+  color: white;
+  cursor: pointer;
+}
+
+
+.syosai{
+  color: #00bfff;
+  border: none;
+  background: none;
+  text-decoration: underline;
+  margin-left: 2%;
+}
+
+.progressBar {
+  width: 100%;
+  height: 10px;
+  background-color: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #6a5acd, #00bfff);
+  transition: width 0.5s ease-in-out;
+}
+
+.addForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10%;
+}
+
+.label {
+  margin-top: 5%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.label input {
+  flex: 1;
+  padding: 6px 8px;
+  font-size: 12px;
+  border: 1.2px solid #ccc;
+}
+
+.buttonGroup {
+  width: 100%;
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.save,
+.cancel {
+  flex: 1;
+  padding: 10px 0;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.save {
+  background-color: #656ac6;
+  color: white;
+}
+
+.cancel {
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+.cancel:hover {
+  background-color: #e0e0e0;
+}
+
+/* レスポンシブ */
+@media (max-width: 400px) {
+  .label {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .buttonGroup {
+    flex-direction: column;
+  }
+
+  .notificationContent {
+    padding-left: 6px;
+  }
+}
