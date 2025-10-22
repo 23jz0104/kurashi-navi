@@ -11,7 +11,7 @@ import DropdownModal from "../../components/common/DropdonwModal";
 import Categories from "../../components/common/Categories";
 
 //Google GenAIのインポート レシート解析に使う
-import { GoogleGenAI, createUserContent, createPartFromUri, Type} from "../../../node_modules/@google/genai/dist/web/index.mjs";
+import { GoogleGenAI, createUserContent, createPartFromUri, Type} from "@google/genai";
 
 //仮のカテゴリアイコン
 const categoryIcons = [
