@@ -14,10 +14,16 @@ const MonthPicker = () => {
   const [modalMonth, setModalMonth] = useState(() => new Date(selectedMonth));
 
   const modalRef = useRef(null);
+  const toggleButtonRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutSide = (event) => {
-      if(modalRef.current && !modalRef.current.contains(event.target)) {
+      if(
+        modalRef.current && 
+        !modalRef.current.contains(event.target) &&
+        toggleButtonRef.current &&
+        !toggleButtonRef.current.contains(event.target)
+      ) {
         setIsModalOpen(false);
       }
     };
@@ -93,6 +99,7 @@ const MonthPicker = () => {
 
         <button
           type="button"
+          ref={toggleButtonRef}
           onClick={toggleModal}
           className={styles["month-picker-button"]}
         >
