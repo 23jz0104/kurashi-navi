@@ -1,3 +1,8 @@
+.main-container {
+  max-width: 28rem;
+  margin: 0 auto;
+}
+
 .finance-summry {
   display: flex;
   justify-content: space-between;
@@ -19,33 +24,58 @@
 }
 
 .label {
-  color: #6b7280; /* 中間グレー */
+  flex: 1;
+  color: #6b7280;
   font-size: 0.875rem;
   line-height: 1;
 }
 
 .value {
-  color: #1f2937; /* 濃いグレー */
-  font-size: 1.25rem;
+  color: #374151;
+  font-size: 1rem;
   line-height: 1;
 }
 
 .graph-container {
   width: 100%;
-  height: 35vh;
-  position: relative; /* これを追加 */
-  display: flex; /* これを追加 */
-  align-items: center; /* これを追加 */
-  justify-content: center; /* これを追加 */
+  height: 40vh;
+  display: flex;
   margin: 1rem 0;
+  padding: 1rem 0;
+  border-top: 1px solid #999999;
+  border-bottom: 1px solid #999999;
 }
 
 .detail {
-  margin: 0 auto;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 1rem;
 }
 
 .flex {
   display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  gap: 1rem;
+  color: #6b7280;
+  border-bottom: 1px solid #eee;
+}
+
+.flex:last-child {
+  border: none;
+}
+
+.category-icon {
+  display: flex;
   justify-content: center;
-  border: 1px solid;
+  align-items: center;
+  color: white;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+}
+
+.category-name {
+  flex: 1;
 }

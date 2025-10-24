@@ -1,0 +1,40 @@
+.calendar-container {
+  flex: 1;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  background-color: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-auto-rows: 1fr;
+  flex: 1;
+  min-height: 0;
+}
+
+.calendar-cell {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid #e5e7eb;
+  font-size: 0.75rem;
+  padding: 0.25rem;
+  min-height: 0;
+}
+
+.day {
+  color: #374151;
+}
+
+.price {
+  color: #ef4444;
+}
