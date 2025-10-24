@@ -3,7 +3,7 @@ import styles from "./MonthPicker.module.css";
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useRef } from "react";
 
-const MonthPicker = () => {
+const MonthPicker = ( {onMonthChange} ) => {
   const [selectedMonth, setSelectedMonth] = useState(() => {
     // 1月31日などから2月に遷移するとバグるため日付は今日の月をベースに1に変換
     const date = new Date();
@@ -15,6 +15,13 @@ const MonthPicker = () => {
 
   const modalRef = useRef(null);
   const toggleButtonRef = useRef(null);
+
+  //selectedMonthが変更されたら親に通知する
+  useEffect(() => {
+    if(onMonthChange) {
+      onMonthChange(selectedMonth);
+    }
+  }, [selectedMonth, onMonthChange]);
 
   useEffect(() => {
     const handleClickOutSide = (event) => {

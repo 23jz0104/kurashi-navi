@@ -86,7 +86,7 @@ const CalendarView = ({receiptData, currentMonth}) => {
 
       <div className={styles["days"]}>
         {calendarDays.map((item, index) => (
-          <div key={index} className={styles["calendar-cell"]}>
+          <div key={index} className={`${styles["calendar-cell"]} ${styles["calendar-cell-day"]}`}>
             <span className={styles["day"]}>{item.days}</span>
             {item.amount > 0 && <span className={styles["price"]}>¥{item.amount}</span>}
           </div>
