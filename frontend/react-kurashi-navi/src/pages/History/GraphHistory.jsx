@@ -82,6 +82,7 @@ const GraphHistory = () => {
     5: { id: 5, name: "その他", icon: <CircleHelp size={16} />, color: "#868E96" }
   };
 
+  //データを全取得する場合はJSでフィルタリングする（可能であればAPIでフィルタリング） 
   const filterReceiptByMonth = (receipts, targetMonth) => {
     const targetYear = targetMonth.getFullYear();
     const targetMonthIndex = targetMonth.getMonth();
@@ -132,8 +133,8 @@ const GraphHistory = () => {
   const totalIncome = 0;
 
   const tabContent = {
-    graph: <GraphView recipetData={filteredReceiptData} />,
-    calendar: <CalendarView receiptData={filteredReceiptData} currentMonth={selectedMonth}/>
+    graph: <GraphView key={activeTab} recipetData={filteredReceiptData} />,
+    calendar: <CalendarView key={activeTab} receiptData={filteredReceiptData} currentMonth={selectedMonth}/>
   };
 
   return (

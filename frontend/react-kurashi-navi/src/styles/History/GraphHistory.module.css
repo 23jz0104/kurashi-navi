@@ -37,8 +37,9 @@
 }
 
 .graph-container {
+  position: relative;
   width: 100%;
-  height: 40vh;
+  height: 19rem;
   display: flex;
   margin: 1rem 0;
   padding: 1rem 0;
