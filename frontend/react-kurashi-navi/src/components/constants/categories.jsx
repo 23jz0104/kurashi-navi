@@ -41,4 +41,4 @@ const ICON_MAP = {
 /* アイコンの名前に応じてマッピングされたアイコンを返す関数 */
 export const getIconComponent = (iconName) => {
   return ICON_MAP[iconName] || ICON_MAP.Default;
-}
+};

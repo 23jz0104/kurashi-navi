@@ -1,10 +1,11 @@
 import { Utensils, TrainFront, Volleyball, ShoppingBag, CircleHelp } from "lucide-react";
 import { Doughnut } from "react-chartjs-2";
 import { Chart as Chartjs, ArcElement, Tooltip, Legend } from "chart.js";
+import styles from "./GraphView.module.css";
 
 Chartjs.register(ArcElement, Tooltip, Legend);
 
-const GraphView = ({ recipetData }) => {  // ← { } で囲む
+const GraphView = ({ receiptData }) => {  // ← { } で囲む
 
   //デバッグ用
   const dummyData = [
@@ -20,7 +21,7 @@ const GraphView = ({ recipetData }) => {  // ← { } で囲む
     { date: "2025-10-30", items: [{ categoryId: 1, productName: "弁当 幕の内", price: 498, quantity: 1 }, { categoryId: 1, productName: "野菜ジュース", price: 138, quantity: 1 }, { categoryId: 5, productName: "宅配便送料", price: 800, quantity: 1 }] }
   ];
 
-  recipetData = recipetData || dummyData
+  receiptData = receiptData || dummyData
 
   const CATEGORIES = {
     1: { id: 1, name: "飲食物", icon: <Utensils size={16} />, color: "#FF6B6B" },
@@ -72,7 +73,7 @@ const GraphView = ({ recipetData }) => {  // ← { } で囲む
     });
   };
 
-  const categoryTotals = calculateCategoryTotals(recipetData);
+  const categoryTotals = calculateCategoryTotals(receiptData);
 
   const chartData = {
     labels: categoryTotals.map(cat => cat.categoryName),
@@ -139,11 +140,19 @@ const GraphView = ({ recipetData }) => {  // ← { } で囲む
   };
   
   return (
-    <Doughnut
-      data={chartData}
-      options={options}
-      plugins={[segmentLabelPlugin]}
-    />
+    <>
+      {receiptData && receiptData.length > 0 ? ( //データが存在する場合はグラフを表示
+        <Doughnut
+          data={chartData}
+          options={options}
+          plugins={[segmentLabelPlugin]}
+        />
+        ) : (
+          <div className={styles["empty-state"]}>
+            <p>データが存在しません。</p>
+          </div>
+        )} 
+    </>
   );
 }
 

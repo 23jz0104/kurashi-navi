@@ -1,6 +1,8 @@
-import React, { useEffect, useState, useId }from "react";
+import React, { useEffect, useState, useId } from "react";
 import { useLocation } from "react-router-dom";
-import { Clock, Store, Utensils, ChevronRight, Plus, TicketCheck, CircleQuestionMark, TrainFront, Lightbulb, Volleyball, Trash2  } from "lucide-react";
+// CircleQuestionMark はデフォルトアイコンとして使用
+// Trash2 の後ろのスペースを削除
+import { Clock, Store, Utensils, ChevronRight, Plus, TicketCheck, CircleQuestionMark, TrainFront, Lightbulb, Volleyball, Trash2 } from "lucide-react";
 import Layout from "../../components/common/Layout";
 import InputSection from "../../components/common/InputSection";
 import styles from "../../styles/DataInput/ConfirmInputData.module.css";
@@ -9,33 +11,17 @@ import DayPicker from "../../components/common/DayPicker";
 import Loader from "../../components/common/Loader";
 import DropdownModal from "../../components/common/DropdonwModal";
 import Categories from "../../components/common/Categories";
+import { useCategories } from "../../components/hooks/useCategories";
 
 //Google GenAIのインポート レシート解析に使う
-import { GoogleGenAI, createUserContent, createPartFromUri, Type} from "@google/genai";
-
-//仮のカテゴリアイコン
-const categoryIcons = [
-  { id: 1, name: "食費", icon: <Utensils size={16}/>, color: "#F2A9A9" },
-  { id: 2, name: "交通費", icon: <TrainFront size={16} />, color: "#8A77B7"},
-  { id: 3, name: "光熱費", icon: <Lightbulb />, color: "#FFEF6C"},
-  { id: 4, name: "娯楽", icon: <Volleyball />, color: "#00B16B"},
-  { id: 6, name: "割引金額", icon: <TicketCheck size={16}/>, color: "#A9D0F2" },
-  { id: 99, name: "未定義", icon: <CircleQuestionMark size={16}/>, color: "gray" },
-];
-
-const getCategoryIcon = (categoryId) => {
-  const category = categoryIcons.find(c => c.id === categoryId);
-  return category ? category.icon : categoryIcons.find(c => c.id === 99).icon;
-}
-
-const getCategoryColor = (categoryId) => {
-  const category = categoryIcons.find(c => c.id === categoryId);
-  return category ? category.color : categoryIcons.find(c => c.id === 99).color;
-}
+import { GoogleGenAI, createUserContent, createPartFromUri, Type } from "@google/genai";
 
 const ConfirmInputData = () => {
   const location = useLocation();
   const file = location.state?.file;
+
+  // 修正 1: getCategoryId -> getCategoryById に修正
+  const { getCategoryById, categoriesByType } = useCategories();
 
   //状態を管理
   const [loading, setLoading] = useState(true);
@@ -88,7 +74,7 @@ const ConfirmInputData = () => {
 
     if (numericString === "") {
       setDisplayValue(isNegative ? "-" : "");
-      setActualValue(isNegative ? "-" : "");
+      setActualValue(isNegative ? "-" : ""); // "" や 0 でなく "-" を保持（必要に応じて変更）
       return;
     }
 
@@ -119,7 +105,7 @@ const ConfirmInputData = () => {
 
     setOcrResult(prev => {
       const newItem = [...prev.items];
-      newItem[index] = {...newItem[index], ...updateItem};
+      newItem[index] = { ...newItem[index], ...updateItem };
       return { ...prev, items: newItem };
     })
   }
@@ -130,59 +116,70 @@ const ConfirmInputData = () => {
     setOcrResult(prev => {
       const deletedResult = [...prev.items];
       deletedResult.splice(index, 1);
-      return {...prev, items: deletedResult};
+      return { ...prev, items: deletedResult };
     });
 
     console.log("現在のocrResult : ", ocrResult);
   }
 
   useEffect(() => {
-    if (!file) return;
+    if (!file) {
+        setLoading(false); // ファイルがない場合はローディング終了
+        return;
+    }
 
-    const ai = new GoogleGenAI({ apiKey: 'AIzaSyDaE9IGHmBNnFgSETBDcqZKv93_W2Q5azI' });
+    const ai = new GoogleGenAI({ apiKey: 'AIzaSyDaE9IGHmBNnFgSETBDcqZKv93_W2Q5azI' }); // APIキーは環境変数推奨
 
     async function fetchOcrResult(prompt) {
       console.log("fetchOcrResultが実行されました。")
+      setLoading(true); // 解析開始
 
-      const myfile = await ai.files.upload({
-        file: file,
-        config: { mimeType: file.type },
-      });
+      try {
+        const myfile = await ai.files.upload({
+          file: file,
+          config: { mimeType: file.type },
+        });
 
-      const result = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: createUserContent([
-          createPartFromUri(myfile.uri, myfile.mimeType),
-          prompt,
-        ]),
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              storeName: { type: Type.STRING },
-              items: {
-                type: Type.ARRAY,
+        const result = await ai.models.generateContent({
+          model: "gemini-2.5-flash",
+          contents: createUserContent([
+            createPartFromUri(myfile.uri, myfile.mimeType),
+            prompt,
+          ]),
+          config: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: Type.OBJECT,
+              properties: {
+                storeName: { type: Type.STRING },
                 items: {
-                  type: Type.OBJECT,
-                  properties: {
-                    categoryId: { type: Type.INTEGER },
-                    productName: { type: Type.STRING },
-                    price: { type: Type.NUMBER },
-                    quantity: { type: Type.NUMBER },
+                  type: Type.ARRAY,
+                  items: {
+                    type: Type.OBJECT,
+                    properties: {
+                      categoryId: { type: Type.INTEGER },
+                      productName: { type: Type.STRING },
+                      price: { type: Type.NUMBER },
+                      quantity: { type: Type.NUMBER },
+                    },
+                    required: ["categoryId", "productName", "price", "quantity"],
                   },
-                  required: ["categoryId", "productName", "price", "quantity"],
                 },
               },
+              required: ["storeName", "items"],
             },
-            required: ["storeName", "items"],
           },
-        },
-      });
+        });
 
-      const parsedResult = JSON.parse(result.text);
-      setOcrResult(parsedResult);
-      setLoading(false);
+        const parsedResult = JSON.parse(result.text);
+        setOcrResult(parsedResult);
+      } catch (error) {
+        console.error("OCR解析エラー:", error);
+        // TODO: ユーザーにエラーを通知するUI（例: アラート、トースト）
+        setOcrResult({ storeName: "解析エラー", items: [] }); // エラー時
+      } finally {
+        setLoading(false); // 成功・失敗に関わらずローディング終了
+      }
     };
 
     const prompt = `
@@ -197,29 +194,29 @@ const ConfirmInputData = () => {
       - productNameは商品名。（割引金額の場合は "値引" とのみ表示する）
       - quantityは数量。解析にあたり数量が検出できない場合は1としてカウント。
       - priceは単価。productNameに対応する金額が合計金額の場合はpriceをquantityで割る。
-      - categoryIdは以下の分類ルールに従い、1〜5 の整数で出力する。
+      - categoryIdは以下の分類ルールに従い、1〜6, 99 の整数で出力する。
         1: 飲食物（食品、飲料、弁当など）
         2: 日用品（洗剤、ティッシュ、文房具など）
         3: 趣味・娯楽（本、ゲーム、スポーツ用品など）
         4: 交通費（電車、バス、タクシーなど）
-        5: その他（上記以外）
+        5: 光熱費（電気、ガス、水道など）
         6: 割引金額（クーポン、ポイント利用など）
+        99: その他（上記以外）
       - 小計・合計・お預かり金などは含めない。
       - 6番カテゴリは最後の出力とする。
       - 6番カテゴリが複数存在する場合、合計を計算して一つの値引として出力すること。
     `;
 
     fetchOcrResult(prompt);
-  }, [file]);
+  }, [file]); // file が変更された時のみ実行
 
-  if(loading) {
+  if (loading) {
     return (
-      <Layout 
+      <Layout
         headerContent={<p className={styles.headerContent}>入力データ確認</p>}
         mainContent={
           <>
-            <Loader text="解析中"/>
-            {/* <button onClick={(e) => setLoading(!loading)}>切り替え</button> */}
+            <Loader text="解析中" />
           </>
         }
       />
@@ -228,11 +225,11 @@ const ConfirmInputData = () => {
 
   //解析結果を表示
   return (
-    <Layout 
+    <Layout
       headerContent={<p className={styles.headerContent}>入力データ確認</p>}
       mainContent={
         <div className={styles["form-container"]}>
-          
+
           <InputSection
             fields={{
               label: <><Clock size={16} />日付</>,
@@ -240,45 +237,56 @@ const ConfirmInputData = () => {
             }}
           />
 
-          <InputSection 
+          <InputSection
             fields={{
               label: <><Store size={16} />店舗名</>,
               contents: (
-                <input 
+                <input
                   className={styles["store-name"]}
-                  type="text" 
-                  placeholder="未入力" 
-                  value={ocrResult.storeName} 
-                  onChange={(e) => 
-                    setOcrResult({...ocrResult, storeName: e.target.value})
+                  type="text"
+                  placeholder="未入力"
+                  value={ocrResult.storeName}
+                  onChange={(e) =>
+                    setOcrResult({ ...ocrResult, storeName: e.target.value })
                   }
                 />
-              ) 
+              )
             }}
           />
 
-          <InputSection 
+          <InputSection
             fields={{
               label: <>合計金額:<span className={styles["total-amount"]}>¥{totalAmount.toLocaleString()}</span></>,
               contents: (
                 <div className={styles["item-list"]}>
-                  {ocrResult.items.map((item, index) => (
-                    <DropdownModal
-                      key={index} 
-                      title={
-                        <>
-                          <span 
-                            className={styles["category-icon"]}
-                            style={{backgroundColor: getCategoryColor(item.categoryId)}}
-                          >
-                            {getCategoryIcon(item.categoryId)}
-                          </span>
-                          <span className={styles["product-name"]}>
-                            {item.productName}
-                          </span>
-                          <div className={styles["product-price-info"]}>
-                            <span className={styles["product-total-price"]}>
-                              ¥{(item.price * item.quantity).toLocaleString()}
+                  {ocrResult.items.map((item, index) => {
+                    // 修正 2: getCategoryById を使用してカテゴリ情報を取得
+                    const category = getCategoryById(item.categoryId);
+                    const categoryColor = category?.color || "#868E96"; // デフォルト色 (ID 99: その他)
+                    // category.icon は React 要素。cloneElement で size を指定
+                    const categoryIcon = category?.icon 
+                      ? React.cloneElement(category.icon, { size: 16 }) 
+                      : <CircleQuestionMark size={16} />; // デフォルトアイコン
+
+                    return (
+                      <DropdownModal
+                        key={index}
+                        title={
+                          <>
+                            <span
+                              className={styles["category-icon"]}
+                              // 修正 2: category.color を使用
+                              style={{ backgroundColor: categoryColor }}
+                            >
+                              {/* 修正 2: category.icon を使用 */}
+                              {categoryIcon}
+                            </span>
+                            <span className={styles["product-name"]}>
+                              {item.productName}
+                            </span>
+                            <div className={styles["product-price-info"]}>
+                              <span className={styles["product-total-price"]}>
+                                ¥{(item.price * item.quantity).toLocaleString()}
                               </span>
                               {item.quantity >= 2 && (
                                 <div className={styles["product-price-and-quantity"]}>
@@ -287,116 +295,136 @@ const ConfirmInputData = () => {
                                   </span>
                                 </div>
                               )}
-                          </div>
-                          <ChevronRight size={16}/>
-                        </>
-                      }
-                    >
-                      {(closeModal) => (
-                        <div className={styles["product-detail"]}>
-                          <div className={styles["product-detail-header"]}>
-                            <span className={styles["product-detail-title"]}>変更</span>
-                            <button 
-                              className={styles["delete-button"]}
-                              onClick={() => {
-                                const item = ocrResult.items[index];
-                                console.log("デバッグ用 選択された削除対象アイテム : ", item);
-                                deleteItem(index);
-                                closeModal();
-                              }}>
-                              <Trash2 size={18}/>
-                            </button>
-                          </div>
-                          <div className={styles["input-group"]}>
-                            <label htmlFor={productNameId}>商品名</label>
-                            <input
-                              id={productNameId} 
-                              type="text" 
-                              className={styles["input-product-name"]} 
-                              defaultValue={item.productName}
-                              onChange={(e) => setEditingItems(prev => ({ 
-                                ...prev, 
-                                [index]: {...prev[index], productName: e.target.value}
-                              }))}
-                              placeholder="商品名"
-                            />
-                          </div>
-                          <div className={styles["input-group"]}>
-                            <label htmlFor={productPriceId}>金額</label>
-                            <input
-                              id={productPriceId}
-                              type="text"
-                              inputMode="numeric"
-                              className={styles["input-product-price"]} 
-                              defaultValue={formatNumberWithCommas(item.price)}
-                              onChange={(e) => handleNumberInput(
-                                e.target.value,
-                                (formatted) => setEditPriceDisplay(prev => ({...prev, [index]: formatted})),
-                                (numValue) => setEditingItems(prev => ({
-                                  ...prev, 
-                                  [index]: {...prev[index], price: numValue}
-                                }))
-                              )}
-                              placeholder="金額"
-                            />
-                          </div>
-                          <div className={styles["input-group"]}>
-                            <label htmlFor={productQuantityId}>数量</label>
-                            <input
-                              id={productQuantityId}
-                              type="text"
-                              inputMode="numeric"
-                              className={styles["input-product-quantity"]}
-                              defaultValue={formatNumberWithCommas(item.quantity)}
-                              onChange={(e) => handleNumberInput(
-                                e.target.value,
-                                (formatted) => setEditQuantityDisplay(prev => ({...prev, [index]: formatted})),
-                                (numValue) => setEditingItems(prev => ({
+                            </div>
+                            <ChevronRight size={16} />
+                          </>
+                        }
+                      >
+                        {(closeModal) => (
+                          <div className={styles["product-detail"]}>
+                            <div className={styles["product-detail-header"]}>
+                              <span className={styles["product-detail-title"]}>変更</span>
+                              <button
+                                className={styles["delete-button"]}
+                                onClick={() => {
+                                  deleteItem(index);
+                                  closeModal();
+                                }}>
+                                <Trash2 size={18} />
+                              </button>
+                            </div>
+                            <div className={styles["input-group"]}>
+                              <label htmlFor={`${productNameId}-${index}`}>商品名</label>
+                              <input
+                                id={`${productNameId}-${index}`} // IDが一意になるように
+                                type="text"
+                                className={styles["input-product-name"]}
+                                defaultValue={item.productName}
+                                onChange={(e) => setEditingItems(prev => ({
                                   ...prev,
-                                  [index]: {...prev[index], quantity: numValue}
-                                }))
-                              )}
-                              placeholder="数量"
+                                  [index]: { ...prev[index], productName: e.target.value }
+                                }))}
+                                placeholder="商品名"
+                              />
+                            </div>
+                            <div className={styles["input-group"]}>
+                              <label htmlFor={`${productPriceId}-${index}`}>金額</label>
+                              <input
+                                id={`${productPriceId}-${index}`} // IDが一意になるように
+                                type="text"
+                                inputMode="numeric"
+                                className={styles["input-product-price"]}
+                                // カンマ区切り入力に対応するため、value と onChange で制御
+                                value={editPriceDisplay[index] !== undefined ? editPriceDisplay[index] : formatNumberWithCommas(item.price)}
+                                onChange={(e) => handleNumberInput(
+                                  e.target.value,
+                                  (formatted) => setEditPriceDisplay(prev => ({ ...prev, [index]: formatted })),
+                                  (numValue) => setEditingItems(prev => ({
+                                    ...prev,
+                                    [index]: { ...prev[index], price: numValue }
+                                  }))
+                                )}
+                                placeholder="金額"
+                              />
+                            </div>
+                            <div className={styles["input-group"]}>
+                              <label htmlFor={`${productQuantityId}-${index}`}>数量</label>
+                              <input
+                                id={`${productQuantityId}-${index}`} // IDが一意になるように
+                                type="text"
+                                inputMode="numeric"
+                                className={styles["input-product-quantity"]}
+                                // カンマ区切り入力に対応するため、value と onChange で制御
+                                value={editQuantityDisplay[index] !== undefined ? editQuantityDisplay[index] : formatNumberWithCommas(item.quantity)}
+                                onChange={(e) => handleNumberInput(
+                                  e.target.value,
+                                  (formatted) => setEditQuantityDisplay(prev => ({ ...prev, [index]: formatted })),
+                                  (numValue) => setEditingItems(prev => ({
+                                    ...prev,
+                                    [index]: { ...prev[index], quantity: numValue }
+                                  }))
+                                )}
+                                placeholder="数量"
+                              />
+                            </div>
+                            {/* 修正 3: categoriesByType.expense を渡す */}
+                            <Categories
+                              categories={categoriesByType.expense}
+                              selectedCategory={editingCategoryId[index] ?? item.categoryId}
+                              onSelected={(categoryId) => {
+                                setEditingCategoryId(prev => ({ ...prev, [index]: categoryId }));
+                                setEditingItems(prev => ({
+                                  ...prev,
+                                  [index]: { ...prev[index], categoryId }
+                                }));
+                              }}
+                            />
+                            <SubmitButton
+                              text={"変更"}
+                              onClick={() => {
+                                const updates = editingItems[index];
+                                if (updates) {
+                                  changeItem(index, updates);
+                                  // 編集用の一時stateをクリア
+                                  setEditingItems(prev => {
+                                    const newState = { ...prev };
+                                    delete newState[index];
+                                    return newState;
+                                  });
+                                  setEditingCategoryId(prev => {
+                                    const newState = { ...prev };
+                                    delete newState[index];
+                                    return newState;
+                                  });
+                                  setEditPriceDisplay(prev => {
+                                    const newState = { ...prev };
+                                    delete newState[index];
+                                    return newState;
+                                  });
+                                  setEditQuantityDisplay(prev => {
+                                    const newState = { ...prev };
+                                    delete newState[index];
+                                    return newState;
+                                  });
+                                }
+                                closeModal(); // 変更があってもなくても閉じる
+                              }}
                             />
                           </div>
-                          <Categories
-                            selectedCategory={editingCategoryId[index] ?? item.categoryId}
-                            onSelected={(categoryId) => {
-                              setEditingCategoryId(prev => ({ ...prev, [index]: categoryId }));
-                              setEditingItems(prev => ({
-                                ...prev,
-                                [index]: {...prev[index], categoryId}
-                              }));
-                            }}
-                          />
-                          <SubmitButton 
-                            text={"変更"}
-                            onClick={() => {
-                              const updates = editingItems[index];
-                              if(updates) {
-                                changeItem(index, updates);
-                                setEditingItems(prev => {
-                                  const newState = {...prev};
-                                  delete newState[index];
-                                  return newState;
-                                });
-                                closeModal();
-                              }
-                            }}
-                          />
-                        </div>
-                      )}
-                    </DropdownModal>
-                  ))}
+                        )}
+                      </DropdownModal>
+                    )
+                  })}
 
-                  <DropdownModal 
+                  {/* 項目を追加 */}
+                  <DropdownModal
                     title={
                       <>
                         <span
                           className={styles["category-icon"]}
-                          style={{backgroundColor: "#C0C0C0"}}
+                          style={{ backgroundColor: "#C0C0C0" }}
                         >
-                          <Plus size={16}/>
+                          <Plus size={16} />
                         </span>
                         <span className={styles["product-name"]}>項目を追加する</span>
                       </>
@@ -411,11 +439,11 @@ const ConfirmInputData = () => {
                           <label htmlFor={newProductNameId}>商品名</label>
                           <input
                             id={newProductNameId}
-                            type="text" 
-                            className={styles["input-product-name"]} 
-                            value={newProductName} 
-                            onChange={(e) => setNewProductName(e.target.value)} 
-                            placeholder="商品名" 
+                            type="text"
+                            className={styles["input-product-name"]}
+                            value={newProductName}
+                            onChange={(e) => setNewProductName(e.target.value)}
+                            placeholder="商品名"
                           />
                         </div>
                         <div className={styles["input-group"]}>
@@ -424,7 +452,7 @@ const ConfirmInputData = () => {
                             id={newProductPriceId}
                             type="text"
                             inputMode="numeric"
-                            className={styles["input-product-price"]} 
+                            className={styles["input-product-price"]}
                             value={newPriceDisplay}
                             onChange={(e) => handleNumberInput(
                               e.target.value,
@@ -441,7 +469,7 @@ const ConfirmInputData = () => {
                             type="text"
                             inputMode="numeric"
                             className={styles["input-product-quantity"]}
-                            value={newQuantityDisplay}
+                            value={newQuantityDisplay || "1"} // デフォルト 1 を表示
                             onChange={(e) => handleNumberInput(
                               e.target.value,
                               setNewQuantityDisplay,
@@ -450,32 +478,35 @@ const ConfirmInputData = () => {
                             placeholder="1"
                           />
                         </div>
-                        <Categories 
+                        {/* 修正 3: categoriesByType.expense を渡す */}
+                        <Categories
+                          categories={categoriesByType.expense}
                           selectedCategory={selectedCategoryId}
                           onSelected={(categoryId) => {
                             setSelectedCategoryId(categoryId);
-                            console.log("選択されたカテゴリID : " + categoryId)
                           }}
                         />
-                        <SubmitButton 
-                          text={"追加"} 
+                        <SubmitButton
+                          text={"追加"}
                           onClick={() => {
+                            const finalQuantity = newProductQuantity === null || newProductQuantity === 0 ? 1 : newProductQuantity;
+
                             // バリデーションチェック
-                            if(!selectedCategoryId || !newProductName || newProductPrice === null || newProductPrice === undefined || newProductQuantity === null || newProductQuantity === undefined) {
-                              alert("未入力の項目があります。");
+                            if (!selectedCategoryId || !newProductName || newProductPrice === null || newProductPrice === undefined) {
+                              alert("カテゴリ、商品名、金額は必須です。");
                               return;
                             }
 
-                            console.log("現在のselectedCategoryId", selectedCategoryId);
-
-                            addItem(selectedCategoryId, newProductName, newProductPrice, newProductQuantity);
+                            addItem(selectedCategoryId, newProductName, newProductPrice, finalQuantity);
+                            
+                            // 追加フォームのリセット
                             setSelectedCategoryId(null);
                             setNewProductName("");
                             setNewProductPrice(0);
                             setNewProductQuantity(1);
                             setNewPriceDisplay("");
                             setNewQuantityDisplay("");
-                            
+
                             closeModal();
                           }}
                         />
@@ -486,8 +517,7 @@ const ConfirmInputData = () => {
               ),
             }}
           />
-          <SubmitButton text={"追加"}/>
-          {/* <button onClick={(e) => setLoading(!loading)}>切り替え</button>  */}
+          <SubmitButton text={"登録する"} /> {/* 最後のボタンは「登録」などが適切か */}
         </div>
       }
     />

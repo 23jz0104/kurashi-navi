@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import { getIconComponent } from "../constants/categories";
+
 //APIからカテゴリデータを取得する関数
 const fetchCategories = async() => {
   const data = [
@@ -20,5 +23,38 @@ const fetchCategories = async() => {
     { id: 199, name: "その他", color: "#12B886", iconName: "DollarSign", type: "income" },
   ];
 
+  // async関数は、returnした値を自動的に「成功したPromise」で包んで返すらしい
   return data;
+};
+
+export const useCategories = () => {
+  const [rawCategories, setRawCategories] = useState([]);
+
+  //初回読み込み時にAPI経由でデータを取得して状態にセットする
+  useEffect(() => {
+    fetchCategories().then(data => {
+      setRawCategories(data);
+    });
+  }, []);
+
+  const allCategories = rawCategories.map(category => ({
+    ...category,
+    icon: getIconComponent(category.iconName)
+  }));
+
+  const categoriesByType = {
+    expense: allCategories.filter(c => c.type === "expense"),
+    income: allCategories.filter(c => c.type === "income"),
+  };
+
+  const categoriesMap = new Map(allCategories.map(c => [c.id, c]));
+
+  const getCategoryById = (id) => {
+    return categoriesMap.get(id) || categoriesMap.get(99);
+  };
+
+  return {
+    categoriesByType,
+    getCategoryById,
+  };
 };
