@@ -1,33 +1,21 @@
 import React, { useState } from "react";
 import styles from "./Categories.module.css";
+import { useCategories } from "../hooks/useCategories";
 
 const Categories = ({ activeTab = "expense", selectedCategory, onSelected }) => {
 
-   // 仮のカテゴリデータ
-  const categories = {
-    expense: [
-      { id: 1, name: "食費", icon: "🍽️" },
-      { id: 2, name: "交通費", icon: "🚃" },
-      { id: 3, name: "光熱費", icon: "💡" },
-      { id: 4, name: "娯楽", icon: "🎮" },
-      { id: 5, name: "その他", icon: "📦" }
-    ],
-    income: [
-      { id: 11, name: "給与", icon: "💼" },
-      { id: 12, name: "賞与", icon: "🎁" },
-      { id: 13, name: "副業", icon: "💻" },
-      { id: 14, name: "その他", icon: "💰" }
-    ]
-  };
+  const { categoriesByType } = useCategories();
 
   const handleSelected = (categoryId) => {
     onSelected?.(categoryId);
-  }
+  };
+
+  const currentCategories = categoriesByType[activeTab] || [];
 
   return (
     <div>
       <div className={styles["category-grid"]}>
-        {categories[activeTab].map((category) => (
+        {currentCategories.map((category) => (
           <button
             key={category.id}
             type="button"
@@ -37,13 +25,20 @@ const Categories = ({ activeTab = "expense", selectedCategory, onSelected }) => 
               ${selectedCategory === category.id ? styles["selected"] : ""}
             `}
           >
-            <span className={styles["category-icon"]}>{category.icon}</span>
+            {/* ▼▼▼ 5. フックから整形済みの .icon と .color を使う ▼▼▼ */}
+            <span 
+              className={styles["category-icon"]}
+              // フックから色も動的に設定
+              style={{ backgroundColor: category.color }} 
+            >
+              {category.icon}
+            </span>
             <span className={styles["category-name"]}>{category.name}</span>
           </button>
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default Categories;

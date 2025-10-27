@@ -31,9 +31,17 @@
 }
 
 .value {
-  color: #374151;
+  color: #343A40; /* 落ち着いたグレー */
   font-size: 1rem;
   line-height: 1;
+}
+
+.value.income {
+  color: #3B82F6;
+}
+
+.value.expence {
+  color: #EF4444;
 }
 
 .graph-container {

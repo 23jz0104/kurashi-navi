@@ -1,13 +1,13 @@
-import GraphHistory from './GraphHistory';
+import History from './History';
 import { MemoryRouter } from 'react-router-dom';
 
 export default {
-  title: 'Pages/GraphHistory',
-  component: GraphHistory,
+  title: 'Pages/History',
+  component: History,
 };
 
 export const Default = () => (
   <MemoryRouter>
-    <GraphHistory />
+    <History />
   </MemoryRouter>
 );
