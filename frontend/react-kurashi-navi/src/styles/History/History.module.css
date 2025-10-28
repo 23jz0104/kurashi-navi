@@ -40,8 +40,37 @@
   color: #3B82F6;
 }
 
-.value.expence {
+.value.expense {
   color: #EF4444;
+}
+
+.view-container {
+  margin: 1rem 0;
+}
+
+.view-controls {
+  display: flex;
+  justify-content: center;
+  height: 1rem;
+  border-bottom: 1px solid #999999;
+}
+
+.control-button {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: none;
+  border: none;
+  color: #374151;
+  border-bottom: 1px solid transparent;
+  margin-bottom: -1px; /* ラッパーのボーダーと重ねる */
+}
+
+.control-button.active {
+  color: #2563eb;
+  border-color: #2563eb;
+  font-weight: bold;
 }
 
 .graph-container {
@@ -49,9 +78,7 @@
   width: 100%;
   height: 19rem;
   display: flex;
-  margin: 1rem 0;
   padding: 1rem 0;
-  border-top: 1px solid #999999;
   border-bottom: 1px solid #999999;
 }
 
@@ -59,7 +86,7 @@
   background-color: white;
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  padding: 0.5rem 1rem;
+  overflow: hidden;
 }
 
 .flex {
@@ -87,4 +114,22 @@
 
 .category-name {
   flex: 1;
+}
+
+.category-price {
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+}
+
+.category-price.income {
+  color: #2563eb;
+}
+
+.date-header {
+  font-size: 0.75rem;
+  background-color: #F3F4F6;
+  color: #374151;
+  border-left: 2px solid #9CA3AF;
+  padding: 0.5rem 0;
 }

@@ -1,18 +1,10 @@
 import styles from "./CalendarView.module.css";
 
-const CalendarView = ({ expenceReceiptData = [], incomeData = [], currentMonth }) => {
-  currentMonth = currentMonth || new Date();
+const CalendarView = ({ expenseReceiptData = [], incomeData = [], currentMonth }) => {
+  const year = currentMonth.getFullYear();
+  const month = currentMonth.getMonth();
 
-  const today = currentMonth;
-  const year = today.getFullYear();
-  const month = today.getMonth();
-  const targetPrefix = `${year}-${String(month + 1).padStart(2, "0")}`;
-  
-  const hasData =
-    expenceReceiptData.some((d) => d.date?.startsWith(targetPrefix)) ||
-    incomeData.some((d) => d.date?.startsWith(targetPrefix));
-
-  if (!hasData) {
+  if (expenseReceiptData.length === 0 && incomeData.length === 0) {
     return (
       <div className={styles["empty-state"]}>
         <p>データが存在しません。</p>
@@ -58,12 +50,12 @@ const CalendarView = ({ expenceReceiptData = [], incomeData = [], currentMonth }
   const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
 
   // 支出データマップ
-  const expenseMap = expenceReceiptData.reduce((acc, receipt) => {
-    const totalAmount = receipt.items.reduce(
+  const expenseMap = expenseReceiptData.reduce((acc, expense) => {
+    const totalAmount = expense.items.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
     );
-    acc[receipt.date] = totalAmount;
+    acc[expense.date] = (acc[expense.date] || 0) + totalAmount;
     return acc;
   }, {});
 
@@ -73,7 +65,7 @@ const CalendarView = ({ expenceReceiptData = [], incomeData = [], currentMonth }
       (sum, item) => sum + item.price * item.quantity,
       0
     );
-    acc[income.date] = totalAmount;
+    acc[income.date] = (acc[income.date] || 0) + totalAmount;
     return acc;
   }, {});
 
@@ -117,7 +109,7 @@ const CalendarView = ({ expenceReceiptData = [], incomeData = [], currentMonth }
                 </span>
               )}
               {item.expenseAmount > 0 && (
-                <span className={styles["expence"]}>
+                <span className={styles["expense"]}>
                   ¥{item.expenseAmount.toLocaleString()}
                 </span>
               )}
