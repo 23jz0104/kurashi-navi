@@ -1,15 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import styles from "./Categories.module.css";
 import { useCategories } from "../hooks/useCategories";
 
 const Categories = ({ activeTab = "expense", selectedCategory, onSelected }) => {
 
-  const { categoriesByType } = useCategories();
-
   const handleSelected = (categoryId) => {
     onSelected?.(categoryId);
   };
 
+  const { categoriesByType } = useCategories();
   const currentCategories = categoriesByType[activeTab] || [];
 
   return (
@@ -25,10 +24,8 @@ const Categories = ({ activeTab = "expense", selectedCategory, onSelected }) => 
               ${selectedCategory === category.id ? styles["selected"] : ""}
             `}
           >
-            {/* ▼▼▼ 5. フックから整形済みの .icon と .color を使う ▼▼▼ */}
             <span 
               className={styles["category-icon"]}
-              // フックから色も動的に設定
               style={{ backgroundColor: category.color }} 
             >
               {category.icon}
