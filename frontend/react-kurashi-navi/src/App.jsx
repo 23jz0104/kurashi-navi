@@ -8,6 +8,7 @@ import NotificationList from "./pages/notifications/NotificationList";
 import PriceInfo from "./pages/notifications/PriceInfo";  
 import BudgetControl from "./pages/Budget/BudgetControl";
 import Ninsyo from "./components/common/Ninsyo";
+import History  from "./pages/History/History";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/notificationlist" element={<Ninsyo><NotificationList /></Ninsyo>} />
         <Route path="/priceInfo/:productName" element={<Ninsyo><PriceInfo /></Ninsyo>} />
         <Route path="/budgetcontrol" element={<Ninsyo><BudgetControl /></Ninsyo>} />
+        <Route path="/history" element={<Ninsyo><History /></Ninsyo>} />
       </Routes>
     </Router>
   );
