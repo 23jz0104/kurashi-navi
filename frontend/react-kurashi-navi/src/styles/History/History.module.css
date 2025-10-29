@@ -1,0 +1,135 @@
+.main-container {
+  max-width: 28rem;
+  margin: 0 auto;
+}
+
+.finance-summry {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  gap: 1rem;
+}
+
+.finance-item {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  color: #374151;
+  background-color: white;
+  padding: 0.5rem 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+}
+
+.label {
+  flex: 1;
+  color: #6b7280;
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+.value {
+  color: #343A40; /* 落ち着いたグレー */
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.value.income {
+  color: #3B82F6;
+}
+
+.value.expense {
+  color: #EF4444;
+}
+
+.view-container {
+  margin: 1rem 0;
+}
+
+.view-controls {
+  display: flex;
+  justify-content: center;
+  border-bottom: 1px solid #999999;
+}
+
+.control-button {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: none;
+  border: none;
+  color: #374151;
+  border-bottom: 1px solid transparent;
+  margin-bottom: -1px; /* ラッパーのボーダーと重ねる */
+}
+
+.control-button.active {
+  color: #2563eb;
+  border-color: #2563eb;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.graph-container {
+  position: relative;
+  width: 100%;
+  height: 19rem;
+  display: flex;
+  padding: 1rem 0;
+  border-bottom: 1px solid #999999;
+}
+
+.detail {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.flex {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  gap: 1rem;
+  color: #6b7280;
+  border-bottom: 1px solid #eee;
+}
+
+.flex:last-child {
+  border: none;
+}
+
+.category-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+}
+
+.category-name {
+  flex: 1;
+}
+
+.category-price {
+  display: flex;
+  align-items: center;
+  font-size: 0.75rem;
+}
+
+.category-price.income {
+  color: #2563eb;
+}
+
+.date-header {
+  font-size: 0.75rem;
+  background-color: #F3F4F6;
+  color: #374151;
+  border-left: 2px solid #9CA3AF;
+  padding: 0.5rem 0;
+}
