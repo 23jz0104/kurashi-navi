@@ -13,7 +13,7 @@ function MyPage() {
   const goToStatistics = () => navigate("/statistics");
 
   const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
+    sessionStorage.removeItem("isLoggedIn");
     navigate("/log");
   };
 

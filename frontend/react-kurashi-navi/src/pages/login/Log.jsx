@@ -26,7 +26,7 @@ function Log() {
     // 認証チェック
     if (email === "23jz0133@jec.ac.jp" && password === "pw123") {
       setErrorMessage("");
-      localStorage.setItem("isLoggedIn", "true"); // 認証状態を保存
+      sessionStorage.setItem("isLoggedIn", "true"); // 認証状態を保存
       navigate("/mypage");
     } else {
       setErrorMessage("メールアドレスまたはパスワードが違います");
