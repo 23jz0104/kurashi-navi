@@ -20,17 +20,15 @@ function NotificationList() {
         setMockToday("2025-10-24");
     }, []);
 
-    // null にして「読み込み中」を判定
     const [notifications, setNotifications] = useState(null);
 
-    // localStorage からデータを読み込む
     useEffect(() => {
         const saved = localStorage.getItem("notifications");
         if (saved) setNotifications(JSON.parse(saved));
         else setNotifications([]);
     }, []);
 
-    // notifications が変化するたび保存
+
     useEffect(() => {
         if (notifications !== null) {
             localStorage.setItem("notifications", JSON.stringify(notifications));
