@@ -2,8 +2,30 @@ import React, { use, useEffect, useRef, useState } from "react";
 import styles from "./DayPicker.module.css";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
  
-const DayPicker = () => {
-  const [selectedDate, setSelectedDate] = useState(new Date());
+const DayPicker = ( {date} ) => {
+
+  const convertToDate = (dateString) => {
+    const parts = dateString.split("-");
+
+    const year = parseInt(parts[0]);
+    const month = parseInt(parts[1]) - 1;
+    const day = parseInt(parts[2]);
+
+    return new Date(year, month, day);
+  };
+
+  const getDefaultDateString = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  }
+
+  const [selectedDate, setSelectedDate] = useState(
+    convertToDate(date || getDefaultDateString())
+  );
   const [showCalendar, setShowCalendar] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date(selectedDate));
   const pickerRef = useRef();
