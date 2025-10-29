@@ -11,9 +11,6 @@ const fetchCategories = async() => {
     { id: 4, name: "交通費", color: "#9775FA", iconName: "TrainFront", type: "expense" },
     { id: 5, name: "光熱費", color: "#FFEF6C", iconName: "Lightbulb", type: "expense" },
 
-    // (割引カテゴリは、支出のマイナスとして扱う例)
-    { id: 6, name: "割引", color: "#A9D0F2", iconName: "TicketCheck", type: "expense" },
-
     { id: 99, name: "その他", color: "#868E96", iconName: "CircleHelp", type: "expense" },
 
     // --- 収入カテゴリ ---
