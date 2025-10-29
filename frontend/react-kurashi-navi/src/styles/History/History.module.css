@@ -51,7 +51,6 @@
 .view-controls {
   display: flex;
   justify-content: center;
-  height: 1rem;
   border-bottom: 1px solid #999999;
 }
 
@@ -70,6 +69,7 @@
 .control-button.active {
   color: #2563eb;
   border-color: #2563eb;
+  font-size: 1.1rem;
   font-weight: bold;
 }
 
