@@ -1,0 +1,36 @@
+.input-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.input-group label {
+  min-width: 3.5rem;
+}
+
+.input-product-name, 
+.input-product-price, 
+.input-product-quantity, 
+.input-product-discount {
+  width: 80%;
+  color: #374151;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.5rem;
+  outline: none;
+  border: 1.5px solid #e5e7eb;
+  transition: all 0.2s ease;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  background-color: #ffffff;
+}
+
+.input-product-name:focus, 
+.input-product-price:focus, 
+.input-product-quantity:focus, 
+.input-product-discount:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}

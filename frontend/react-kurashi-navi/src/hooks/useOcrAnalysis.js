@@ -118,7 +118,9 @@ export const useOcrAnalysis = (file) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!file) return;
+    if (!file) {
+      return;
+    }
 
     setLoading(true);
     const ai = new GoogleGenAI({ apiKey: API_KEY });
@@ -159,7 +161,7 @@ export const useOcrAnalysis = (file) => {
       }
     };
     analyzeReceipt()
-  }, []);
+  }, [file]);
 
   return {
     ocrResult,

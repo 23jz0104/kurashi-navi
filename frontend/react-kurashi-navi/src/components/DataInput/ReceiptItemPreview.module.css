@@ -1,0 +1,60 @@
+/* 商品表示 */
+.product-total-price {
+  font-size: 0.9375rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-left: auto;
+  letter-spacing: -0.01em;
+}
+
+.product-sub-info {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.125rem;
+}
+
+.category-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.product-name {
+  flex: 1;
+  margin-left: 0.625rem;
+  text-align: left;
+  color: #1f2937;
+  font-weight: 500;
+  font-size: 0.9375rem;
+}
+
+.product-price-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.125rem;
+}
+
+.product-price-and-quantity {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.product-discount {
+  font-size: 0.75rem;
+  color: #ef4444;
+  font-weight: 600;
+  line-height: 1.2;
+}
