@@ -7,106 +7,24 @@
   gap: 1rem;
 }
 
-/* ヘッダーコンテナ */
-.header-container {
+.category-icon {
   display: flex;
-  flex-direction: column;
-  padding: 0.75rem 1rem;
-  background-color: #ffffff;
-  gap: 0.75rem;
-  border-radius: 0.5rem;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-}
-
-.header-container-row {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  font-size: 0.875rem;
-  color: #6b7280;
+  color: white;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.store-name-value, .store-address-value {
+.product-name {
   flex: 1;
-  margin-left: 1.5rem;
-  border: none;
-  border-bottom: 1px solid #e5e7eb;
-  background: none;
-  padding: 0.25rem 0.1rem;
-  font-size: 0.875rem;
+  margin-left: 0.625rem;
+  text-align: left;
   color: #1f2937;
   font-weight: 500;
-  text-align: left;
-  transition: border-color 0.2s ease-in-out;
-}
-
-.store-name-value:focus, .store-address-value:focus {
-  outline: none;
-  border-bottom-color: #3b82f6;
-}
-
-.store-name-value::placeholder, .store-address-value::placeholder {
-  color: #d1d5db;
-  font-weight: 400;
-  text-align: left;
-}
-
-/* 合計セクション */
-.total-container {
-  background-color: #f7e8ac;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-}
-
-.total-row {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  line-height: 1.5;
-  padding: 0.25rem 0;
-}
-
-.tax-container {
-  color: #78716c;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.tax-container:hover {
-  color: #57534e;
-}
-
-.total-amount-container {
-  border-top: 1.5px solid #fbbf24;
-  padding-top: 0.75rem;
-  margin-top: 0.25rem;
-}
-
-.total-label {
-  font-size: 0.8125rem;
-  color: #78716c;
-  font-weight: 500;
-}
-
-.tax-value {
-  flex: 1;
-}
-
-.sub-total-amount, .tax {
-  font-size: 0.875rem;
-  color: #57534e;
-  font-weight: 600;
-}
-
-.total-amount {
-  font-size: 1.25rem;
-  color: #292524;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-size: 0.9375rem;
 }
 
 /* 商品リストコンテナ */
@@ -168,105 +86,6 @@
 
 .delete-button:active {
   transform: scale(0.95);
-}
-
-/* 商品表示 */
-.product-total-price {
-  font-size: 0.9375rem;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-left: auto;
-  letter-spacing: -0.01em;
-}
-
-.product-sub-info {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 0.125rem;
-}
-
-.category-icon {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: white;
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.product-name {
-  flex: 1;
-  margin-left: 0.625rem;
-  text-align: left;
-  color: #1f2937;
-  font-weight: 500;
-  font-size: 0.9375rem;
-}
-
-.product-price-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.125rem;
-}
-
-.product-price-and-quantity {
-  font-size: 0.75rem;
-  color: #9ca3af;
-  font-weight: 500;
-  line-height: 1.2;
-}
-
-.product-discount {
-  font-size: 0.75rem;
-  color: #ef4444;
-  font-weight: 600;
-  line-height: 1.2;
-}
-
-/* 入力フィールド */
-.input-product-name, 
-.input-product-price, 
-.input-product-quantity, 
-.input-product-discount {
-  width: 80%;
-  color: #374151;
-  padding: 0.625rem 0.75rem;
-  border-radius: 0.5rem;
-  outline: none;
-  border: 1.5px solid #e5e7eb;
-  transition: all 0.2s ease;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  background-color: #ffffff;
-}
-
-.input-product-name:focus, 
-.input-product-price:focus, 
-.input-product-quantity:focus, 
-.input-product-discount:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.input-group {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #4b5563;
-}
-
-.input-group label {
-  min-width: 3.5rem;
 }
 
 /* ヘッダーコンテント（ページタイトル） */

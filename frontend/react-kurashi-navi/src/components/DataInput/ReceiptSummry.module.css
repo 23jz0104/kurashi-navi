@@ -1,0 +1,54 @@
+.total-container {
+  background-color: #f7e8ac;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.total-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  line-height: 1.5;
+  padding: 0.25rem 0;
+}
+
+.tax-container {
+  color: #78716c;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tax-container:hover {
+  color: #57534e;
+}
+
+.total-amount-container {
+  border-top: 1.5px solid #fbbf24;
+  padding-top: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.total-label {
+  font-size: 0.8125rem;
+  color: #78716c;
+  font-weight: 500;
+}
+
+.tax-value {
+  flex: 1;
+}
+
+.sub-total-amount, .tax {
+  font-size: 0.875rem;
+  color: #57534e;
+  font-weight: 600;
+}
+
+.total-amount {
+  font-size: 1.25rem;
+  color: #292524;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
