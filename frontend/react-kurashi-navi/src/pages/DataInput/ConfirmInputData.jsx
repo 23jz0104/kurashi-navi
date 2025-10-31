@@ -5,16 +5,18 @@ import styles from "../../styles/DataInput/ConfirmInputData.module.css";
 import SubmitButton from "../../components/common/SubmitButton";
 import DropdownModal from "../../components/common/DropdonwModal";
 import { useCategories } from "../../hooks/useCategories";
-import { useReceiptForm } from "../../hooks/useReceiptForm";
+import { useReceiptForm } from "../../hooks/dataInput/useReceiptForm";
 import ReceiptHeader from "../../components/DataInput/ReceiptHeader";
 import ReceiptSummry from "../../components/DataInput/ReceiptSummry";
 import ReceiptItemPreview from "../../components/DataInput/ReceiptItemPreview";
 import ReceiptItemModal from "../../components/DataInput/ReceiptItemModal";
+import { useReceiptUploader } from "../../hooks/dataInput/useReceiptUploader";
 
 const ConfirmInputData = () => {
   const location = useLocation();
   const initialReceipt = location.state?.ocrResult;
   const { getCategoryById, categoriesByType } = useCategories();
+  const { uploadReceipt } = useReceiptUploader();
   const {
     receipt,
     totalAmount,
@@ -24,6 +26,15 @@ const ConfirmInputData = () => {
     deleteItem,
     updateReceiptInfo,
   } = useReceiptForm(initialReceipt);
+
+  const handleSubmit = async (receipt) => {
+    if (!receipt) return;
+
+    const result = await uploadReceipt(receipt);
+    if(result) {
+      console.log("データを登録しました。");
+    }
+  }
 
   // メインコンテンツ
   return (
@@ -97,7 +108,7 @@ const ConfirmInputData = () => {
             </div>
           </div>
 
-          <SubmitButton text="登録する" />
+          <SubmitButton text="登録する" onClick={() => handleSubmit(receipt)}/>
         </div>
       }
     />

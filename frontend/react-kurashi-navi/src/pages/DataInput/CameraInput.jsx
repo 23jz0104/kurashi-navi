@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import "../../index.css"
 import styles from "../../styles/DataInput/CameraInput.module.css";
 import Layout from "../../components/common/Layout";
-import { useOcrAnalysis } from "../../hooks/useOcrAnalysis";
+import { useOcrAnalysis } from "../../hooks/dataInput/useOcrAnalysis";
 import Loader from "../../components/common/Loader";
 
 const CameraInput = () => {
