@@ -16,7 +16,7 @@ const ConfirmInputData = () => {
   const location = useLocation();
   const initialReceipt = location.state?.ocrResult;
   const { getCategoryById, categoriesByType } = useCategories();
-  const { uploadReceipt } = useReceiptUploader();
+  const { uploadReceipt, isUploading } = useReceiptUploader();
   const {
     receipt,
     totalAmount,
@@ -28,7 +28,7 @@ const ConfirmInputData = () => {
   } = useReceiptForm(initialReceipt);
 
   const handleSubmit = async (receipt) => {
-    if (!receipt) return;
+    if (!receipt || isUploading) return;
 
     const result = await uploadReceipt(receipt);
     if(result) {
@@ -108,7 +108,11 @@ const ConfirmInputData = () => {
             </div>
           </div>
 
-          <SubmitButton text="登録する" onClick={() => handleSubmit(receipt)}/>
+          <SubmitButton 
+            text={isUploading ? "登録中..." : "送信"} 
+            onClick={() => handleSubmit(receipt)}
+            disabled={isUploading}
+            />
         </div>
       }
     />
