@@ -12,6 +12,13 @@
   align-items: center;
   justify-content: center;
   background-color: #2563eb;
+  transition: all 0.2s ease;
+}
+
+.submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #2563eb;
 }
 
 .submit-button:active {

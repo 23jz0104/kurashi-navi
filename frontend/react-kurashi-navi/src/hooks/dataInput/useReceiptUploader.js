@@ -1,20 +1,30 @@
+import { useState } from "react";
+
 export const useReceiptUploader = () => {
+  const [isUploading, setIsUploading] = useState(false);
+
   const uploadReceipt = async (receipt) => {
+    setIsUploading(true);
+
+    //discount属性をJSOｎから削除して整形
     const formattedItems = receipt.items.map(item => {
-        const { discount, ...restItem } = item;
+      const { discount, ...restItem } = item;
 
-        const finalPrice = item.price - discount;
+      const finalPrice = item.price - discount;
 
-        return {
-          ...restItem,
-          price: finalPrice,
-        };
-      });
-
-      const formattedReceipt = {
-        ...receipt,
-        items: formattedItems,
+      return {
+        ...restItem,
+        price: finalPrice,
       };
+    });
+
+    const formattedReceipt = {
+      ...receipt,
+      items: formattedItems,
+    };
+
+    console.log(JSON.stringify(formattedReceipt));
+
     try {
       const response = await fetch("https://example.com/receipt", {
         method: "POST",
@@ -33,9 +43,9 @@ export const useReceiptUploader = () => {
     } catch (error) {
       console.log(error);
     } finally {
-
+      setIsUploading(false);
     }
   };
 
-  return { uploadReceipt };
+  return { uploadReceipt, isUploading };
 };
