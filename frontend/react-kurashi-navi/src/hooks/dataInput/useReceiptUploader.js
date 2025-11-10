@@ -23,10 +23,11 @@ export const useReceiptUploader = () => {
       items: formattedItems,
     };
 
-    console.log(JSON.stringify(formattedReceipt));
+    console.log("送信するJSON -> ", JSON.stringify(formattedReceipt, null, 1));
 
     try {
-      const response = await fetch("https://example.com/receipt", {
+      const url = "https://t08pushtest.mydns.jp/kakeibo/receipt";
+      const response = await fetch(url, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
