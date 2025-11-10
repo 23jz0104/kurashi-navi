@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./Calculator.module.css"
 
-const Calculator = () => {
+const Calculator = ({ onChange }) => {
   const [displayValue, setDisplayValue] = useState("0");
   const [expression, setExpression] = useState("");
   const [showCalculator, setShowCalculator] = useState(false);
@@ -9,6 +9,12 @@ const Calculator = () => {
   const [isAfterOperator, setIsAfterOperator] = useState(false);
   const inputRef = useRef(null);
   const calculatorOverlayRef = useRef(null);
+  
+  useEffect(() => {
+    if (onChange) {
+      onChange(displayValue);
+    }
+  }, [displayValue, onChange]);
 
   const calculate = (expr) => {
     if(!expr || typeof expr !== "string") return "0";

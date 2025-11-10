@@ -10,6 +10,7 @@ import DayPicker from "../../components/common/DayPicker";
 import Categories from "../../components/common/Categories";
 import Toast from "../../components/common/Toast";
 import Calculator from "../../components/common/Calculator";
+import { useManualInputUploader } from "../../hooks/dataInput/useManualInputUploader";
 
 const ManualInput = () => {
   const [activeTab, setActiveTab] = useState("expense");
@@ -18,9 +19,11 @@ const ManualInput = () => {
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     memo: "",
-    amount: "",
+    quantity: "",
     category: ""
   });
+  
+  const { uploadData, isUploading } = useManualInputUploader();
 
   const tabs = [
     { id: "expense", label: "支出", icon: <Wallet size={20} /> },
@@ -60,6 +63,13 @@ const ManualInput = () => {
     setIsVisible(true);
   };
 
+  const handleSubmit = (data) => {
+    if (!formData.date || !formData.quantity || !formData.category) {
+      alert("未入力の項目があります");
+    }
+    console.log(formData);
+  }
+
   return (
     <Layout 
       headerContent={<TabButton tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} />}
@@ -82,12 +92,16 @@ const ManualInput = () => {
             fields={[
               {
                 label: <>金額<span className={styles["required"]}>*</span></>,
-                contents: <Calculator />
+                contents: <Calculator onChange={(val) => setFormData(prev => ({ ...prev, amount: val }))} />
+              },
+              {
+                label: <>個数<span className={styles["required"]}>*</span></>,
+                contents: <input type="text" placeholder="未入力" onChange={(e) => setFormData(prev => ({...prev, quantity: e.target.value}))} />
               },
               {
                 label: "メモ",
-                contents: <input type="text" placeholder="未入力" />
-              }
+                contents: <input type="text" placeholder="未入力" onChange={(e) => setFormData(prev => ({...prev, memo: e.target.value}))}/>
+              },
             ]}
           />
 
@@ -106,7 +120,8 @@ const ManualInput = () => {
 
           <SubmitButton 
             text={<><Plus size={20}/>追加</>}
-            onClick={showToast}
+            onClick={() => handleSubmit(formData)}
+            disabled={isUploading}
           />
 
           <Toast

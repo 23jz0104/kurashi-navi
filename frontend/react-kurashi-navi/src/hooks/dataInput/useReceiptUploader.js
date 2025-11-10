@@ -6,38 +6,45 @@ export const useReceiptUploader = () => {
   const uploadReceipt = async (receipt) => {
     setIsUploading(true);
 
-    //discount属性をJSOｎから削除して整形
-    const formattedItems = receipt.items.map(item => {
-      const { discount, ...restItem } = item;
+    //discount属性をJSONから削除して整形
+    const formattedproducts = receipt.products.map(product => {
+      const { discount, ...restproduct } = product;
 
-      const finalPrice = item.price - discount;
+      //商品当たりの割引額を求める（後で修正するかも）
+      const finalPrice = Math.floor((product.product_price * product.quantity - discount) / product.quantity);
 
       return {
-        ...restItem,
-        price: finalPrice,
+        ...restproduct,
+        product_price: finalPrice,
       };
     });
 
-    const formattedReceipt = {
-      ...receipt,
-      items: formattedItems,
-    };
+    // taxRateを除外したレシートデータを作成
+    const { taxRate, ...restReceipt } = receipt;
+
+    const formattedReceipt = [{
+      ...restReceipt,
+      products: formattedproducts,
+    }];
 
     console.log("送信するJSON -> ", JSON.stringify(formattedReceipt, null, 1));
 
     try {
-      const url = "https://t08pushtest.mydns.jp/kakeibo/receipt";
-      const response = await fetch(url, {
+      const response = await fetch("/api/receipt", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-User-ID": "1",  // テスト用の値
+          "X-Type-ID": "1"   // テスト用の値
         },
         body: JSON.stringify(formattedReceipt),
       });
 
       if(!response.ok) {
-        //えらー
+        console.log(response.status + "エラー:", response);
       }
+
+      console.log("response:", response);
 
       const result = await response.json();
       return result;

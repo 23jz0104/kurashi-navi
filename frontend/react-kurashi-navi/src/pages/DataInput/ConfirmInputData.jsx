@@ -56,7 +56,7 @@ const ConfirmInputData = () => {
           {/* アイテムリスト */}
           <div className={styles["item-container"]}>
             <div className={styles["item-list"]}>
-              {receipt.items.map((item, index) => (
+              {receipt.products.map((item, index) => (
                 <DropdownModal
                   key={index}
                   title={
