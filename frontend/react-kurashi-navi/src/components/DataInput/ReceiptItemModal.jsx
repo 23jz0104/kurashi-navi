@@ -20,8 +20,8 @@ const ReceiptItemModal = ({
     isEditMode
       ? { ...item }
       : {
-          productName: "",
-          price: 0,
+          product_name: "",
+          product_price: 0,
           quantity: 1,
           discount: 0,
           categoryId: null,
@@ -35,10 +35,10 @@ const ReceiptItemModal = ({
   const handleSubmit = () => {
     // バリデーション
     if (
-      !formData.categoryId ||
-      !formData.productName ||
-      formData.price === null ||
-      formData.price === undefined
+      !formData.category_id ||
+      !formData.product_name ||
+      formData.product_price === null ||
+      formData.product_price === undefined
     ) {
       alert("カテゴリ、商品名、金額は必須です。");
       return;
@@ -58,9 +58,9 @@ const ReceiptItemModal = ({
     } else {
       // 追加モード: addItem(categoryId, productName, price, quantity, discount)
       onSubmit(
-        finalData.categoryId,
-        finalData.productName,
-        finalData.price,
+        finalData.category_id,
+        finalData.product_name,
+        finalData.product_price,
         finalData.quantity,
         finalData.discount || 0
       );

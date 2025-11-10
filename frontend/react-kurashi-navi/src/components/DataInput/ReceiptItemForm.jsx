@@ -11,14 +11,14 @@ const ReceiptItemForm = ({
   idPrefix = "" 
 }) => {
   const { 
-    productName = "", 
-    price = 0, 
+    product_name = "", 
+    product_price = 0, 
     quantity = 1, 
     discount = 0, 
     categoryId = null 
   } = initialValues;
 
-  const priceInput = useNumberInput(price);
+  const priceInput = useNumberInput(product_price);
   const quantityInput = useNumberInput(quantity);
   const discountInput = useNumberInput(discount);
 
@@ -43,8 +43,8 @@ const ReceiptItemForm = ({
           id={`${idPrefix}-name`}
           type="text"
           className={styles["input-product-name"]}
-          defaultValue={productName}
-          onChange={(e) => onFieldChange("productName", e.target.value)}
+          defaultValue={product_name}
+          onChange={(e) => onFieldChange("product_name", e.target.value)}
           placeholder="商品名"
         />
       </div>

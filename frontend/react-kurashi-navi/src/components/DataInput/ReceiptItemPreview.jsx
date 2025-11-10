@@ -3,7 +3,7 @@ import styles from "./ReceiptItemPreview.module.css";
 import React from "react";
 
 const ReceiptItemPreview = ( {item, getCategoryById} ) => {
-  const category = getCategoryById(item.categoryId);
+  const category = getCategoryById(item.category_id);
   const categoryColor = category?.color || "#868E96";
   const categoryIcon = category?.icon ? (
     React.cloneElement(category.icon, { size: 16 })
@@ -20,16 +20,16 @@ const ReceiptItemPreview = ( {item, getCategoryById} ) => {
         {categoryIcon}
       </span>
       <span className={styles["product-name"]}>
-        {item.productName}
+        {item.product_name}
       </span>
       <div className={styles["product-price-info"]}>
         <span className={styles["product-total-price"]}>
-          ¥{(item.price * item.quantity).toLocaleString()}
+          ¥{(item.product_price * item.quantity).toLocaleString()}
         </span>
         <div className={styles["product-sub-info"]}>
           {item.quantity >= 2 && (
             <span className={styles["product-price-and-quantity"]}>
-              ¥{item.price.toLocaleString()} × {item.quantity}個
+              ¥{item.product_price.toLocaleString()} × {item.quantity}個
             </span>
           )}
           {item.discount > 0 && (

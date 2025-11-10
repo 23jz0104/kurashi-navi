@@ -8,39 +8,39 @@ export const useReceiptForm = (initialReceipt) => {
   useEffect(() => {
     if(!receipt) return;
 
-    const subTotals = receipt.items.reduce((sum, item) => {
-      const price = item.price;
+    const subTotals = receipt.products.reduce((sum, item) => {
+      const product_price = item.product_price;
       const quantity = item.quantity;
       const discount = item.discount;
-      return sum + (price * quantity) - discount;
+      return sum + (product_price * quantity) - discount;
     }, 0);
 
     setTotalAmount(subTotals);
     setTax(Math.floor(subTotals * (receipt.taxRate / 100)));
-  }, [receipt.items, receipt.taxRate]);
+  }, [receipt.products, receipt.taxRate]);
 
-  const addItem = (categoryId, productName, price, quantity, discount) => {
-    const newItem = {categoryId, productName, price, quantity, discount};
+  const addItem = (category_id, product_name, product_price, quantity, discount) => {
+    const newItem = {category_id, product_name, product_price, quantity, discount};
 
     setReceipt(prev => ({
       ...prev,
-      items: [...prev.items, newItem],
+      products: [...prev.products, newItem],
     }));
   };
 
   const updateItem = (index, updates) => {
     setReceipt(prev => {
-      const newItems = [...prev.items];
-      newItems[index] = { ...newItems[index], ...updates };
-      return { ...prev, items: newItems };
+      const newProducts = [...prev.products];
+      newProducts[index] = { ...newProducts[index], ...updates };
+      return { ...prev, products: newProducts };
     });
   };
 
   const deleteItem = (index) => {
     setReceipt(prev => {
-      const newItems = [...prev.items];
-      newItems.splice(index, 1);
-      return { ...prev, items: newItems};
+      const newProducts = [...prev.products];
+      newProducts.splice(index, 1);
+      return { ...prev, products: newProducts};
     });
   };
 

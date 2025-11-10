@@ -11,7 +11,7 @@ const ReceiptHeader = ({ receipt, updateField}) => {
           className={styles["store-name-value"]}
           type="text"
           placeholder="未入力"
-          value={receipt.storeName}
+          value={receipt.shop_name}
           onChange={(e) => updateField("storeName", e.target.value)}
         />
       </div>
@@ -21,7 +21,7 @@ const ReceiptHeader = ({ receipt, updateField}) => {
           className={styles["store-address-value"]}
           type="text"
           placeholder="未入力"
-          value={receipt.storeAddress}
+          value={receipt.shop_address}
           onChange={(e) => updateField("storeAddress", e.target.value)}
         />
       </div>
