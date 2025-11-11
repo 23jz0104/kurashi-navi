@@ -1,8 +1,8 @@
-import React, { use, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./DayPicker.module.css";
 import { ChevronLeft, ChevronRight } from 'lucide-react';
  
-const DayPicker = ( {date} ) => {
+const DayPicker = ( {date, onChange} ) => {
 
   const convertToDate = (dateString) => {
     const parts = dateString.split("-");
@@ -56,6 +56,14 @@ const DayPicker = ( {date} ) => {
     const newDate = new Date(selectedDate);
     newDate.setDate(newDate.getDate() + days);
     setSelectedDate(newDate);
+
+    if (onChange) {
+      const year = newDate.getFullYear();
+      const month = String(newDate.getMonth() + 1).padStart(2, "0");
+      const day = String(newDate.getDate()).padStart(2, "0");
+      const formatted = `${year}-${month}-${day}`;
+      onChange(formatted);
+    }
   }
 
   const generateCalendarDays = () => {
@@ -82,6 +90,14 @@ const DayPicker = ( {date} ) => {
   const selectDate = (date) => {
     setSelectedDate(date);
     setShowCalendar(false);
+
+    if (onChange) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const formatted = `${year}-${month}-${day}`;
+      onChange(formatted);
+    }
   }
 
   const changeMonth = (delta) => {

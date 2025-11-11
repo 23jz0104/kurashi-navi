@@ -1,4 +1,7 @@
 .main-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   max-width: 28rem;
   margin: 0 auto;
 }
@@ -83,10 +86,11 @@
 }
 
 .detail {
+  min-height: 0;
+  overflow-y: auto;  /* 内容があふれたらスクロール */
   background-color: white;
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
 }
 
 .flex {
