@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Wallet, TrendingUp, Clock, Tag, Plus, Upload, Camera } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { Wallet, TrendingUp, Tag, Plus, Upload, Camera } from "lucide-react";
 import "../../index.css";
 import styles from "../../styles/DataInput/ManualInput.module.css";
 import Layout from "../../components/common/Layout";
@@ -11,18 +11,25 @@ import Categories from "../../components/common/Categories";
 import Toast from "../../components/common/Toast";
 import Calculator from "../../components/common/Calculator";
 import { useManualInputUploader } from "../../hooks/dataInput/useManualInputUploader";
+import { useNumberInput } from "../../hooks/useNumberInput";
 
 const ManualInput = () => {
   const [activeTab, setActiveTab] = useState("expense");
   const [isVisible, setIsVisible] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(1);
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     memo: "",
-    quantity: "",
-    product_price: "",
-    categoryId: "",
+    quantity: 1,
+    product_price: 0,
+    category_id: 1,
   });
+  
+  const quantityInput = useNumberInput(formData.quantity);
+
+  useEffect(() => {
+    setFormData((prev => ({ ...prev, quantity: quantityInput.actualValue})));
+  }, [quantityInput.actualValue]);
   
   const { uploadData, isUploading } = useManualInputUploader();
 
@@ -35,13 +42,13 @@ const ManualInput = () => {
     setActiveTab(tab);
     setFormData(prev => ({
       ...prev,
-      category: ""
+      category_id: ""
     }));
   };
 
-  const handleCategorySelect = (categoryId) => {
-    setSelectedCategory(categoryId);
-    setFormData(prev => ({ ...prev, category: categoryId}))
+  const handleCategorySelect = (category_id) => {
+    setSelectedCategory(category_id);
+    setFormData(prev => ({ ...prev, category_id}))
   }
 
   const renderOcrButton = () => {
@@ -65,11 +72,21 @@ const ManualInput = () => {
     setIsVisible(true);
   };
 
-  const handleSubmit = () => {
-    if (!formData.date || !formData.quantity || !formData.category) {
+  const handleSubmit = async () => {
+    if (!formData.date || !formData.quantity || !formData.category_id) {
       alert("未入力の項目があります");
+      return;
     }
-    console.log(formData);
+    console.log("未入力項目なし");
+
+    const result = await uploadData(formData);
+    if(result) {
+      console.log("データアップロード完了");  
+    }
+  }
+
+  const debug = () => {
+    console.log("formData: ", formData);
   }
 
   return (
@@ -82,7 +99,7 @@ const ManualInput = () => {
             {renderOcrButton()}
           </div>
 
-          <DayPicker />
+          <DayPicker date={formData.date} onChange={(date) => setFormData(prev => ({ ...prev, date}))}/>
 
           <div className={styles["manual-input-details"]}>
             <div className={styles["manual-input-row"]}>
@@ -91,7 +108,7 @@ const ManualInput = () => {
             </div>
             <div className={styles["manual-input-row"]}>
               <span className={styles["quantity"]}>個数</span><span className={styles["required"]}>*</span>
-              <input type="number" className={styles["detail-input"]} defaultValue={1} onChange={(e) => setFormData(prev => ({ ...prev, quantity: e.target.value}))} inputMode="numeric"/>
+              <input type="text" className={styles["detail-input"]} value={quantityInput.displayValue} onChange={(e) => quantityInput.handleChange(e.target.value)}/>
             </div>
             <div className={styles["manual-input-row"]}>
               <span className={styles["memo"]}>メモ</span>
@@ -117,6 +134,8 @@ const ManualInput = () => {
             onClick={() => handleSubmit()}
             disabled={isUploading}
           />
+
+          <button onClick={() => debug()}>デバッグ</button>
 
           <Toast
             message="データを入力しました"
