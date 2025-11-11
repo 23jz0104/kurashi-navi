@@ -15,8 +15,11 @@ export const useReceiptForm = (initialReceipt) => {
       return sum + (product_price * quantity) - discount;
     }, 0);
 
+    const tax = Math.floor(subTotals * (receipt.taxRate / 100));
+
     setTotalAmount(subTotals);
-    setTax(Math.floor(subTotals * (receipt.taxRate / 100)));
+    setTax(tax);
+    setReceipt(prev => ({ ...prev, total_amount: subTotals + tax}));
   }, [receipt.products, receipt.taxRate]);
 
   const addItem = (category_id, product_name, product_price, quantity, discount) => {

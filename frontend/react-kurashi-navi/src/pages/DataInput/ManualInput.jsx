@@ -20,7 +20,8 @@ const ManualInput = () => {
     date: new Date().toISOString().split('T')[0],
     memo: "",
     quantity: "",
-    category: ""
+    product_price: "",
+    categoryId: "",
   });
   
   const { uploadData, isUploading } = useManualInputUploader();
@@ -40,6 +41,7 @@ const ManualInput = () => {
 
   const handleCategorySelect = (categoryId) => {
     setSelectedCategory(categoryId);
+    setFormData(prev => ({ ...prev, category: categoryId}))
   }
 
   const renderOcrButton = () => {
@@ -63,7 +65,7 @@ const ManualInput = () => {
     setIsVisible(true);
   };
 
-  const handleSubmit = (data) => {
+  const handleSubmit = () => {
     if (!formData.date || !formData.quantity || !formData.category) {
       alert("未入力の項目があります");
     }
@@ -80,30 +82,22 @@ const ManualInput = () => {
             {renderOcrButton()}
           </div>
 
-          {/* 日付入力 */}
-          <InputSection 
-            fields={{
-              label: <><Clock size={16}/>日付</>,
-              contents: <DayPicker />
-            }}
-          />
+          <DayPicker />
 
-          <InputSection
-            fields={[
-              {
-                label: <>金額<span className={styles["required"]}>*</span></>,
-                contents: <Calculator onChange={(val) => setFormData(prev => ({ ...prev, amount: val }))} />
-              },
-              {
-                label: <>個数<span className={styles["required"]}>*</span></>,
-                contents: <input type="text" placeholder="未入力" onChange={(e) => setFormData(prev => ({...prev, quantity: e.target.value}))} />
-              },
-              {
-                label: "メモ",
-                contents: <input type="text" placeholder="未入力" onChange={(e) => setFormData(prev => ({...prev, memo: e.target.value}))}/>
-              },
-            ]}
-          />
+          <div className={styles["manual-input-details"]}>
+            <div className={styles["manual-input-row"]}>
+              <span className={styles["price"]}>金額</span><span className={styles["required"]}>*</span>
+              <Calculator onChange={(e) => setFormData(prev => ({ ...prev, product_price: e}))} className={styles["detail-input"]}/>
+            </div>
+            <div className={styles["manual-input-row"]}>
+              <span className={styles["quantity"]}>個数</span><span className={styles["required"]}>*</span>
+              <input type="number" className={styles["detail-input"]} defaultValue={1} onChange={(e) => setFormData(prev => ({ ...prev, quantity: e.target.value}))} inputMode="numeric"/>
+            </div>
+            <div className={styles["manual-input-row"]}>
+              <span className={styles["memo"]}>メモ</span>
+              <input type="text" className={styles["detail-input"]} value={formData.memo} onChange={(e) => setFormData(prev => ({ ...prev, memo: e.target.value}))}/>
+            </div>
+          </div>
 
           <InputSection 
             fields={{
@@ -120,7 +114,7 @@ const ManualInput = () => {
 
           <SubmitButton 
             text={<><Plus size={20}/>追加</>}
-            onClick={() => handleSubmit(formData)}
+            onClick={() => handleSubmit()}
             disabled={isUploading}
           />
 

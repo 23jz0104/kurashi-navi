@@ -36,6 +36,10 @@ const ConfirmInputData = () => {
     }
   }
 
+  const debug = () => {
+    console.log("現在のreceipt: ", receipt);
+  }
+
   // メインコンテンツ
   return (
     <Layout
@@ -113,6 +117,10 @@ const ConfirmInputData = () => {
             onClick={() => handleSubmit(receipt)}
             disabled={isUploading}
             />
+
+          <button onClick={() => debug()}>
+            デバッグ
+          </button>
         </div>
       }
     />

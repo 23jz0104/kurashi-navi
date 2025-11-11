@@ -22,9 +22,9 @@ const ReceiptItemModal = ({
       : {
           product_name: "",
           product_price: 0,
-          quantity: 1,
+          quantity: 1,  
           discount: 0,
-          categoryId: null,
+          category_id: null,
         }
   );
 

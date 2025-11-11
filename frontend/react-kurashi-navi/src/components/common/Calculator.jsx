@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./Calculator.module.css"
 
-const Calculator = ({ onChange }) => {
+const Calculator = ({ onChange, className }) => {
   const [displayValue, setDisplayValue] = useState("0");
   const [expression, setExpression] = useState("");
   const [showCalculator, setShowCalculator] = useState(false);
@@ -14,7 +14,7 @@ const Calculator = ({ onChange }) => {
     if (onChange) {
       onChange(displayValue);
     }
-  }, [displayValue, onChange]);
+  }, [displayValue]);
 
   const calculate = (expr) => {
     if(!expr || typeof expr !== "string") return "0";
@@ -258,7 +258,7 @@ const Calculator = ({ onChange }) => {
   return (
     <div className={styles["calculator-container"]}>
       <input
-        className={styles["calculator-display"]} 
+        className={`${className ? className : styles["calculator-display"]}`} 
         ref={inputRef}
         type="text"
         readOnly

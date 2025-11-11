@@ -34,7 +34,7 @@
 
 .store-name-value:focus, .store-address-value:focus {
   outline: none;
-  border-bottom-color: #3b82f6;
+  caret-color: #3b82f6;
 }
 
 .store-name-value::placeholder, .store-address-value::placeholder {

@@ -15,7 +15,7 @@ const ReceiptItemForm = ({
     product_price = 0, 
     quantity = 1, 
     discount = 0, 
-    categoryId = null 
+    category_id = null 
   } = initialValues;
 
   const priceInput = useNumberInput(product_price);
@@ -23,7 +23,7 @@ const ReceiptItemForm = ({
   const discountInput = useNumberInput(discount);
 
   useEffect(() => {
-    onFieldChange("price", priceInput.actualValue);
+    onFieldChange("product_price", priceInput.actualValue);
   }, [priceInput.actualValue]);
 
   useEffect(() => {
@@ -94,8 +94,8 @@ const ReceiptItemForm = ({
       {/* カテゴリ選択 */}
       <Categories
         categories={categoriesByType.expense}
-        selectedCategory={categoryId}
-        onSelected={(id) => onFieldChange("categoryId", id)}
+        selectedCategory={category_id}
+        onSelected={(id) => onFieldChange("category_id", id)}
       />
     </>
   );
