@@ -6,7 +6,7 @@ export const useManualInputUploader = () => {
   const uploadData = async (data) => {
     setIsUploading(true);
 
-    console.log("送信するデータ:", data);
+    console.log("送信するデータ:", JSON.stringify(data, null, 1));
     try {
       const response = await fetch("/api/receipt", {
         method: "POST",
@@ -23,6 +23,7 @@ export const useManualInputUploader = () => {
       }
 
       const result = await response.json();
+      return result;
     } catch (error) {
       console.log("error: ", error);
     } finally {
