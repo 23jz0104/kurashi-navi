@@ -1,13 +1,23 @@
 import { useNavigate } from "react-router-dom";
 import { Camera, ArrowLeft } from "lucide-react";
-import { useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import "../../index.css"
 import styles from "../../styles/DataInput/CameraInput.module.css";
 import Layout from "../../components/common/Layout";
+import { useOcrAnalysis } from "../../hooks/dataInput/useOcrAnalysis";
+import Loader from "../../components/common/Loader";
 
 const CameraInput = () => {
+  const [file, setFile] = useState(null);
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
+  const { ocrResult, loading, error } = useOcrAnalysis(file);
+
+  useEffect(() => {
+    if(!loading && ocrResult) {
+      navigate("/confirm-input-data", { state: {ocrResult} });
+    }
+  }, [ocrResult, loading, error]);
 
   const handleCameraClick = () => {
     fileInputRef.current?.click();
@@ -16,9 +26,21 @@ const CameraInput = () => {
   const handleCameraChange = (event) => {
     const file = event.target.files?.[0];
     if(file) {
-      console.log(file.name);
-      navigate("/confirm-input-data", { state: { file: file }});
+      setFile(file);
     }
+  };
+
+  if(loading && file) {
+    return (
+      <Layout 
+        headerContent={
+          <p>カメラ</p>
+        }
+        mainContent={
+          <Loader text="解析中"/>
+        }
+      />
+    )
   }
 
   return (

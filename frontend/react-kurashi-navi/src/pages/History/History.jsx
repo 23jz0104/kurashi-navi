@@ -6,7 +6,7 @@ import MonthPicker from "../../components/common/MonthPicker";
 import { ChartPie, CalendarDays } from "lucide-react";
 import GraphView from "../../components/common/GraphView";
 import CalendarView from "../../components/common/CalendarView";
-import { useCategories } from "../../components/hooks/useCategories";
+import { useCategories } from "../../hooks/useCategories";
 import { expenseReceiptData, incomeData } from "../../mocks/historyData";
 
 const History = () => {
