@@ -35,11 +35,11 @@ export const useReceiptUploader = () => {
         headers: {
           "Content-Type": "application/json",
           "X-User-ID": "1",  // テスト用の値
-          "X-Type-ID": "1"   // テスト用の値
+          "X-Type-ID": "2"   // テスト用の値 1が収入　2が支出
         },
         body: JSON.stringify(formattedReceipt),
       });
-
+      
       if(!response.ok) {
         console.log(response.status + "エラー:", response);
       }
