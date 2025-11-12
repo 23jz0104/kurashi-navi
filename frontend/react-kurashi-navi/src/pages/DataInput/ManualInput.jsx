@@ -1,26 +1,37 @@
 import React, { useState } from "react";
-import { Wallet, TrendingUp, Clock, Tag, Plus, Upload, Camera } from "lucide-react";
+import { Wallet, TrendingUp, Plus, Upload, Camera } from "lucide-react";
 import "../../index.css";
 import styles from "../../styles/DataInput/ManualInput.module.css";
 import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";
 import SubmitButton from "../../components/common/SubmitButton";
-import InputSection from "../../components/common/InputSection";
-import DayPicker from "../../components/common/DayPicker";
-import Categories from "../../components/common/Categories";
 import Toast from "../../components/common/Toast";
-import Calculator from "../../components/common/Calculator";
+import { useManualInputUploader } from "../../hooks/dataInput/useManualInputUploader";
+import ReceiptHeader from "../../components/DataInput/ReceiptHeader";
+import ReceiptSummry from "../../components/DataInput/ReceiptSummry";
+import { useReceiptForm } from "../../hooks/dataInput/useReceiptForm";
+import ReceiptItemPreview from "../../components/DataInput/ReceiptItemPreview";
+import DropdownModal from "../../components/common/DropdonwModal";
+import ReceiptItemModal from "../../components/DataInput/ReceiptItemModal";
+import { useCategories } from "../../hooks/useCategories";
 
 const ManualInput = () => {
   const [activeTab, setActiveTab] = useState("expense");
   const [isVisible, setIsVisible] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [formData, setFormData] = useState({
-    date: new Date().toISOString().split('T')[0],
-    memo: "",
-    amount: "",
-    category: ""
-  });
+
+  const { getCategoryById, categoriesByType } = useCategories();
+  
+  const {
+    receipt,
+    totalAmount,
+    tax,
+    addItem,
+    updateItem,
+    deleteItem,
+    updateReceiptInfo,
+  } = useReceiptForm();
+  
+  const { uploadData, isUploading } = useManualInputUploader();
 
   const tabs = [
     { id: "expense", label: "支出", icon: <Wallet size={20} /> },
@@ -29,15 +40,7 @@ const ManualInput = () => {
 
   const handleTabChange = (tab) => {
     setActiveTab(tab);
-    setFormData(prev => ({
-      ...prev,
-      category: ""
-    }));
   };
-
-  const handleCategorySelect = (categoryId) => {
-    setSelectedCategory(categoryId);
-  }
 
   const renderOcrButton = () => {
     if (activeTab !== "expense") return null;
@@ -60,6 +63,24 @@ const ManualInput = () => {
     setIsVisible(true);
   };
 
+  const handleSubmit = async () => {
+    if (!receipt.shop_name || !receipt.products) {
+      alert("未入力の項目があります");
+      return;
+    }
+    console.log("未入力項目なし");
+
+    const result = await uploadData(receipt);
+    if(result) {
+      console.log("データアップロード完了");  
+    }
+  }
+
+  const debug = () => {
+    // console.log("formData: ", JSON.stringify(formData, null, 2));
+    console.log("receipt: ", JSON.stringify(receipt, null, 1));
+  }
+
   return (
     <Layout 
       headerContent={<TabButton tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} />}
@@ -70,44 +91,79 @@ const ManualInput = () => {
             {renderOcrButton()}
           </div>
 
-          {/* 日付入力 */}
-          <InputSection 
-            fields={{
-              label: <><Clock size={16}/>日付</>,
-              contents: <DayPicker />
-            }}
+          <ReceiptHeader
+            receipt={receipt}
+            updateField={updateReceiptInfo}
           />
 
-          <InputSection
-            fields={[
-              {
-                label: <>金額<span className={styles["required"]}>*</span></>,
-                contents: <Calculator />
-              },
-              {
-                label: "メモ",
-                contents: <input type="text" placeholder="未入力" />
-              }
-            ]}
+          <ReceiptSummry
+            totalAmount={totalAmount}
+            taxRate={receipt.taxRate}
+            tax={tax}
           />
 
-          <InputSection 
-            fields={{
-              label: <><Tag size={16}/>カテゴリ<span className={styles.required}>*</span></>,
-              contents: (
-                <Categories 
-                  activeTab={activeTab}
-                  selectedCategory={selectedCategory}
-                  onSelected={handleCategorySelect}
-                />
-              )
-            }}
-          />
+          {/* アイテムリスト */}
+          <div className={styles["item-container"]}>
+            <div className={styles["item-list"]}>
+              {receipt.products.map((item, index) => (
+                <DropdownModal
+                  key={index}
+                  title={
+                    <ReceiptItemPreview
+                      item={item}
+                      getCategoryById={getCategoryById}
+                    />
+                  }
+                >
+                  {(closeModal) => (
+                    <ReceiptItemModal
+                      mode="edit"
+                      item={item}
+                      index={index}
+                      categoriesByType={categoriesByType}
+                      onSubmit={updateItem}
+                      onDelete={deleteItem}
+                      closeModal={closeModal}
+                    />
+                  )}
+                </DropdownModal>
+              ))}
+
+              {/* 項目を追加 */}
+              <DropdownModal
+                title={
+                  <>
+                    <span
+                      className={styles["category-icon"]}
+                      style={{ backgroundColor: "#C0C0C0" }}
+                    >
+                      <Plus size={16} />
+                    </span>
+                    <span className={styles["product-name"]}>
+                      項目を追加する
+                    </span>
+                  </>
+                }
+              >
+                {(closeModal) => (
+                  <ReceiptItemModal
+                    mode="add"
+                    categoriesByType={categoriesByType}
+                    onSubmit={addItem}
+                    closeModal={closeModal}
+                  />
+                )}
+              </DropdownModal>
+            </div>
+          </div>
 
           <SubmitButton 
             text={<><Plus size={20}/>追加</>}
-            onClick={showToast}
+            onClick={() => handleSubmit()}
+            disabled={isUploading}
           />
+
+          <button onClick={() => debug()}>デバッグ</button>
 
           <Toast
             message="データを入力しました"

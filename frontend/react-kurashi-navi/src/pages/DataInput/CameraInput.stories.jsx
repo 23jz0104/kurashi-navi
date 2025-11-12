@@ -1,4 +1,3 @@
-import React from "react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import CameraInput from "./CameraInput";
 import ConfirmInputData from "./ConfirmInputData";
