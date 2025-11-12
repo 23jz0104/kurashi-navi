@@ -6,7 +6,8 @@ import { useEffect, useRef } from "react";
 
 Chartjs.register(ArcElement, Tooltip, Legend);
 
-const GraphView = ({ data }) => {
+const GraphView = ({ summary }) => {
+  console.log("summry:", summary);
   const chartRef = useRef(null);
 
   useEffect(() => {
@@ -15,60 +16,21 @@ const GraphView = ({ data }) => {
       chartRef.current.reset();
       chartRef.current.update();
     }
-  }, [data]);
-
-  const { getCategoryById } = useCategories();
-
-  const calculateCategoryTotals = (entries) => {
-    if(!entries || entries.length === 0) {
-      return [];
-    }
-
-    const totals = {};
-
-    entries.forEach(entry => {
-      entry.items.forEach(item => {
-        const { categoryId, price, quantity } = item;
-        const total = price * quantity;
-
-        if (!totals[categoryId]) {
-          totals[categoryId] = 0;
-        }
-        totals[categoryId] += total;
-      });
-    });
-
-    return Object.entries(totals).map(([categoryId, total]) => {
-      const category = getCategoryById(Number(categoryId));
-
-      if (!category) {
-        return {
-          categoryId: Number(categoryId),
-          categoryName: "...",
-          icon: null,
-          color: "#ccc",
-          total: total
-        };
-      }
-
-      return {
-        categoryId: category.id,
-        categoryName: category.name,
-        icon: category.icon,
-        color: category.color,
-        total: total
-      };
-    });
-  };
-
-  const categoryTotals = calculateCategoryTotals(data);
+  }, [summary]);
 
   const chartData = {
-    labels: categoryTotals.map(cat => cat.categoryName),
+    labels: summary.map((item) => item.category_name),
     datasets: [{
       label: "合計金額",
-      data: categoryTotals.map(cat => cat.total),
-      backgroundColor: categoryTotals.map(cat => cat.color),
+      data: summary.map((item) => Number(item.total)),
+      backgroundColor: [
+        "#FF6384",
+        "#36A2EB",
+        "#FFCE56",
+        "#4BC0C0",
+        "#9966FF",
+        "#FF9F40",
+      ],
       borderWidth: 0,
     }],
   };
@@ -89,8 +51,8 @@ const GraphView = ({ data }) => {
           label: (context) => {
             const label = context.label || "";
             const value = context.parsed;
-            const sum = context.chart._metasets[context.datasetIndex].total;
-            const percent = ((value / sum) * 100).toFixed(1);
+            const total = context.chart._metasets[context.datasetIndex].total;
+            const percent = ((value / total) * 100).toFixed(1);
             return `${label}: ${value}円 (${percent}%)`;
           },
         },
@@ -129,7 +91,7 @@ const GraphView = ({ data }) => {
   
   return (
     <>
-      {data && data.length > 0 ? ( //データが存在する場合はグラフを表示
+      {summary && summary.length > 0 ? ( //データが存在する場合はグラフを表示
         <Doughnut
           ref={chartRef}
           data={chartData}
