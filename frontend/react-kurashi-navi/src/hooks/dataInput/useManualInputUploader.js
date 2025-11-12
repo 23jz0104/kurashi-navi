@@ -6,7 +6,29 @@ export const useManualInputUploader = () => {
   const uploadData = async (data) => {
     setIsUploading(true);
 
-    console.log("送信するデータ:", JSON.stringify(data, null, 1));
+    //discount属性をJSONから削除して整形
+    const formattedproducts = data.products.map(product => {
+      const { discount, ...restproduct } = product;
+
+      //商品当たりの割引額を求める（後で修正するかも）
+      const finalPrice = Math.floor((product.product_price * product.quantity - discount) / product.quantity);
+
+      return {
+        ...restproduct,
+        product_price: finalPrice,
+      };
+    });
+
+    // taxRateを除外したレシートデータを作成
+    const { taxRate, ...restReceipt } = data;
+
+    const formattedReceipt = [{
+      ...restReceipt,
+      products: formattedproducts,
+    }];
+
+    console.log("送信するデータ:", JSON.stringify(formattedReceipt, null, 1));
+
     try {
       const response = await fetch("/api/receipt", {
         method: "POST",
@@ -15,7 +37,7 @@ export const useManualInputUploader = () => {
           "X-user-ID": "1",
           "X-Type-ID": "1",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(formattedReceipt),
       });
 
       if(!response.ok) {

@@ -37,6 +37,7 @@ const ConfirmInputData = () => {
   }
 
   const debug = () => {
+    console.log("initialReceipt: ", JSON.stringify(initialReceipt, null, 1));
     console.log("現在のreceipt: ", receipt);
   }
 

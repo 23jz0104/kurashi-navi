@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 
-export const useReceiptForm = (initialReceipt) => {
+export const useReceiptForm = (initialReceipt = {
+  shop_name: "",
+  shop_address: "",
+  purchase_day: new Date().toISOString().split('T')[0],
+  products: [],
+  total_amount: "0",
+  taxRate: 8,
+}) => {
   const [receipt, setReceipt] = useState(initialReceipt);
   const [totalAmount, setTotalAmount] = useState(0);
   const [tax, setTax] = useState(0);
