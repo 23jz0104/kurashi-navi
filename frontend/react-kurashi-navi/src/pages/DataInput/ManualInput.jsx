@@ -13,7 +13,7 @@ import { useReceiptForm } from "../../hooks/dataInput/useReceiptForm";
 import ReceiptItemPreview from "../../components/DataInput/ReceiptItemPreview";
 import DropdownModal from "../../components/common/DropdonwModal";
 import ReceiptItemModal from "../../components/DataInput/ReceiptItemModal";
-import { useCategories } from "../../hooks/useCategories";
+import { useCategories } from "../../hooks/useCategories.old";
 
 const ManualInput = () => {
   const [activeTab, setActiveTab] = useState("expense");

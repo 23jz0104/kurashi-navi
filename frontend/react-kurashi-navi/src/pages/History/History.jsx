@@ -5,12 +5,19 @@ import styles from "../../styles/History/History.module.css";
 import { useTab } from "../../hooks/useTab";
 import MonthPicker from "../../components/common/MonthPicker";
 import { useGetRecord } from "../../hooks/history/useGetRecord";
+import { useMonthPicker } from "../../hooks/useMonthPicker";
+import { useState } from "react";
+import GraphView from "../../components/common/GraphView";
+import { useCategories } from "../../hooks/useCategories";
 
 const History = () => {
   const { activeTab, handleTabChange } = useTab("graph");
-  const { isLoading, record } = useGetRecord("2025-11");
+  const { selectedMonth, changeMonth, setMonth, getMonthString } = useMonthPicker();
+  const { isLoading: isRecordLoading, record } = useGetRecord(getMonthString());
+  const { isLoading: isCategoriesLoading, categories } = useCategories();
+  const [ transactionType, setTransactionType ] = useState("expense");
 
-  if (isLoading) {
+  if (isRecordLoading || isCategoriesLoading) {
     return <div>ロード中...</div>
   }
 
@@ -19,11 +26,26 @@ const History = () => {
     { id: "calendar", label: "カレンダー", icon: <CalendarDays size={20} /> },
   ];
 
+  //transactionType(選択中のタブ)に応じて支出と収入の出力を切り替え
+  const filteredRecords = record.summary.filter(r => {
+    if (transactionType === "income") return r.type === "1";
+    if (transactionType === "expense") return r.type === "2";
+  });
+
+  const viewContent = {
+    graph: (
+      <GraphView summary={filteredRecords}/>
+    ),
+    calendar: (
+      <></>
+    )
+  }
+
   //recordをもとにして支出と収入を計算
-  const totalIncome = record.records?.reduce((sum, r) => {
+  const totalIncome = record.records.reduce((sum, r) => {
     return r.type_id === "1" ? sum + Number(r.total_amount) : sum ;
   }, 0);
-  const totalExpense = record.records?.reduce((sum, r) => {
+  const totalExpense = record.records.reduce((sum, r) => {
     return r.type_id === "2" ? sum + Number(r.total_amount) : sum ;
   }, 0);
   const balance = totalIncome - totalExpense;
@@ -39,7 +61,11 @@ const History = () => {
       }
       mainContent={
         <div className={styles["main-container"]}>
-          <MonthPicker />
+          <MonthPicker 
+            selectedMonth={selectedMonth} 
+            onMonthChange={changeMonth}
+            onMonthSelect={setMonth}
+          />
 
           <div className={styles["finance-summary"]}>
             <div className={`${styles["finance-item"]} ${styles["expense"]}`}>
@@ -53,6 +79,36 @@ const History = () => {
             <div className={`${styles["finance-item"]} ${styles["balance"]}`}>
               <span className={styles["label"]}>収支</span>
               <span className={styles["value"]}>¥{balance.toLocaleString()}</span>
+            </div>
+          </div>
+
+          <div className={styles["view-container"]}>
+            <div className={styles["view-controls"]}>
+              {activeTab === "graph" && (
+                <>
+                  <button
+                    className={`
+                      ${styles["control-button"]}
+                      ${transactionType === "expense" ? styles["active"] : ""}
+                    `}
+                    onClick={() => setTransactionType("expense")}
+                  >
+                    支出
+                  </button>
+                  <button
+                    className={`
+                      ${styles["control-button"]}
+                      ${transactionType === "income" ? styles["active"] : ""}  
+                    `}
+                    onClick={() => setTransactionType("income")}
+                  >
+                    収入
+                  </button>
+                </>
+              )}
+            </div>
+            <div className={styles["graph-container"]}>
+              {viewContent[activeTab]}
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./Categories.module.css";
-import { useCategories } from "../../hooks/useCategories";
+import { useCategories } from "../../hooks/useCategories.old";
 
 const Categories = ({ activeTab = "expense", selectedCategory, onSelected }) => {
 
