@@ -7,7 +7,6 @@ import { useEffect, useRef } from "react";
 Chartjs.register(ArcElement, Tooltip, Legend);
 
 const GraphView = ({ summary }) => {
-  console.log("summry:", summary);
   const chartRef = useRef(null);
 
   useEffect(() => {

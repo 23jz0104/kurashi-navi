@@ -4,7 +4,7 @@ import Layout from "../../components/common/Layout";
 import styles from "../../styles/DataInput/ConfirmInputData.module.css";
 import SubmitButton from "../../components/common/SubmitButton";
 import DropdownModal from "../../components/common/DropdonwModal";
-import { useCategories } from "../../hooks/useCategories";
+import { useCategories } from "../../hooks/useCategories.old";
 import { useReceiptForm } from "../../hooks/dataInput/useReceiptForm";
 import ReceiptHeader from "../../components/DataInput/ReceiptHeader";
 import ReceiptSummry from "../../components/DataInput/ReceiptSummry";

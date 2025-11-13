@@ -34,7 +34,7 @@ export const useManualInputUploader = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-User-ID": "1",
+          "X-User-ID": "2",
           "X-Type-ID": "2", //収入は1、支出は2
         },
         body: JSON.stringify(formattedReceipt),

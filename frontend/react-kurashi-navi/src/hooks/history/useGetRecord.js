@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
 
 export const useGetRecord = (month) => {
-  const [record, setRecord] = useState({ records: [], summary:[] });
-  const [isLoading, setIsLoading] = useState(false);
+  const [record, setRecord] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const getRecord = async () => {
       try {
         setIsLoading(true);
-        console.log("通信中");
+        console.log("getRecord_通信中");
         const response = await fetch(`/api/records?month=${month}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "X-User-ID": "1", //テスト用のID
+            "X-User-ID": "1", //個々の数値でユーザーIDを指定する
           },
         });
 
@@ -23,7 +23,7 @@ export const useGetRecord = (month) => {
 
         const data = await response.json();
         setRecord(data);
-        console.log("データの取得に成功", "データ:", JSON.stringify(data, null, 1));
+        console.log("データの取得に成功", data.month);
         return data;
       } catch (error) {
         console.log(error);
