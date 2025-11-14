@@ -8,7 +8,7 @@ export const useGetRecord = (month) => {
     const getRecord = async () => {
       try {
         setIsLoading(true);
-        console.log("getRecord_通信中");
+        console.log("API通信: useGetRecord.js");
         const response = await fetch(`/api/records?month=${month}`, {
           method: "GET",
           headers: {
@@ -23,7 +23,7 @@ export const useGetRecord = (month) => {
 
         const data = await response.json();
         setRecord(data);
-        console.log("データの取得に成功", data.month);
+        console.log("データの取得に成功", JSON.stringify(data, null, 1));
         return data;
       } catch (error) {
         console.log(error);

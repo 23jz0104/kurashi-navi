@@ -2,22 +2,23 @@ import { CalendarDays, ChartPie } from "lucide-react";
 import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";
 import styles from "../../styles/History/History.module.css";
-import { useTab } from "../../hooks/useTab";
+import { useTab } from "../../hooks/common/useTab";
 import MonthPicker from "../../components/common/MonthPicker";
 import { useGetRecord } from "../../hooks/history/useGetRecord";
-import { useMonthPicker } from "../../hooks/useMonthPicker";
+import { useMonthPicker } from "../../hooks/common/useMonthPicker";
 import { useState } from "react";
 import GraphView from "../../components/common/GraphView";
-import { useCategories } from "../../hooks/useCategories";
+import { useCategories } from "../../hooks/common/useCategories";
 
 const History = () => {
   const { activeTab, handleTabChange } = useTab("graph");
   const { selectedMonth, changeMonth, setMonth, getMonthString } = useMonthPicker();
   const { isLoading: isRecordLoading, record } = useGetRecord(getMonthString());
-  const { isLoading: isCategoriesLoading, categories } = useCategories();
+  const { isLoading: isIncomeCategoriesLoading, categories: incomeCategories } = useCategories(1);
+  const { isLoading: isExpenseCategoriesLoading, categories: expenseCategories } = useCategories(2);
   const [ transactionType, setTransactionType ] = useState("expense");
 
-  if (isRecordLoading || isCategoriesLoading) {
+  if (isRecordLoading || isIncomeCategoriesLoading || isExpenseCategoriesLoading) {
     return <div>ロード中...</div>
   }
 

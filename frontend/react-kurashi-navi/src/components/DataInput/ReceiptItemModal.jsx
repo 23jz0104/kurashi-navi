@@ -9,10 +9,10 @@ const ReceiptItemModal = ({
   mode = "add", // "add" | "edit"
   item = null,
   index = null,
-  categoriesByType,
   onSubmit,
   onDelete,
   closeModal,
+  categories,
 }) => {
   const isEditMode = mode === "edit";
   
@@ -92,9 +92,9 @@ const ReceiptItemModal = ({
       {/* フォーム */}
       <ReceiptItemForm
         initialValues={formData}
-        categoriesByType={categoriesByType}
         onFieldChange={handleFieldChange}
         idPrefix={isEditMode ? `edit-${index}` : "add"}
+        categories={categories}
       />
 
       {/* 送信ボタン */}

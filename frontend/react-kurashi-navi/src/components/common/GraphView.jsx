@@ -1,7 +1,7 @@
 import { Doughnut } from "react-chartjs-2";
 import { Chart as Chartjs, ArcElement, Tooltip, Legend } from "chart.js";
 import styles from "./GraphView.module.css";
-import { useCategories } from "../../hooks/useCategories";
+import { useCategories } from "../../hooks/common/useCategories";
 import { useEffect, useRef } from "react";
 
 Chartjs.register(ArcElement, Tooltip, Legend);

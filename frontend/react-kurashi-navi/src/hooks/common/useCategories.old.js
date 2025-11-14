@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getIconComponent } from "../constants/categories";
+import { getIconComponent } from "../../constants/categories";
 
 //APIからカテゴリデータを取得する関数
 const fetchCategories = async() => {
