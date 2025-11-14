@@ -1,5 +1,5 @@
-import React from "react";
 import styles from "./Loader.module.css";
+import React from "react";
 
 const Loader = ({ text = "読み込み中"}) => {
   return (

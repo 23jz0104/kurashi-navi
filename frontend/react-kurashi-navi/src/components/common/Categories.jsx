@@ -1,36 +1,18 @@
 import React from "react";
 import styles from "./Categories.module.css";
-import { useCategories } from "../../hooks/useCategories.old";
 
-const Categories = ({ activeTab = "expense", selectedCategory, onSelected }) => {
-
-  const handleSelected = (categoryId) => {
-    onSelected?.(categoryId);
-  };
-
-  const { categoriesByType } = useCategories();
-  const currentCategories = categoriesByType[activeTab] || [];
-
+const Categories = ({categories}) => {
   return (
     <div>
       <div className={styles["category-grid"]}>
-        {currentCategories.map((category) => (
+        {categories.map((category) => (
           <button
             key={category.id}
             type="button"
-            onClick={() => handleSelected(category.id)}
-            className={`
-              ${styles["category-button"]}
-              ${selectedCategory === category.id ? styles["selected"] : ""}
-            `}
+            className={`${styles["category-button"]}`}
           >
-            <span 
-              className={styles["category-icon"]}
-              style={{ backgroundColor: category.color }} 
-            >
-              {category.icon}
-            </span>
-            <span className={styles["category-name"]}>{category.name}</span>
+            <span className={styles["category-icon"]}></span>
+            <span className={styles["category-name"]}>{category.category_name}</span>
           </button>
         ))}
       </div>

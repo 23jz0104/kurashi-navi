@@ -1,23 +1,16 @@
-import { ChevronRight, CircleQuestionMark } from "lucide-react";
-import styles from "./ReceiptItemPreview.module.css";
 import React from "react";
+import styles from "./ReceiptItemPreview.module.css";
+import { ChevronRight } from "lucide-react";
 
-const ReceiptItemPreview = ( {item, getCategoryById} ) => {
-  const category = getCategoryById(item.category_id);
-  const categoryColor = category?.color || "#868E96";
-  const categoryIcon = category?.icon ? (
-    React.cloneElement(category.icon, { size: 16 })
-  ) : (
-    <CircleQuestionMark size={16} />
-  );
-
+const ReceiptItemPreview = ({item}) => {
   return (
     <>
       <span
         className={styles["category-icon"]}
-        style={{ backgroundColor: categoryColor }}
+        /* 将来的にカテゴリフックからidに応じたカラーを取得 */
+        style={{ backgroundColor: "red"}}
       >
-        {categoryIcon}
+        {/* 将来的にここにアイコンを配置 */}
       </span>
       <span className={styles["product-name"]}>
         {item.product_name}
@@ -27,7 +20,7 @@ const ReceiptItemPreview = ( {item, getCategoryById} ) => {
           ¥{(item.product_price * item.quantity).toLocaleString()}
         </span>
         <div className={styles["product-sub-info"]}>
-          {item.quantity >= 2 && (
+          {item.quantity >= 2 && ( //アイテム個数が2より多ければ個数を合わせて表示
             <span className={styles["product-price-and-quantity"]}>
               ¥{item.product_price.toLocaleString()} × {item.quantity}個
             </span>

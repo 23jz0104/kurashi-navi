@@ -1,14 +1,14 @@
 // components/DataInput/ReceiptItemForm.jsx
 import { useEffect } from "react";
 import Categories from "../common/Categories";
-import { useNumberInput } from "../../hooks/useNumberInput";
+import { useNumberInput } from "../../hooks/common/useNumberInput";
 import styles from "./ReceiptItemForm.module.css";
 
 const ReceiptItemForm = ({ 
-  initialValues = {}, 
-  categoriesByType, 
+  initialValues = {},
   onFieldChange, 
-  idPrefix = "" 
+  idPrefix = "",
+  categories
 }) => {
   const { 
     product_name = "", 
@@ -92,11 +92,7 @@ const ReceiptItemForm = ({
       </div>
 
       {/* カテゴリ選択 */}
-      <Categories
-        categories={categoriesByType.expense}
-        selectedCategory={category_id}
-        onSelected={(id) => onFieldChange("category_id", id)}
-      />
+      <Categories categories={categories} />
     </>
   );
 };

@@ -19,7 +19,7 @@ export const useReceiptUploader = () => {
       };
     });
 
-    // taxRateを除外したレシートデータを作成
+    //taxRateを除外したレシートデータを作成
     const { taxRate, ...restReceipt } = receipt;
 
     const formattedReceipt = [{
@@ -43,8 +43,6 @@ export const useReceiptUploader = () => {
       if(!response.ok) {
         console.log(response.status + "エラー:", response);
       }
-
-      console.log("response:", response);
 
       const result = await response.json();
       return result;

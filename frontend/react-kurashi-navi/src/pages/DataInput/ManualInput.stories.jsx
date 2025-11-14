@@ -11,4 +11,4 @@ export const Default = () => (
   <MemoryRouter>
     <ManualInput />
   </MemoryRouter>
-)
+) 

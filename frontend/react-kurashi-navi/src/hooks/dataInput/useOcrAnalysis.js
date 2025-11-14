@@ -1,9 +1,14 @@
 import { useState, useEffect } from "react";
 import { GoogleGenAI, createUserContent, createPartFromUri, Type } from "@google/genai";
+import { useCategories } from "../common/useCategories";
 
 const API_KEY = "AIzaSyDaE9IGHmBNnFgSETBDcqZKv93_W2Q5azI";
 
-const OCR_PROMPT = `
+const generateCategoriesPrompt = (categories) => {
+  return categories.map(cat => `   ${cat.id}: ${cat.category_name}`).join('\n');
+}
+
+const generateOcrPropmt =  (categoryPrompt) => `
   あなたはレシート画像を解析するAIです。
 
   次のルールに従って、JSONを抽出してください。
@@ -27,12 +32,8 @@ const OCR_PROMPT = `
   - 「値引」「割引」といった名前の商品アイテムをproductsに含めないでください。
   - 割引金額に関しては1個あたりの金額を計算する必要はありません。そのままの値を出力してください。
 
-  - category_idは以下の分類ルールに従い、1〜5, 99 の整数で出力する。
-    1: 飲食物（食品、飲料、弁当など）
-    2: 日用品（洗剤、ティッシュ、文房具など）       
-    3: 趣味・娯楽（本、ゲーム、スポーツ用品など）
-    4: 交通費（電車、バス、タクシーなど）
-    5: 光熱費（電気、ガス、水道など）
+  - category_idは以下の分類ルールに従い、整数で出力する。
+   ${categoryPrompt}
     99: その他（上記以外）
 
   - 小計・合計・お預かり金などは含めない。
@@ -116,9 +117,10 @@ export const useOcrAnalysis = (file) => {
   const [loading, setLoading] = useState(true);
   const [ocrResult, setOcrResult] = useState(DEFAULT_OCR_RESULT);
   const [error, setError] = useState(null);
+  const {isLoading: isCategoriesLoading, categories} = useCategories(2); //レシートは基本的に支出のため支出のカテゴリのみ伝える
 
   useEffect(() => {
-    if (!file) {
+    if (!file || isCategoriesLoading) {
       return;
     }
 
@@ -127,6 +129,8 @@ export const useOcrAnalysis = (file) => {
 
     const analyzeReceipt = async () => {
       try {
+        const categoryPrompt = generateCategoriesPrompt(categories);
+        const ocrPrompt = generateOcrPropmt(categoryPrompt);
         const uploadFile = await ai.files.upload({
           file: file,
           config: { mimeType: file.type },
@@ -136,15 +140,13 @@ export const useOcrAnalysis = (file) => {
           model: "gemini-2.5-flash",
           contents: createUserContent([
             createPartFromUri(uploadFile.uri, uploadFile.mimeType),
-            OCR_PROMPT,
+            ocrPrompt,
           ]),
           config: {
             responseMimeType: "application/json",
             responseSchema: RESPONSE_SCHEMA,
           },
         });
-
-        console.log("解析結果", result.text);
 
         const parsedResult = JSON.parse(result.text);
         setOcrResult(parsedResult);
@@ -161,7 +163,7 @@ export const useOcrAnalysis = (file) => {
       }
     };
     analyzeReceipt()
-  }, [file]);
+  }, [file, isCategoriesLoading, categories]);
 
   return {
     ocrResult,
