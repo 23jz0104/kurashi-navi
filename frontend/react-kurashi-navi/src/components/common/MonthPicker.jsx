@@ -3,25 +3,12 @@ import styles from "./MonthPicker.module.css";
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useRef } from "react";
 
-const MonthPicker = ( {onMonthChange} ) => {
-  const [selectedMonth, setSelectedMonth] = useState(() => {
-    // 1月31日などから2月に遷移するとバグるため日付は今日の月をベースに1に変換
-    const date = new Date();
-    date.setDate(1); 
-    return date;
-  });
+const MonthPicker = ({ selectedMonth, onMonthChange, onMonthSelect }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMonth, setModalMonth] = useState(() => new Date(selectedMonth));
 
   const modalRef = useRef(null);
   const toggleButtonRef = useRef(null);
-
-  //selectedMonthが変更されたら親に通知する
-  useEffect(() => {
-    if(onMonthChange) {
-      onMonthChange(selectedMonth);
-    }
-  }, [selectedMonth, onMonthChange]);
 
   useEffect(() => {
     const handleClickOutSide = (event) => {
@@ -55,17 +42,13 @@ const MonthPicker = ( {onMonthChange} ) => {
     return `${year}年${month}月`;
   };
 
-  const changeMonth = (month) => {
-    const newMonth = new Date(selectedMonth);
-    newMonth.setMonth(newMonth.getMonth() + month);
-    setSelectedMonth(newMonth);
-  };
+  const handleChangeMonth = (offset) => {
+    onMonthChange(offset);
+  }
 
-  const selectMonth = (monthIndex) => {
-    const newDate = new Date(modalMonth);
-    newDate.setMonth(monthIndex);
-    newDate.setDate(1);
-    setSelectedMonth(newDate);
+  const handleSelectMonth = (monthIndex) => {
+    const year = modalMonth.getFullYear();
+    onMonthSelect(year, monthIndex);
     setIsModalOpen(false);
   };
 
@@ -86,19 +69,13 @@ const MonthPicker = ( {onMonthChange} ) => {
     setIsModalOpen(prev => !prev);
   };
 
-  const debug = () => {
-    console.log(modalMonth);
-    console.log(modalMonth.getDate() + "月" );
-    console.log(modalMonth.getFullYear() + "年");
-  };
-
   return(
     <div className={styles["month-picker-container"]}>
 
       <div className={styles["month-picker-display"]}>
         <button
           type="button"
-          onClick={() => changeMonth(-1)}
+          onClick={() => handleChangeMonth(-1)}
           className={styles["btn-navigate"]}
         >
           <ChevronLeft size={20}/>
@@ -115,7 +92,7 @@ const MonthPicker = ( {onMonthChange} ) => {
 
         <button
           type="button"
-          onClick={() => changeMonth(1)}
+          onClick={() => handleChangeMonth(1)}
           className={styles["btn-navigate"]}
         >
           <ChevronRight size={20}/>
@@ -139,7 +116,7 @@ const MonthPicker = ( {onMonthChange} ) => {
             return (
               <button
                 key={index}
-                onClick={() => selectMonth(index)}
+                onClick={() => handleSelectMonth(index)}
                 className={`${styles["month-button"]} ${isSelectedMonth(index) ? styles["current-month"] : ""}`}
               >
                 {month}
