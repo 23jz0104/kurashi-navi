@@ -8,17 +8,14 @@ import { useGetRecord } from "../../hooks/history/useGetRecord";
 import { useMonthPicker } from "../../hooks/common/useMonthPicker";
 import { useState } from "react";
 import GraphView from "../../components/common/GraphView";
-import { useCategories } from "../../hooks/common/useCategories";
 
 const History = () => {
   const { activeTab, handleTabChange } = useTab("graph");
   const { selectedMonth, changeMonth, setMonth, getMonthString } = useMonthPicker();
-  const { isLoading: isRecordLoading, record } = useGetRecord(getMonthString());
-  const { isLoading: isIncomeCategoriesLoading, categories: incomeCategories } = useCategories(1);
-  const { isLoading: isExpenseCategoriesLoading, categories: expenseCategories } = useCategories(2);
+  const { isLoading: isRecordLoading, record } = useGetRecord(getMonthString(selectedMonth));
   const [ transactionType, setTransactionType ] = useState("expense");
 
-  if (isRecordLoading || isIncomeCategoriesLoading || isExpenseCategoriesLoading) {
+  if (isRecordLoading) {
     return <div>ロード中...</div>
   }
 
@@ -28,14 +25,18 @@ const History = () => {
   ];
 
   //transactionType(選択中のタブ)に応じて支出と収入の出力を切り替え
-  const filteredRecords = record.summary.filter(r => {
+  const filteredRecordsByType = record.summary.filter(r => {
     if (transactionType === "income") return r.type === "1";
     if (transactionType === "expense") return r.type === "2";
   });
 
+  const filteredRecordsByMonth = filteredRecordsByType.filter(r => r.month === getMonthString(selectedMonth));
+
+  console.log(JSON.stringify(filteredRecordsByMonth, null, 1));
+
   const viewContent = {
     graph: (
-      <GraphView summary={filteredRecords}/>
+      <GraphView summary={filteredRecordsByMonth}/>
     ),
     calendar: (
       <></>
@@ -50,6 +51,8 @@ const History = () => {
     return r.type_id === "2" ? sum + Number(r.total_amount) : sum ;
   }, 0);
   const balance = totalIncome - totalExpense;
+
+  console.log("filteredRecordsByMonth", JSON.stringify(filteredRecordsByMonth, null, 1));
 
   return (
     <Layout 
@@ -112,6 +115,18 @@ const History = () => {
               {viewContent[activeTab]}
             </div>
           </div>
+
+          {activeTab === "graph" && filteredRecordsByMonth.length > 0 && (
+            <div className={styles["detail"]}>
+              {filteredRecordsByMonth.map((r, index) => (
+                <div className={styles["flex"]} key={index}>
+                  <span className={styles["category-icon"]}></span>
+                  <span className={styles["category-name"]}>{r.category_name}</span>
+                  <span className={styles["category-price"]}>¥{r.total.toLocaleString()}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       }
     />

@@ -3,7 +3,7 @@ import { useState } from "react";
 export const useReceiptUploader = () => {
   const [isUploading, setIsUploading] = useState(false);
 
-  const uploadReceipt = async (receipt) => {
+  const uploadReceipt = async (receipt, tax) => {
     setIsUploading(true);
 
     //discount属性をJSONから削除して整形
@@ -22,9 +22,16 @@ export const useReceiptUploader = () => {
     //taxRateを除外したレシートデータを作成
     const { taxRate, ...restReceipt } = receipt;
 
+    const taxItem = {
+      product_name: "消費税",
+      category_id: 8,
+      product_price: tax,
+      quantity: 1,
+    }
+
     const formattedReceipt = [{
       ...restReceipt,
-      products: formattedproducts,
+      products: [...formattedproducts, taxItem],
     }];
 
     console.log("送信するJSON -> ", JSON.stringify(formattedReceipt, null, 1));
@@ -34,7 +41,7 @@ export const useReceiptUploader = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-User-ID": "2",  // テスト用の値
+          "X-User-ID": "5",  // テスト用の値
           "X-Type-ID": "2"   // テスト用の値 1が収入　2が支出
         },
         body: JSON.stringify(formattedReceipt),
