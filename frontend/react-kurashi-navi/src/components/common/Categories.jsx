@@ -6,7 +6,7 @@ const Categories = ({ categories, selectedCategoryId, onSelectedCategory }) => {
     <div>
       <div className={styles["category-grid"]}>
         {categories.map((category) => {
-          const isSelected = category.id === selectedCategoryId;
+          const isSelected = Number(category.id) === Number(selectedCategoryId);
 
           return (
             <button
@@ -14,7 +14,8 @@ const Categories = ({ categories, selectedCategoryId, onSelectedCategory }) => {
               className={`${styles["category-button"]} ${isSelected ? styles["selected"] : ""}`}
               onClick={() => onSelectedCategory(category.id)}
             >
-              {categories.category.name}
+              <span className={styles["category-icon"]}></span>
+              <span className={styles["category-name"]}>{category.category_name}</span>
             </button>
           )
         })}

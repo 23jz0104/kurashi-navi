@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+const recordCache = {};
+
 export const useGetRecord = (month) => {
   const [record, setRecord] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -9,11 +11,12 @@ export const useGetRecord = (month) => {
       try {
         setIsLoading(true);
         console.log("API通信: useGetRecord.js");
-        const response = await fetch(`/api/records?month=${month}`, {
+        const response = await fetch(`/api/records`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "X-User-ID": "1", //個々の数値でユーザーIDを指定する
+            "X-User-ID": "5", //個々の数値でユーザーIDを指定する
+            "X-YearMonth": month,
           },
         });
 
