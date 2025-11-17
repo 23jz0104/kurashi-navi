@@ -15,7 +15,7 @@ import { Plus } from "lucide-react";
 const ConfirmInputData = () => {
   const location = useLocation();
   const initialReceipt = location.state.ocrResult; //CameraInput.jsxで解析したデータを受け取る
-  const { categories } = useCategories(2);
+  const { categories } = useCategories(2); //引数に2を設定して支出カテゴリを取得
   const { isUploading, uploadReceipt} = useReceiptUploader();
   const { receipt, totalAmount, tax, addItem, updateItem, deleteItem, updateReceiptInfo } = useReceiptForm(initialReceipt); //レシートデータを管理する専用のフック
   
@@ -25,6 +25,10 @@ const ConfirmInputData = () => {
     if(result) {
       console.log("データ登録完了")
     }
+  }
+
+  const printCurrentReceipt = () => {
+    console.log(JSON.stringify(receipt, null, 1));
   }
 
   return (
@@ -100,6 +104,8 @@ const ConfirmInputData = () => {
             text={"送信"}
             onClick={() => handleSubmit(receipt)}
           />
+
+          <button onClick={() => printCurrentReceipt()}>コンソールにレシートを出力</button>
         </div>
       }
     />

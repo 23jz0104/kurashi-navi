@@ -1,20 +1,23 @@
 import React from "react";
 import styles from "./Categories.module.css";
 
-const Categories = ({categories}) => {
+const Categories = ({ categories, selectedCategoryId, onSelectedCategory }) => {
   return (
     <div>
       <div className={styles["category-grid"]}>
-        {categories.map((category) => (
-          <button
-            key={category.id}
-            type="button"
-            className={`${styles["category-button"]}`}
-          >
-            <span className={styles["category-icon"]}></span>
-            <span className={styles["category-name"]}>{category.category_name}</span>
-          </button>
-        ))}
+        {categories.map((category) => {
+          const isSelected = category.id === selectedCategoryId;
+
+          return (
+            <button
+              key={category.id}
+              className={`${styles["category-button"]} ${isSelected ? styles["selected"] : ""}`}
+              onClick={() => onSelectedCategory(category.id)}
+            >
+              {categories.category.name}
+            </button>
+          )
+        })}
       </div>
     </div>
   );
