@@ -32,17 +32,8 @@
   margin: auto;
 }
 
-/* .flex-textPw {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.5rem;
-} */
-
-
 .flex-mail {
-  width: 50%;
+  width: 60%;
   padding: 8px 12px; 
   border: 1px solid #ccc;
   border-radius: 5px;  
@@ -50,12 +41,35 @@
 
 
 .flex-pass {
-  width: 50%;
+  width: 60%;
   padding: 8px 12px; 
   border: 1px solid #ccc;
   border-radius: 5px;  
 }
 
+.inputWrapper {
+  position: relative;
+  width: 60%;
+  margin-bottom: 1rem;
+}
+
+.inputWrapper input {
+  width: 100%;
+  padding: 8px 36px 8px 12px; 
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.inputWrapper .passwordToggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #555;
+}
 
 .sp {
   font-size: 80%;
@@ -65,16 +79,16 @@
   cursor: pointer;
 }
 
-/* ログイン / 新規登録ボタン */
+/* ログイン */
 .bt {
-  padding: 5px 35px;
+  margin-top: 2em;
+  padding: 8px 35px;
   font-size: 14px;
   color: white;
-  background-color: rgb(75, 100, 189);
+  background-color: rgb(75, 102, 189);
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: 5%;
 }
 
 /* 下部余白エリア */
