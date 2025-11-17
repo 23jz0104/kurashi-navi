@@ -19,7 +19,7 @@ export const useReceiptUploader = () => {
       };
     });
 
-    // taxRateを除外したレシートデータを作成
+    //taxRateを除外したレシートデータを作成
     const { taxRate, ...restReceipt } = receipt;
 
     const formattedReceipt = [{
@@ -34,17 +34,15 @@ export const useReceiptUploader = () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-User-ID": "1",  // テスト用の値
-          "X-Type-ID": "1"   // テスト用の値
+          "X-User-ID": "2",  // テスト用の値
+          "X-Type-ID": "2"   // テスト用の値 1が収入　2が支出
         },
         body: JSON.stringify(formattedReceipt),
       });
-
+      
       if(!response.ok) {
         console.log(response.status + "エラー:", response);
       }
-
-      console.log("response:", response);
 
       const result = await response.json();
       return result;

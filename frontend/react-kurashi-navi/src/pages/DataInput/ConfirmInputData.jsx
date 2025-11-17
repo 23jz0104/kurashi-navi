@@ -1,57 +1,49 @@
-import { useLocation } from "react-router-dom";
-import { Plus } from "lucide-react";
-import Layout from "../../components/common/Layout";
 import styles from "../../styles/DataInput/ConfirmInputData.module.css";
-import SubmitButton from "../../components/common/SubmitButton";
-import DropdownModal from "../../components/common/DropdonwModal";
-import { useCategories } from "../../hooks/useCategories";
-import { useReceiptForm } from "../../hooks/dataInput/useReceiptForm";
+import { useLocation } from "react-router-dom";
+import Layout from "../../components/common/Layout";
 import ReceiptHeader from "../../components/DataInput/ReceiptHeader";
+import { useReceiptForm } from "../../hooks/dataInput/useReceiptForm";
 import ReceiptSummry from "../../components/DataInput/ReceiptSummry";
+import DropdownModal from "../../components/common/DropdonwModal";
 import ReceiptItemPreview from "../../components/DataInput/ReceiptItemPreview";
 import ReceiptItemModal from "../../components/DataInput/ReceiptItemModal";
+import SubmitButton from "../../components/common/SubmitButton";
 import { useReceiptUploader } from "../../hooks/dataInput/useReceiptUploader";
+import { useCategories } from "../../hooks/common/useCategories";
+import { Plus } from "lucide-react";
 
 const ConfirmInputData = () => {
   const location = useLocation();
-  const initialReceipt = location.state?.ocrResult;
-  const { getCategoryById, categoriesByType } = useCategories();
-  const { uploadReceipt, isUploading } = useReceiptUploader();
-  const {
-    receipt,
-    totalAmount,
-    tax,
-    addItem,
-    updateItem,
-    deleteItem,
-    updateReceiptInfo,
-  } = useReceiptForm(initialReceipt);
+  const initialReceipt = location.state.ocrResult; //CameraInput.jsxで解析したデータを受け取る
+  const { categories } = useCategories(2); //引数に2を設定して支出カテゴリを取得
+  const { isUploading, uploadReceipt} = useReceiptUploader();
+  const { receipt, totalAmount, tax, addItem, updateItem, deleteItem, updateReceiptInfo } = useReceiptForm(initialReceipt); //レシートデータを管理する専用のフック
+  
 
   const handleSubmit = async (receipt) => {
-    if (!receipt || isUploading) return;
-
     const result = await uploadReceipt(receipt);
     if(result) {
-      console.log("データを登録しました。");
+      console.log("データ登録完了")
     }
   }
 
-  const debug = () => {
-    console.log("initialReceipt: ", JSON.stringify(initialReceipt, null, 1));
-    console.log("現在のreceipt: ", receipt);
+  const printCurrentReceipt = () => {
+    console.log(JSON.stringify(receipt, null, 1));
   }
 
-  // メインコンテンツ
   return (
-    <Layout
-      headerContent={<p className={styles.headerContent}>入力データ確認</p>}
+    <Layout 
+      headerContent={
+        <p className={styles["header-content"]}>入力データ確認</p>
+      }
       mainContent={
         <div className={styles["form-container"]}>
-          <ReceiptHeader
+          {/* 日付 店舗名 住所の入力フォーム */}
+          <ReceiptHeader 
             receipt={receipt}
-            updateField={updateReceiptInfo}
+            updateReceiptInfo={updateReceiptInfo}
           />
-
+          {/* 合計金額 税率 税金を表示するサマリ */}
           <ReceiptSummry
             totalAmount={totalAmount}
             taxRate={receipt.taxRate}
@@ -62,12 +54,11 @@ const ConfirmInputData = () => {
           <div className={styles["item-container"]}>
             <div className={styles["item-list"]}>
               {receipt.products.map((item, index) => (
-                <DropdownModal
+                <DropdownModal 
                   key={index}
                   title={
-                    <ReceiptItemPreview
+                    <ReceiptItemPreview 
                       item={item}
-                      getCategoryById={getCategoryById}
                     />
                   }
                 >
@@ -76,24 +67,20 @@ const ConfirmInputData = () => {
                       mode="edit"
                       item={item}
                       index={index}
-                      categoriesByType={categoriesByType}
                       onSubmit={updateItem}
                       onDelete={deleteItem}
                       closeModal={closeModal}
+                      categories={categories}
                     />
                   )}
                 </DropdownModal>
               ))}
 
-              {/* 項目を追加 */}
-              <DropdownModal
+              <DropdownModal 
                 title={
                   <>
-                    <span
-                      className={styles["category-icon"]}
-                      style={{ backgroundColor: "#C0C0C0" }}
-                    >
-                      <Plus size={16} />
+                    <span className={styles["category-icon"]} style={{ backgroundColor: "#c0c0c0"}} >
+                      <Plus />
                     </span>
                     <span className={styles["product-name"]}>
                       項目を追加する
@@ -102,30 +89,27 @@ const ConfirmInputData = () => {
                 }
               >
                 {(closeModal) => (
-                  <ReceiptItemModal
+                  <ReceiptItemModal 
                     mode="add"
-                    categoriesByType={categoriesByType}
                     onSubmit={addItem}
                     closeModal={closeModal}
+                    categories={categories}
                   />
-                )}
+                )} 
               </DropdownModal>
             </div>
           </div>
 
           <SubmitButton 
-            text={isUploading ? "登録中..." : "送信"} 
+            text={"送信"}
             onClick={() => handleSubmit(receipt)}
-            disabled={isUploading}
-            />
+          />
 
-          <button onClick={() => debug()}>
-            デバッグ
-          </button>
+          <button onClick={() => printCurrentReceipt()}>コンソールにレシートを出力</button>
         </div>
       }
     />
-  );
-};
+  )
+}
 
 export default ConfirmInputData;
