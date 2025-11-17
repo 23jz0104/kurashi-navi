@@ -4,16 +4,21 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContai
 import styles from "../../styles/MyPages/Statistics.module.css";
 import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";
+import DayPicker from "../../components/common/DayPicker";
 import { Undo2, Calendar, Clock, TrendingUp, ChartLine } from 'lucide-react';
 
 function Statistics() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("statistics");
-  const [mode, setMode] = useState("preset");
+  const [mode, setMode] = useState("custom");
   const [period, setPeriod] = useState("week");
   const [mounted, setMounted] = useState(false);
-  const [customStart, setCustomStart] = useState("");
-  const [customEnd, setCustomEnd] = useState("");
+  const [customStart, setCustomStart] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 6); // 過去7日間
+    return d.toISOString().slice(0, 10);
+  });
+  const [customEnd, setCustomEnd] = useState(() => new Date().toISOString().slice(0, 10));
   const [customData, setCustomData] = useState([]);
 
   const goBack = () => navigate("/mypage");
@@ -27,6 +32,13 @@ function Statistics() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // 日付範囲に応じて customData を自動生成
+  useEffect(() => {
+    if (customStart && customEnd) {
+      setCustomData(generateData(customStart, customEnd));
+    }
+  }, [customStart, customEnd]);
 
   const generateData = (startDate, endDate) => {
     const data = [];
@@ -48,10 +60,23 @@ function Statistics() {
     year: generateData(new Date(new Date().setDate(new Date().getDate() - 364)), new Date()),
   };
 
-  const handleCustomGenerate = () => {
-    if (customStart && customEnd) {
-      setCustomData(generateData(customStart, customEnd));
-    }
+  const handleDownload = () => {
+    const dataToDownload = mode === "custom" ? customData : emptyDataMap[period];
+    const csv = convertToCSV(dataToDownload);
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "statistics.csv";
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  const convertToCSV = (data) => {
+    if (!data || data.length === 0) return "";
+    const header = Object.keys(data[0]).join(",");
+    const rows = data.map(row => Object.values(row).join(",")).join("\n");
+    return `${header}\n${rows}`;
   };
 
   const headerContent = <TabButton tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} />;
@@ -60,16 +85,17 @@ function Statistics() {
     <div className={styles['flex-statistics']}>
       <button className={styles.modoru} onClick={goBack}><Undo2 /></button>
       <p className={styles.time}>期間を選択</p>
+
       <div className={styles.period}>
         <ul className={styles.ul}>
           <li className={styles.li}>
-            <button className={`${styles.purisetto} ${mode === "preset" ? styles.active : ""}`} onClick={() => setMode("preset")}>
-              プリセット
+            <button className={`${styles.custom} ${mode === "custom" ? styles.active : ""}`} onClick={() => setMode("custom")}>
+              カスタム期間
             </button>
           </li>
           <li className={styles.li}>
-            <button className={`${styles.custom} ${mode === "custom" ? styles.active : ""}`} onClick={() => setMode("custom")}>
-              カスタム期間
+            <button className={`${styles.purisetto} ${mode === "preset" ? styles.active : ""}`} onClick={() => setMode("preset")}>
+              プリセット
             </button>
           </li>
         </ul>
@@ -86,9 +112,25 @@ function Statistics() {
 
       {mode === "custom" && (
         <div className={styles['custom-period']}>
-          <label>開始日:<input className={styles.start} type="date" value={customStart} onChange={(e) => setCustomStart(e.target.value)} /></label>
-          <label>終了日:<input className={styles.end} type="date" value={customEnd} onChange={(e) => setCustomEnd(e.target.value)} /></label>
-          <button className={styles['btn-custom']} onClick={handleCustomGenerate}>表示</button>
+          <div style={{ marginBottom: "10px" }}>
+            <p>開始日</p>
+            <DayPicker
+              selected={new Date(customStart)}
+              onSelect={(date) => date && setCustomStart(date.toISOString().slice(0, 10))}
+            />
+          </div>
+
+          <div style={{ marginBottom: "10px" }}>
+            <p>終了日</p>
+            <DayPicker
+              selected={new Date(customEnd)}
+              onSelect={(date) => date && setCustomEnd(date.toISOString().slice(0, 10))}
+            />
+          </div>
+
+          <button className={styles['btn-custom']} onClick={() => setCustomData(generateData(customStart, customEnd))}>
+            表示
+          </button>
         </div>
       )}
 
@@ -108,7 +150,8 @@ function Statistics() {
           )}
         </div>
       </div>
-      <button className={styles.download}>ダウンロード</button>
+
+      <button className={styles.download} onClick={handleDownload}>ダウンロード</button>
     </div>
   );
 

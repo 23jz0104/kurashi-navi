@@ -11,6 +11,7 @@ function MyPage() {
 
   const goToUserInfo = () => navigate("/userinfo");
   const goToStatistics = () => navigate("/statistics");
+  const goSetting = () => navigate("/Setting");
 
   const handleLogout = () => {
     sessionStorage.removeItem("isLoggedIn");
@@ -31,6 +32,11 @@ function MyPage() {
         <li className={styles.li}>
           <button className={styles.button} onClick={goToStatistics}>
             <ChartBar />統計データ
+          </button>
+        </li>
+        <li className={styles.li}>
+          <button className={styles.button} onClick={goSetting}>
+            <ChartBar />設定
           </button>
         </li>
         <li className={styles.li}>
