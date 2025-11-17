@@ -14,16 +14,23 @@
     padding: 20px;
 }
 
-/* 月セレクター */
-.month-selector {
+/* 月セレクターラッパー */
+.month-selector-wrapper {
     display: flex;
-    align-items: center;
     justify-content: center;
-    gap: 12px;
-    margin-bottom: 20px;
+    width: auto;
+    margin-bottom: 16px;
 }
 
-.month-selector button {
+/* MonthPicker 内部表示 */
+.month-picker-display {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* MonthPicker ナビボタン */
+.month-picker-display button {
     background-color: transparent;
     border: none;
     border-radius: 8px;
@@ -34,7 +41,8 @@
     width: 56px;
 }
 
-.month-selector p {
+/* MonthPicker 年月表示部分 */
+.month-picker-display p {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -48,15 +56,16 @@
     text-align: center;
 }
 
-/* カテゴリボタン */
+/* カテゴリグリッド */
 .category-grid {
     display: flex;
     flex-direction: column;
     gap: 16px;
     width: 80%;
-    max-width: 300px;
+    max-width: 360px;
 }
 
+/* カテゴリボタン */
 .category-button {
     background-color: #fff;
     border: 2px solid #ccc;
@@ -69,6 +78,7 @@
     cursor: pointer;
     transition: all 0.2s ease;
     font-size: 1rem;
+    position: relative;
 }
 
 .category-icon {
@@ -80,17 +90,28 @@
     color: #333;
 }
 
-.notAddedText {
+/* 未追加テキスト */
+.notAddedMessage {
     font-size: 0.8rem;
     color: #999;
     margin-left: auto;
+    /* 右端に寄せる */
 }
 
+/* 詳細情報ボタン（カテゴリ内表示） */
+.detailButtonInCategory {
+    color: #00bfff;
+    border: none;
+    background: none;
+    text-decoration: underline;
+    margin-left: 2%;
+    margin-left: auto;
+    cursor: pointer;
+}
 
 
 /* 支出・収入ボタン */
 .budget-type-card {
-    background-color: transparent;
     display: flex;
     gap: 12px;
     width: 100%;
@@ -166,7 +187,7 @@
     background-color: transparent;
 }
 
-/* カテゴリセレクト */
+/* 統合セレクト */
 .categorySelectWrapper {
     position: relative;
     width: 100%;
@@ -189,11 +210,6 @@
     color: #333;
 }
 
-.selectedIcon {
-    font-size: 1rem;
-    padding-left: 60%;
-}
-
 .arrow {
     margin-left: 8px;
     color: #999;
@@ -208,6 +224,8 @@
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     z-index: 100;
+    max-height: 150px;
+    overflow-y: auto;
 }
 
 .dropdownItem {
@@ -220,10 +238,6 @@
 
 .dropdownItem:hover {
     background-color: #f0f0f0;
-}
-
-.icon {
-    font-size: 1rem;
 }
 
 /* 追加ボタン */
@@ -255,12 +269,12 @@
 
 /* 繰り返しボタン */
 .repeatButton {
-    background-color: #fff;      
-    color: #999;                 
-    border: 1px solid #ccc;       
-    border-radius: 8px;           
-    padding: 8px 12px;           
-    cursor: pointer;              
+    background-color: #fff;
+    color: #999;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
     font-size: 14px;
     display: inline-flex;
     align-items: center;
@@ -272,16 +286,16 @@
 
 /* 繰り返し設定サマリー */
 .repeatSummary {
-    background-color: #f0f8ff;  
-    border: 1px solid #007bff; 
+    background-color: #f0f8ff;
+    border: 1px solid #007bff;
     border-radius: 8px;
     padding: 8px 12px;
     font-size: 14px;
-    color: #007bff;            
+    color: #007bff;
     display: flex;
-    flex-direction: column; /* 縦並び */
+    flex-direction: column;
     margin-top: 8px;
-    gap: 4px; /* 行間 */
+    gap: 4px;
 }
 
 /* 繰り返しフォーム */
@@ -299,25 +313,6 @@
     color: #333;
 }
 
-/* select幅調整（スマホ対応） */
-.repeatSettingRow select {
-    width: 100%;
-    max-width: 100%;
-    padding: 6px 8px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
-    background-color: #fff;
-    cursor: pointer;
-    transition: border-color 0.2s ease;
-    box-sizing: border-box;
-}
-
-.repeatSettingRow select:focus {
-    border-color: #007bff;
-    outline: none;
-}
-
 /* 繰り返しフォームボタン */
 .repeatFormButtons {
     display: flex;
@@ -325,9 +320,13 @@
     margin-top: 16px;
 }
 
+.backButton,
 .confirmButton,
-.cancelButton {
-    flex: 1;         
+.cancelButton,
+.deleteButton {
+    height: auto;
+    width: 50%;
+    flex: 1;
     padding: 8px 12px;
     border-radius: 8px;
     font-weight: bold;
@@ -336,30 +335,39 @@
     transition: background-color 0.2s;
 }
 
-.confirmButton {
-    background-color: #4caf50;
+/*削除*/
+.deleteButton {
+    background-color: #f44336;
     color: white;
 }
 
+/*戻る*/
+.backButton{
+    background-color: #16d877;
+    color: white;
+}
+
+/*確定*/
+.confirmButton {
+    background-color: #007bff;
+    color: white;
+}
+
+/*キャンセル*/
 .cancelButton {
-    background-color: #f44336;
+    background-color: #16d877;
     color: white;
 }
 
 /* モバイル対応 */
 @media (max-width: 480px) {
-    .customSelectWrapper {
+    .categorySelectWrapper {
         width: 95%;
-        max-width: 95%;
     }
 
-    .customSelectWrapper select {
-        font-size: 13px;
-        padding: 6px 36px 6px 10px;
-    }
-
-    .customSelectWrapper::after {
-        font-size: 12px;
+    .category-grid {
+        width: 95%;
+        max-width: 100%;
     }
 }
 
