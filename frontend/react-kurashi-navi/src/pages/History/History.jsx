@@ -8,6 +8,7 @@ import { useGetRecord } from "../../hooks/history/useGetRecord";
 import { useMonthPicker } from "../../hooks/common/useMonthPicker";
 import { useState } from "react";
 import GraphView from "../../components/common/GraphView";
+import CalendarView from "../../components/common/CalendarView";
 
 const History = () => {
   const { activeTab, handleTabChange } = useTab("graph");
@@ -23,36 +24,24 @@ const History = () => {
     { id: "graph", label: "グラフ", icon: <ChartPie size={20} /> },
     { id: "calendar", label: "カレンダー", icon: <CalendarDays size={20} /> },
   ];
-
+  
   //transactionType(選択中のタブ)に応じて支出と収入の出力を切り替え
-  const filteredRecordsByType = record.summary.filter(r => {
+  const filteredRecordsByType = record.filter(r => {
     if (transactionType === "income") return r.type === "1";
     if (transactionType === "expense") return r.type === "2";
   });
 
-  const filteredRecordsByMonth = filteredRecordsByType.filter(r => r.month === getMonthString(selectedMonth));
-
-  console.log(JSON.stringify(filteredRecordsByMonth, null, 1));
+  const totalIncome = record.filter(r => r.type === "1").reduce((sum, r) => sum + Number(r.total), 0);
+  const totalExpense = record.filter(r => r.type === "2").reduce((sum, r) => sum + Number(r.total), 0);
 
   const viewContent = {
     graph: (
-      <GraphView summary={filteredRecordsByMonth}/>
+      <GraphView summary={filteredRecordsByType}/>
     ),
     calendar: (
-      <></>
+      <CalendarView />
     )
   }
-
-  //recordをもとにして支出と収入を計算
-  const totalIncome = record.records.reduce((sum, r) => {
-    return r.type_id === "1" ? sum + Number(r.total_amount) : sum ;
-  }, 0);
-  const totalExpense = record.records.reduce((sum, r) => {
-    return r.type_id === "2" ? sum + Number(r.total_amount) : sum ;
-  }, 0);
-  const balance = totalIncome - totalExpense;
-
-  console.log("filteredRecordsByMonth", JSON.stringify(filteredRecordsByMonth, null, 1));
 
   return (
     <Layout 
@@ -82,7 +71,7 @@ const History = () => {
             </div>
             <div className={`${styles["finance-item"]} ${styles["balance"]}`}>
               <span className={styles["label"]}>収支</span>
-              <span className={styles["value"]}>¥{balance.toLocaleString()}</span>
+              <span className={styles["value"]}>¥{totalIncome - totalExpense}</span>
             </div>
           </div>
 
@@ -116,9 +105,9 @@ const History = () => {
             </div>
           </div>
 
-          {activeTab === "graph" && filteredRecordsByMonth.length > 0 && (
+          {activeTab === "graph" && (
             <div className={styles["detail"]}>
-              {filteredRecordsByMonth.map((r, index) => (
+              {filteredRecordsByType.map((r, index) => (
                 <div className={styles["flex"]} key={index}>
                   <span className={styles["category-icon"]}></span>
                   <span className={styles["category-name"]}>{r.category_name}</span>
