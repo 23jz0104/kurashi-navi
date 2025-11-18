@@ -10,6 +10,16 @@ export const useGetRecord = (month) => {
     const getRecord = async () => {
       try {
         setIsLoading(true);
+
+        const year = month.substring(0, 4);
+
+        if(recordCache[year]) {
+          console.log("キャッシュからデータを取得");
+          setRecord(recordCache[year][month] || []);
+          setIsLoading(false);
+          return;
+        }
+
         console.log("API通信: useGetRecord.js");
         const response = await fetch(`/api/records`, {
           method: "GET",
@@ -25,9 +35,30 @@ export const useGetRecord = (month) => {
         }
 
         const data = await response.json();
-        setRecord(data);
-        console.log("データの取得に成功", JSON.stringify(data, null, 1));
-        return data;
+        console.log(JSON.stringify(data, null, 1));
+        const summaryData = data.monthlysummary || [];
+
+        recordCache[year] = {};
+        for(let m = 1; m <= 12; m++) {
+          const monthKey = `${year}-${String(m).padStart(2, '0')}`;
+          recordCache[year][monthKey] = [];
+        }
+
+        summaryData.forEach((item) => {
+          const itemMonth = item.month;
+          const itemYear = itemMonth.substring(0, 4);
+
+          // リクエストした年のデータのみ処理
+          if(itemYear === year && recordCache[year][itemMonth]) {
+            recordCache[year][itemMonth].push({
+              type: item.type,
+              category_name: item.category_name,
+              total: parseInt(item.total, 10) || 0,
+            });
+          }
+        });
+
+        setRecord(recordCache[year][month]);
       } catch (error) {
         console.log(error);
       } finally {
