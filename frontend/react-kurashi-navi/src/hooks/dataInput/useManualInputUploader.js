@@ -30,7 +30,7 @@ export const useManualInputUploader = () => {
     console.log("送信するデータ:", JSON.stringify(formattedReceipt, null, 1));
 
     try {
-      const response = await fetch("/api/receipt", {
+      const response = await fetch("https://t08.mydns.jp/kakeibo/public/api/receipt", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

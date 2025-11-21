@@ -12,14 +12,23 @@ const IncomeManualInput = ({ categories }) => {
     isSubmitting
   } = useIncomeForm();
 
+  const validateForm = () => {
+    if(!receipt.products || receipt.products.length === 0) {
+      return "データを入力してください。";
+    }
+
+    return null;
+  }
+
   return (
     <div className={styles["form-container"]}>
+      <div className={styles["ajusted-space"]}></div>
+      <DayPicker
+        date={income.date}
+        onChange={(newDate) => updateIncomeInfo("date", newDate)}
+      />
       <div className={styles["header-container"]}>
-        <DayPicker
-          date={income.date}
-          onChange={(newDate) => updateIncomeInfo("date", newDate)}
-        />
-        
+ 
         <div className={styles["header-container-row"]}>
           <span>金　額</span>
           <input
@@ -28,28 +37,6 @@ const IncomeManualInput = ({ categories }) => {
             placeholder="0"
             value={income.amount || ""}
             onChange={(e) => updateIncomeInfo("amount", Number(e.target.value))}
-          />
-        </div>
-
-        <div className={styles["header-container-row"]}>
-          <span>収入元</span>
-          <input
-            className={styles["store-name-value"]}
-            type="text"
-            placeholder="未入力"
-            value={income.shop_name}
-            onChange={(e) => updateIncomeInfo("shop_name", e.target.value)}
-          />
-        </div>
-        
-        <div className={styles["header-container-row"]}>
-          <span>住　所</span>
-          <input
-            className={styles["store-address-value"]}
-            type="text"
-            placeholder="未入力"
-            value={income.shop_address}
-            onChange={(e) => updateIncomeInfo("shop_address", e.target.value)}
           />
         </div>
 
@@ -80,10 +67,6 @@ const IncomeManualInput = ({ categories }) => {
         onClick={handleSubmit}
         disabled={isSubmitting}
       />
-
-      <button onClick={() => {
-        console.log("receipt", JSON.stringify(income, null, 1));
-      }}>収入フィールドを表示</button>
     </div>
   );
 };

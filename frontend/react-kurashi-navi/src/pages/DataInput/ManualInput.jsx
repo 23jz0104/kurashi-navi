@@ -32,6 +32,7 @@ const ConfirmInputData = () => {
           {activeTab === "income" && <IncomeManualInput categories={incomeCategories}/>}
         </>
       }
+      hideDataInputButton={true}
     />
   );
 };

@@ -8,6 +8,10 @@
   gap: 1rem;
 }
 
+.ajusted-space {
+  min-height: 2rem;
+}
+
 /* 収入フォームコンテナ */
 .header-container {
   display: flex;

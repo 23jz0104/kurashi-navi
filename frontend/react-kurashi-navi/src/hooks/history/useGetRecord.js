@@ -27,7 +27,7 @@ export const useGetRecord = (month) => {
 
         // API通信
         console.log("API通信: useGetRecord.js");
-        const response = await fetch(`/api/records`, {
+        const response = await fetch(`https://t08.mydns.jp/kakeibo/public/api/records`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -42,6 +42,7 @@ export const useGetRecord = (month) => {
         }
 
         const data = await response.json();
+        console.log("data", JSON.stringify(data, null, 1));
         const monthlySummary = data.monthlysummary || [];
         const dailySummary = data.dailysummary || [];
 
