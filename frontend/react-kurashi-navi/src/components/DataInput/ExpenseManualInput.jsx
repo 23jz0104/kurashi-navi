@@ -7,7 +7,8 @@ import ReceiptItemModal from "./ReceiptItemModal";
 import SubmitButton from "../common/SubmitButton";
 import { useReceiptForm } from "../../hooks/dataInput/useReceiptForm";
 import { useReceiptUploader } from "../../hooks/dataInput/useReceiptUploader";
-import { Plus, Upload, Camera } from "lucide-react";
+import { Plus, Upload, Camera, CircleAlert, Cross, X } from "lucide-react";
+import { useState } from "react";
 
 const ExpenseInput = ({ categories }) => {
   const { isUploading, uploadReceipt } = useReceiptUploader();
@@ -21,12 +22,35 @@ const ExpenseInput = ({ categories }) => {
     updateReceiptInfo,
   } = useReceiptForm();
 
+  const [validationError, setValidationError] = useState(null); //エラーを管理
+
+  const validateForm = () => {
+    if(!receipt.products || receipt.products.length === 0) {
+      return "データを入力してください。";
+    }
+
+    return null;
+  }
+
   const handleSubmit = async () => {
+    const error = validateForm();
+    if(error) {
+      setValidationError(error);
+
+      setTimeout(() => {
+        setValidationError(null);
+      }, 5000);
+      return;
+    }
     const result = await uploadReceipt(receipt, tax);
     if (result) {
       console.log("データ登録完了");
     }
   };
+
+  const resetError = () => {
+    setValidationError(null);
+  }
   
   return (
     <div className={styles["form-container"]}>
@@ -108,6 +132,19 @@ const ExpenseInput = ({ categories }) => {
         onClick={handleSubmit}
         disabled={isUploading}
       />
+
+      {validationError && (
+        <div className={styles["error-container"]}>
+          <span className={styles["error-icon"]}><CircleAlert size={16}/></span>
+          <span className={styles["error-message"]}>{validationError}</span>
+          <button
+          className={styles["error-reset-button"]}
+            onClick={() => resetError()}
+          >
+            <X size={16}/>
+          </button>
+        </div>
+      )}
     </div>
   );
 };

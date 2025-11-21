@@ -108,6 +108,7 @@ const ConfirmInputData = () => {
           <button onClick={() => printCurrentReceipt()}>コンソールにレシートを出力</button>
         </div>
       }
+      hideDataInputButton={true}
     />
   )
 }
