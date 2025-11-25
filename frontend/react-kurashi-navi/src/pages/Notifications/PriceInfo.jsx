@@ -1,106 +1,121 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import Layout from "../../components/common/Layout";
 import styles from "../../styles/Notifications/PriceInfo.module.css";
-import { Undo2 } from "lucide-react";
+import { Undo2, ArrowRightLeft } from "lucide-react";
 
-function PriceInfo() {
-    const { productName } = useParams();
-    const navigate = useNavigate();
-    const [items, setItems] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [sortOrder, setSortOrder] = useState("recommend"); 
+export default function PriceInfo() {
+  const { productName } = useParams();
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchRakutenItems = async () => {
-            try {
-                const appId = "1031715228971555413";
-                let allItems = [];
-                let page = 1;
-                let totalPages = 1;
+  const [site, setSite] = useState("rakuten");
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-                do {
-                    const response = await fetch(
-                        `https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601?applicationId=${appId}&keyword=${encodeURIComponent(productName)}&hits=30&page=${page}`
-                    );
-                    const data = await response.json();
-                    if (data.Items) {
-                        allItems = allItems.concat(data.Items.map(i => i.Item));
-                    }
-                    totalPages = data.pageCount || 1;
-                    page++;
-                } while (page <= totalPages);
+  // 商品名 or サイト切替で再取得
+  useEffect(() => {
+    if (!productName) return;
+    fetchItems();
+  }, [site, productName]);
 
-                setItems(allItems);
-            } catch (error) {
-                console.error("APIエラー:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+  const fetchItems = async () => {
+    setLoading(true);
+    setItems([]);
+    try {
+      // ← ここをプロキシ経由に変更
+      const url =
+        site === "rakuten"
+          ? `/api/rakuten?keyword=${encodeURIComponent(productName)}&hits=5`
+          : `/api/yahoo/search?query=${encodeURIComponent(productName)}`;
 
-        fetchRakutenItems();
-    }, [productName]);
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
-    // 表示順に応じてソート
-    const sortedItems = [...items].sort((a, b) => {
-        if (sortOrder === "cheap") {
-            return a.itemPrice - b.itemPrice; // 安い順
-        } else if (sortOrder === "recommend") {
-            return b.reviewAverage - a.reviewAverage; // おすすめ順（レビュー平均が高い順）
-        } else {
-            return 0;
-        }
-    }).slice(0, 5); // 上位5件だけ表示
+      const data = await res.json();
 
-    const headerContent = <h2>「{productName}」の価格情報</h2>;
+      // 楽天／Yahoo で共通フォーマットに変換
+      let parsedItems = [];
+      if (site === "rakuten") {
+        parsedItems = (data.Items || []).map((itemWrapper, idx) => {
+          const item = itemWrapper.Item;
+          return {
+            id: `rakuten-${item.itemCode || idx}`,
+            name: item.itemName,
+            price: item.itemPrice,
+            shop: item.shopName,
+            url: item.itemUrl,
+            image: item.mediumImageUrls?.[0]?.imageUrl || ""
+          };
+        });
+      } else {
+        const hits = data.hits || [];
+        parsedItems = hits.map((item, idx) => ({
+          id: `yahoo-${item.code || idx}`,
+          name: item.name,
+          price: parseInt(item.price, 10) || 0,
+          shop: item.seller?.name || "",
+          url: item.url,
+          image: item.image?.medium || ""
+        }));
+      }
 
-    const mainContent = (
-        <div className={styles.container}>
-            <button className={styles.backBtn} onClick={() => navigate(-1)}>
-                <Undo2 />
-            </button>
+      setItems(parsedItems);
+    } catch (err) {
+      console.error("APIエラー:", err);
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            <div className={styles.sortButtons}>
-                <button
-                    className={sortOrder === "recommend" ? styles.active : ""}
-                    onClick={() => setSortOrder("recommend")}
+  return (
+    <div className={styles.container}>
+      {/* 戻るボタン */}
+      <button className={styles.backBtn} onClick={() => navigate(-1)}>
+        <Undo2 />
+      </button>
+
+      <h2>「{productName}」の価格情報</h2>
+
+      {/* 楽天 / ヤフー 切替 */}
+      <div className={styles.switchContainer}>
+        <span className={site === "rakuten" ? styles.activeLabel : ""}>楽天</span>
+
+        <button
+          className={styles.switchIconBtn}
+          onClick={() => setSite(site === "rakuten" ? "yahoo" : "rakuten")}
+        >
+          <ArrowRightLeft size={24} />
+        </button>
+
+        <span className={site === "yahoo" ? styles.activeLabel : ""}>ヤフー</span>
+      </div>
+
+      {loading ? (
+        <p>読み込み中...</p>
+      ) : items.length === 0 ? (
+        <p>商品が見つかりませんでした。</p>
+      ) : (
+        <ul className={styles.list}>
+          {items.map((item) => (
+            <li key={item.id} className={styles.itemCard}>
+              {item.image && <img src={item.image} alt={item.name} />}
+              <div>
+                <p className={styles.itemName}>{item.name}</p>
+                <p className={styles.itemPrice}>{item.price.toLocaleString()} 円</p>
+                <p className={styles.shopName}>販売店：{item.shop}</p>
+                <a
+                  className={styles.itemLink}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                    おすすめ順
-                </button>
-                <button
-                    className={sortOrder === "cheap" ? styles.active : ""}
-                    onClick={() => setSortOrder("cheap")}
-                >
-                    安い順
-                </button>
-            </div>
-
-            {loading ? (
-                <p>読み込み中...</p>
-            ) : sortedItems.length === 0 ? (
-                <p>商品が見つかりませんでした。</p>
-            ) : (
-                <ul className={styles.list}>
-                    {sortedItems.map((item, index) => (
-                        <li key={index} className={styles.itemCard}>
-                            <img src={item.mediumImageUrls[0]?.imageUrl} alt={item.itemName} />
-                            <div>
-                                <p className={styles.itemName}>{item.itemName}</p>
-                                <p className={styles.itemPrice}>{item.itemPrice}円</p>
-                                <p className={styles.shopName}>販売店：{item.shopName}</p>
-                                <a href={item.itemUrl} target="_blank" rel="noopener noreferrer">
-                                    商品ページへ
-                                </a>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
-            )}
-        </div>
-    );
-
-    return <Layout headerContent={headerContent} mainContent={mainContent} />;
+                  商品ページへ
+                </a>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
 }
-
-export default PriceInfo;

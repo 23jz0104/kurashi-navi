@@ -57,6 +57,8 @@ function CustomSelect({ options, selectedValue, setSelectedValue, isCategory }) 
 function BudgetControl() {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState("budget");
+
+  const [selectedMonth, setSelectedMonth] = useState(new Date());
   const [checkSelectedCategory, setCheckSelectedCategory] = useState(null);
   const [settingSelectedCategory, setSettingSelectedCategory] = useState(null);
   const [settingMode, setSettingMode] = useState("expense");
@@ -75,6 +77,7 @@ function BudgetControl() {
   const [detailMode, setDetailMode] = useState(false);
   const [detailItem, setDetailItem] = useState(null);
 
+  // tabs
   const tabs = [
     { id: "budget", label: "予算確認", icon: null },
     { id: "budget1", label: "予算設定", icon: null },
@@ -106,6 +109,7 @@ function BudgetControl() {
   ];
   const dateOptions = Array.from({ length: 31 }, (_, i) => ({ value: i + 1, label: `${i + 1}日` }));
 
+  // --- resetForm ---
   const resetForm = (mode, categoryReset = true) => {
     if (categoryReset) setSettingSelectedCategory(null);
     setTitle("");
@@ -122,8 +126,19 @@ function BudgetControl() {
     }
   };
 
+  // --- localStorage復元 ---
   useEffect(() => {
-    setAddedCategories([]);
+    const saved = localStorage.getItem("addedCategories");
+    if (saved) setAddedCategories(JSON.parse(saved));
+  }, []);
+
+  // --- addedCategories 変更時に保存 ---
+  useEffect(() => {
+    localStorage.setItem("addedCategories", JSON.stringify(addedCategories));
+  }, [addedCategories]);
+
+  // --- location変更時リセット ---
+  useEffect(() => {
     setTitle("");
     setAmount("");
     setSettingSelectedCategory(null);
@@ -137,6 +152,8 @@ function BudgetControl() {
     setRepeatHoliday("no");
     setActiveTab("budget");
     setCheckSelectedCategory(null);
+    setDetailMode(false);
+    setDetailItem(null);
   }, [location.pathname]);
 
   const handleModeChange = (newMode) => {
@@ -149,13 +166,25 @@ function BudgetControl() {
       headerContent={<TabButton tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />}
       mainContent={
         <div className={styles.container}>
+
           {/* 予算確認画面 */}
           {activeTab === "budget" && (
             <div className={styles["category-grid"]}>
-              {!detailMode ? (
+              {!detailMode && (
                 <>
                   <div className={styles["month-selector-wrapper"]}>
-                    <MonthPicker onMonthChange={(newMonth) => console.log("選択された月:", newMonth)} />
+                    <MonthPicker
+                      selectedMonth={selectedMonth}
+                      onMonthChange={(offset) => {
+                        const newDate = new Date(selectedMonth);
+                        newDate.setMonth(newDate.getMonth() + offset);
+                        setSelectedMonth(newDate);
+                      }}
+                      onMonthSelect={(year, monthIndex) => {
+                        const newDate = new Date(year, monthIndex, 1);
+                        setSelectedMonth(newDate);
+                      }}
+                    />
                   </div>
 
                   {filteredCategoriesForCheck.map(category => {
@@ -178,11 +207,7 @@ function BudgetControl() {
                       >
                         <span className={styles["category-icon"]}>{category.icon}</span>
                         <span className={styles["category-name"]}>{category.name}</span>
-
-                        {!addedItem && (
-                          <div className={styles.notAddedMessage}>未追加</div>
-                        )}
-
+                        {!addedItem && <div className={styles.notAddedMessage}>未追加</div>}
                         {addedItem && (
                           <div
                             className={styles.detailButtonInCategory}
@@ -208,8 +233,10 @@ function BudgetControl() {
                     );
                   })}
                 </>
-              ) : (
-                // 詳細フォーム画面
+              )}
+
+              {/* 詳細情報画面 */}
+              {detailMode && detailItem && (
                 <div className={styles.entryCard}>
                   <h3>詳細情報</h3>
 
@@ -227,10 +254,10 @@ function BudgetControl() {
                     <span className={styles.label}>カテゴリ</span>
                     <div className={styles.fixedCategoryBox}>
                       <span className={styles.fixedIcon}>
-                        {filteredCategoriesForCheck.find(c => c.id === settingSelectedCategory)?.icon}
+                        {filteredCategoriesForCheck.find(c => c.id === settingSelectedCategory)?.icon || ""}
                       </span>
                       <span>
-                        {filteredCategoriesForCheck.find(c => c.id === settingSelectedCategory)?.name}
+                        {filteredCategoriesForCheck.find(c => c.id === settingSelectedCategory)?.name || ""}
                       </span>
                     </div>
                   </div>
@@ -254,6 +281,13 @@ function BudgetControl() {
                         setAddedCategories(prev => prev.filter(c => c.id !== detailItem.id));
                         setCheckSelectedCategory(null);
                         setDetailMode(false);
+                        setDetailItem(null);
+                        setTitle("");
+                        setAmount("");
+                        setSettingSelectedCategory(null);
+                        setRepeatDate("");
+                        setRepeatInterval("every_month");
+                        setRepeatHoliday("no");
                       }}
                     >
                       削除
@@ -274,7 +308,6 @@ function BudgetControl() {
                     >
                       戻る
                     </button>
-
                   </div>
                 </div>
               )}
@@ -331,7 +364,6 @@ function BudgetControl() {
                     />
                   </div>
 
-                  {/* 繰り返し表示 */}
                   <div className={styles.entryRow}>
                     <span className={styles.label}>繰り返し</span>
                     {settingMode === "expense" ? (
@@ -400,8 +432,9 @@ function BudgetControl() {
                       確定
                     </button>
                     <button className={styles.cancelButton}
-                     onClick={() => setIsRepeatFormOpen(false)}>
-                      キャンセル</button>
+                      onClick={() => setIsRepeatFormOpen(false)}>
+                      キャンセル
+                    </button>
                   </div>
                 </div>
               )}
@@ -411,29 +444,41 @@ function BudgetControl() {
                   className={styles.addButton}
                   onClick={() => {
                     setAmountErrorMessage("");
+                    setAddErrorMessage("");
+
                     if (!amount || amount.trim() === "") {
                       setAmountErrorMessage("金額が未入力です");
                       setTimeout(() => setAmountErrorMessage(""), 2000);
                       return;
                     }
+
                     if (settingMode === "income" && !repeatDate) {
                       setAddErrorMessage("繰り返しが未設定です");
                       setTimeout(() => setAddErrorMessage(""), 2000);
                       return;
                     }
-                    if (settingSelectedCategory && !addedCategories.some(c => c.id === settingSelectedCategory)) {
-                      const newItem = {
-                        id: settingSelectedCategory,
-                        mode: settingMode,
-                        title,
-                        amount: Number(amount),
-                        repeat: settingMode === "income" ? { date: repeatDate, interval: repeatInterval, holiday: repeatHoliday } : null,
-                      };
-                      setAddedCategories([...addedCategories, newItem]);
-                      setActiveTab("budget");
-                      setCheckSelectedCategory(settingSelectedCategory);
-                      resetForm(settingMode);
+
+                    if (!settingSelectedCategory) return;
+
+                    const exists = addedCategories.some(c => c.id === settingSelectedCategory);
+                    if (exists) {
+                      setAddErrorMessage("このカテゴリは既に追加されています");
+                      setTimeout(() => setAddErrorMessage(""), 2000);
+                      return;
                     }
+
+                    const newItem = {
+                      id: settingSelectedCategory,
+                      mode: settingMode,
+                      title,
+                      amount: Number(amount),
+                      repeat: settingMode === "income" ? { date: repeatDate, interval: repeatInterval, holiday: repeatHoliday } : null,
+                    };
+
+                    setAddedCategories([...addedCategories, newItem]);
+                    setActiveTab("budget");
+                    setCheckSelectedCategory(settingSelectedCategory);
+                    resetForm(settingMode);
                   }}
                 >
                   追加
