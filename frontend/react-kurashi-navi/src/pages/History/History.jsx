@@ -16,10 +16,6 @@ const History = () => {
   const { isLoading: isRecordLoading, record } = useGetRecord(getMonthString(selectedMonth));
   const [transactionType, setTransactionType] = useState("expense");
 
-  if (isRecordLoading) {
-    return <div>ロード中...</div>;
-  }
-
   const headerTabs = [
     { id: "graph", label: "グラフ", icon: <ChartPie size={20} /> },
     { id: "calendar", label: "カレンダー", icon: <CalendarDays size={20} /> },
@@ -159,7 +155,11 @@ const History = () => {
               )}
             </div>
             <div className={styles["graph-container"]}>
-              {viewContent[activeTab]}
+              {isRecordLoading ? (
+                <div className={styles["loading-text"]}>読み込み中...</div>
+              ) : (
+                viewContent[activeTab]
+              )}
             </div>
           </div>
 
