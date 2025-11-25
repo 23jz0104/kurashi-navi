@@ -1,10 +1,12 @@
 import styles from "./CalendarView.module.css";
 
-const CalendarView = ({ expenseReceiptData = [], incomeData = [], currentMonth }) => {
+const CalendarView = ({ dailySummary = [], currentMonth }) => {
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
 
-  if (expenseReceiptData.length === 0 && incomeData.length === 0) {
+  console.log(JSON.stringify(dailySummary, null, 1));
+
+  if (dailySummary.length === 0) {
     return (
       <div className={styles["empty-state"]}>
         <p>データが存在しません。</p>
@@ -49,23 +51,24 @@ const CalendarView = ({ expenseReceiptData = [], incomeData = [], currentMonth }
 
   const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
 
-  // 支出データマップ
-  const expenseMap = expenseReceiptData.reduce((acc, expense) => {
-    const totalAmount = expense.items.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    );
-    acc[expense.date] = (acc[expense.date] || 0) + totalAmount;
-    return acc;
-  }, {});
+  // dailySummaryから日付ごとの支出・収入を集計
+  const dailyDataMap = dailySummary.reduce((acc, item) => {
+    const date = item.record_date; // "2025-11-17"
+    
+    if (!acc[date]) {
+      acc[date] = {
+        expense: 0,
+        income: 0,
+      };
+    }
 
-  // 収入データマップ
-  const incomeMap = incomeData.reduce((acc, income) => {
-    const totalAmount = income.items.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    );
-    acc[income.date] = (acc[income.date] || 0) + totalAmount;
+    // type_idで支出・収入を判定
+    if (item.type_id === "1") {
+      acc[date].income += item.total;
+    } else if (item.type_id === "2") {
+      acc[date].expense += item.total;
+    }
+
     return acc;
   }, {});
 
@@ -74,10 +77,13 @@ const CalendarView = ({ expenseReceiptData = [], incomeData = [], currentMonth }
       const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(
         day.days
       ).padStart(2, "0")}`;
+      
+      const dayData = dailyDataMap[dateStr] || { expense: 0, income: 0 };
+      
       return {
         ...day,
-        expenseAmount: expenseMap[dateStr] || 0,
-        incomeAmount: incomeMap[dateStr] || 0,
+        expenseAmount: dayData.expense,
+        incomeAmount: dayData.income,
       };
     }
     return { ...day, expenseAmount: 0, incomeAmount: 0 };
