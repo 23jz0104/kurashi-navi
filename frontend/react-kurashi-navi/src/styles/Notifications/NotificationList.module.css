@@ -44,11 +44,13 @@
 .notificationItem {
   width: 100%;
   margin-bottom: 20px;
+  padding: 20px 0;
+  border-bottom: 5px solid #5ab8ea;
 }
 
 .notificationWrapper {
   display: flex;
-  align-items: stretch; /* 縦棒をメッセージの高さに合わせる */
+  align-items: stretch; 
 }
 
 .verticalBar {
