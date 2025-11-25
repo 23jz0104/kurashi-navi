@@ -31,7 +31,7 @@ function Log() {
     }
   };
 
-  // ★ PHP と通信してログイン
+  // PHP と通信してログイン
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
       setErrorMessage("メールアドレスまたはパスワードが未入力です。");
@@ -39,15 +39,10 @@ function Log() {
     }
 
     try {
-      const res = await fetch("https://t08pushtest.mydns.jp/kakeibo/public/api/user", {
+      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          mail_address: email,
-          password: password,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
       });
 
       const data = await res.json();
@@ -57,10 +52,9 @@ function Log() {
         return;
       }
 
-      // ★ログイン成功
       sessionStorage.setItem("isLoggedIn", "true");
-      sessionStorage.setItem("lastEmail", email);
-      sessionStorage.setItem("userId", data.user_id);
+      sessionStorage.setItem("lastEmail", data.user.email);
+      sessionStorage.setItem("userId", data.user.id);
       sessionStorage.setItem("token", data.token);
 
       navigate("/mypage");
