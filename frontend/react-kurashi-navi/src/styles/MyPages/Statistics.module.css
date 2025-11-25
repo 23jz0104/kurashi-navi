@@ -1,7 +1,4 @@
-/* ======================
-   Global / 基本設定
-   ====================== */
-   * {
+  * {
     padding: 0;
     margin: 0;
   }
@@ -16,9 +13,7 @@
     height: 300px;
   }
   
-  /* ======================
-     Statistics レイアウト
-     ====================== */
+  /*Statistics レイアウト*/
   .flex-statistics {
     display: flex;
     align-items: center;
@@ -181,9 +176,7 @@
     width: 120%;
   }
   
-  /* ======================
-     Responsive / モバイル対応
-     ====================== */
+  /* Responsive / モバイル対応 */
   @media (max-width: 500px) {
     .flex-past {
       grid-template-columns: 1fr 1fr;
@@ -209,9 +202,7 @@
     }
   }
   
-  /* ======================
-     Calendar / DayPicker 用
-     ====================== */
+  /* Calendar / DayPicker 用*/
   .date-picker-container {
     position: relative;
     width: 100%;
@@ -382,9 +373,7 @@
   }
   
 
-  /* ======================
-   日ごと／月ごと切替ボタン
-   ====================== */
+  /*日ごと／月ごと切替ボタン*/
 .unit-toggle {
   display: flex;
   gap: 10px;
