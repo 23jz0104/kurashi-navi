@@ -4,7 +4,7 @@ import NewLog from "./pages/login/NewLog";
 import MyPage from "./pages/MyPages/MyPage";
 import UserInfo from "./pages/MyPages/UserInfo";
 import Statistics from "./pages/mypages/Statistics";
-import NotificationList from "./pages/Notifications/NotificationList";
+import NotificationList from "./pages/notifications/NotificationList";
 import PriceInfo from "./pages/Notifications/PriceInfo.jsx";
 import BudgetControl from "./pages/Budget/BudgetControl";
 import Ninsyo from "./components/common/Ninsyo";
