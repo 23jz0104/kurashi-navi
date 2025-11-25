@@ -112,19 +112,19 @@ const History = () => {
             <div className={`${styles["finance-item"]} ${styles["expense"]}`}>
               <span className={styles["label"]}>支出</span>
               <span className={`${styles["value"]} ${styles["expense"]}`}>
-                ¥{totalExpense.toLocaleString()}
+                ¥{isRecordLoading ? 0 : totalExpense.toLocaleString()}
               </span>
             </div>
             <div className={`${styles["finance-item"]} ${styles["income"]}`}>
               <span className={styles["label"]}>収入</span>
               <span className={`${styles["value"]} ${styles["income"]}`}>
-                ¥{totalIncome.toLocaleString()}
+                ¥{isRecordLoading ? 0 : totalIncome.toLocaleString()}
               </span>
             </div>
             <div className={`${styles["finance-item"]} ${styles["balance"]}`}>
               <span className={styles["label"]}>収支</span>
               <span className={styles["value"]}>
-                ¥{(totalIncome - totalExpense).toLocaleString()}
+                ¥{isRecordLoading ? 0 : (totalIncome - totalExpense).toLocaleString()}
               </span>
             </div>
           </div>
