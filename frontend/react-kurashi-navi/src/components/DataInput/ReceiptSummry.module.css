@@ -1,5 +1,5 @@
 .total-container {
-  background-color: #f7e8ac;
+  background-color: #eff6ff;
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
@@ -15,7 +15,7 @@
 }
 
 .tax-container {
-  color: #78716c;
+  color: #4b5563;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -25,7 +25,7 @@
 }
 
 .total-amount-container {
-  border-top: 1.5px solid #fbbf24;
+  border-top: 1.5px solid #bfdbfe;
   padding-top: 0.75rem;
   margin-top: 0.25rem;
 }
@@ -48,7 +48,7 @@
 
 .total-amount {
   font-size: 1.25rem;
-  color: #292524;
+  color: #2563eb;
   font-weight: 700;
   letter-spacing: -0.01em;
 }

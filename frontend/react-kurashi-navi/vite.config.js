@@ -14,7 +14,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://t08pushtest.mydns.jp',
+        target: 'https://t08.mydns.jp',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, '/kakeibo/public/api'),
