@@ -83,6 +83,7 @@ const CameraInput = () => {
           </div>
         </div>
       }
+      hideDataInputButton={true}
     />
   )
 }

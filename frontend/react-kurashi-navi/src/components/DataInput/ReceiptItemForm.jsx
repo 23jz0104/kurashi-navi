@@ -92,7 +92,11 @@ const ReceiptItemForm = ({
       </div>
 
       {/* カテゴリ選択 */}
-      <Categories categories={categories} />
+      <Categories
+        categories={categories}
+        selectedCategoryId={category_id}
+        onSelectedCategory={(id) => onFieldChange("category_id", id)}
+      />
     </>
   );
 };
