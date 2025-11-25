@@ -29,6 +29,7 @@
 
 /* 商品リストコンテナ */
 .item-container {
+  width: 100%;
   background-color: #ffffff;
   border-radius: 0.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);

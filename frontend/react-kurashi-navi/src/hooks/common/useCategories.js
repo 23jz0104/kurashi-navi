@@ -9,7 +9,7 @@ export const useCategories = (typeId) => {
       try {
         setIsLoading(true);
         console.log("API通信: useCategories.js");
-        const response = await fetch("/api/category", {
+        const response = await fetch("https://t08.mydns.jp/kakeibo/public/api/category", {
           method: "GET",
           headers: {
             "Content-Type": "application/json",

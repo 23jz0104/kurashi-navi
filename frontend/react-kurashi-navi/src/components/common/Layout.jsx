@@ -1,9 +1,9 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Wallet, List, Bell, User } from "lucide-react";
+import { Wallet, List, Bell, User, Plus } from "lucide-react";
 import styles from "./Layout.module.css";
 
-const Layout = ({ headerContent, mainContent }) => {
+const Layout = ({ headerContent, mainContent, hideDataInputButton = false}) => {
   const location = useLocation();
 
   const isActive = (path) => location.pathname === path;
@@ -11,7 +11,9 @@ const Layout = ({ headerContent, mainContent }) => {
   return (
     <div className={styles.container}>
       <header className={styles.header}>{headerContent}</header>
-      <main className={styles.main}>{mainContent}</main>
+      <main className={styles.main}>
+        {mainContent}
+      </main>
       <footer className={styles.footer}>
         <nav className={styles["footer-nav"]}>
           <Link
@@ -30,6 +32,14 @@ const Layout = ({ headerContent, mainContent }) => {
             <span className={styles["nav-label"]}>予算</span>
           </Link>
 
+          {!hideDataInputButton && (
+            <Link to="/dataInput">
+              <button className={styles["navigate-datainput"]}><Plus size={16} /></button>
+            </Link>
+          )}
+
+
+
           <Link
             to="/notificationlist"
             className={`${styles["nav-item"]} ${isActive("/notificationlist") ? styles.active : ""}`}
@@ -42,7 +52,7 @@ const Layout = ({ headerContent, mainContent }) => {
             to="/mypage"
             className={`${styles["nav-item"]} ${isActive("/mypage") ? styles.active : ""}`}
           >
-            <User className={styles["nav-icon"]} size={20} />
+            <User className={styles["nav-icon"]} size={24} />
             <span className={styles["nav-label"]}>マイページ</span>
           </Link>
         </nav>
