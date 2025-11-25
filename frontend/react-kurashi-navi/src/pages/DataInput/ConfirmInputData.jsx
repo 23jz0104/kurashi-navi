@@ -20,8 +20,8 @@ const ConfirmInputData = () => {
   const { receipt, totalAmount, tax, addItem, updateItem, deleteItem, updateReceiptInfo } = useReceiptForm(initialReceipt); //レシートデータを管理する専用のフック
   
 
-  const handleSubmit = async (receipt) => {
-    const result = await uploadReceipt(receipt);
+  const handleSubmit = async (receipt, tax) => {
+    const result = await uploadReceipt(receipt, tax);
     if(result) {
       console.log("データ登録完了")
     }
@@ -102,12 +102,13 @@ const ConfirmInputData = () => {
 
           <SubmitButton 
             text={"送信"}
-            onClick={() => handleSubmit(receipt)}
+            onClick={() => handleSubmit(receipt, tax)}
           />
 
           <button onClick={() => printCurrentReceipt()}>コンソールにレシートを出力</button>
         </div>
       }
+      hideDataInputButton={true}
     />
   )
 }
