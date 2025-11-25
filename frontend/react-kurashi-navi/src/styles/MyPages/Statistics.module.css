@@ -1,217 +1,401 @@
-* {
-  padding: 0;
-  margin: 0;
-}
-
-.main {
-  width: 100%;
-  height: 100vh;
-}
-
-.chart-wrapper {
-  width: 100%;
-  height: 300px;
-}
-
-
-.flex-statistics {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  position: relative;
-  /* ← 追加: 絶対配置の基準 */
-  min-height: 100vh;
-  /* ← 追加: ボタンが下に隠れないように */
-}
-
-.modoru {
-  padding: 5px 10px;
-  margin: 1% 80% 0 0;
-  font-size: 10%;
-  border: none;
-  border-radius: 5px;
-  background: #656ac6;
-  color: white;
-  cursor: pointer;
-  box-shadow: 5px 5px 5px rgb(143, 155, 188);
-}
-
-.modoru svg {
-  width: 15px;
-  height: 15px;
-}
-
-.time {
-  margin-top: 5%;
-}
-
-.period {
-  width: 80%;
-  height: auto;
-  margin-top: 1%;
-  background-color: white;
-  border-radius: 15px;
-}
-
-.ul {
-  list-style: none;
-  display: flex;
-}
-
-.li {
-  width: 50%;
-}
-
-.purisetto {
-  width: 100%;
-  height: 80%;
-  font-size: 120%;
-  border-radius: 15px;
-  margin-bottom: 1em;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 5px 5px rgb(143, 155, 188);
-}
-
-.active {
-  background-color: #656ac6;
-  color: white;
-}
-
-.custom {
-  width: 100%;
-  height: 80%;
-  font-size: 120%;
-  margin-bottom: 1em;
-  border-radius: 15px;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 5px 5px rgb(143, 155, 188);
-}
-
-.flex-past {
-  width: 80%;
-  height: auto;
-  margin-top: 10%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  /* 2列 */
-  gap: 20px;
-  justify-items: center;
-  align-items: center;
-
-}
-
-.past {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
-.button {
-  display: flex;
-  flex-direction: column;
-  /* 縦方向に並べる */
-  align-items: center;
-  /* 中央寄せ */
-  justify-content: center;
-  /* 縦方向も中央に */
-  gap: 5px;
-  /* アイコンと文字の間の余白 */
-
-  width: 80%;
-  padding: 10px;
-  font-size: 120%;
-  border-radius: 10px;
-  border: none;
-  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-}
-
-.btn-custom {
-  background-color: #37d265;
-  color: white;
-}
-
-.button.active {
-  background-color: #8884d8;
-  color: white;
-}
-
-.flex-view {
-  width: 80%;
-  height: auto;
-  margin-top: 10%;
-}
-
-.view {
-  font-size: 150%;
-}
-
-
-.download {
-  position: relative;
-  margin-top: 20px;
-  padding: 10px 20px;
-  border-radius: 50px;
-  background-color: #656ac6;
-  color: white;
-  text-align: center;
-  cursor: pointer;
-  border: 0;
-  box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
-  font-size: 16px;
-  align-self: center;
-}
-
-.custom-period {
-  margin-top: 5%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  font-size: 120%;
-}
-
-.start {
-  width: 120%;
-}
-
-.end {
-  width: 120%;
-}
-
-.btn-custom {
-  width: 80%;
-  padding: 4px;
-  margin-top: 10%;
-  border-radius: 10px;
-  border: none;
-  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-}
-
-
-
-/* iPhone SEなど画面幅が狭いとき */
-@media (max-width: 500px) {
+  * {
+    padding: 0;
+    margin: 0;
+  }
+  
+  .main {
+    width: 100%;
+    height: 100vh;
+  }
+  
+  .chart-wrapper {
+    width: 100%;
+    height: 300px;
+  }
+  
+  /*Statistics レイアウト*/
+  .flex-statistics {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+    min-height: 100vh;
+    overflow: visible; /* カレンダーがはみ出さないように */
+  }
+  
+  .modoru {
+    padding: 5px 10px;
+    margin: 1% 80% 0 0;
+    font-size: 10%;
+    border: none;
+    border-radius: 5px;
+    background: #656ac6;
+    color: white;
+    cursor: pointer;
+    box-shadow: 5px 5px 5px rgb(143, 155, 188);
+  }
+  
+  .modoru svg {
+    width: 15px;
+    height: 15px;
+  }
+  
+  .time {
+    margin-top: 5%;
+  }
+  
+  .period {
+    width: 80%;
+    height: auto;
+    margin-top: 1%;
+    background-color: white;
+    border-radius: 15px;
+  }
+  
+  .ul {
+    list-style: none;
+    display: flex;
+  }
+  
+  .li {
+    width: 50%;
+  }
+  
+  .purisetto {
+    width: 100%;
+    height: 80%;
+    font-size: 120%;
+    border-radius: 15px;
+    margin-bottom: 1em;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 5px 5px rgb(143, 155, 188);
+  }
+  
+  .active {
+    background-color: #656ac6;
+    color: white;
+  }
+  
+  .custom {
+    width: 100%;
+    height: 80%;
+    font-size: 120%;
+    margin-bottom: 1em;
+    border-radius: 15px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 5px 5px rgb(143, 155, 188);
+  }
+  
   .flex-past {
+    width: 80%;
+    height: auto;
+    margin-top: 10%;
+    display: grid;
     grid-template-columns: 1fr 1fr;
-    /* 1列表示に変更 */
+    gap: 20px;
+    justify-items: center;
+    align-items: center;
+  }
+  
+  .past {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    width: 80%;
+    padding: 10px;
+    font-size: 120%;
+    border-radius: 10px;
+    border: none;
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+  }
+  
+  .btn-custom {
+    background-color: #37d265;
+    color: white;
+    width: 80%;
+    padding: 4px;
+    margin-top: 10%;
+    border-radius: 10px;
+    border: none;
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+  }
+  
+  .button.active {
+    background-color: #8884d8;
+    color: white;
+  }
+  
+  .flex-view {
+    width: 80%;
+    height: auto;
+    margin-top: 10%;
+  }
+  
+  .view {
+    font-size: 150%;
+  }
+  
+  .download {
+    position: relative;
+    margin-top: 20px;
+    padding: 10px 20px;
+    border-radius: 50px;
+    background-color: #656ac6;
+    color: white;
+    text-align: center;
+    cursor: pointer;
+    border: 0;
+    box-shadow: 0px 3px 5px rgba(0, 0, 0, 0.2);
+    font-size: 16px;
+    align-self: center;
+  }
+  
+  .custom-period {
+    margin-top: 5%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 120%;
+  }
+  
+  .start, .end {
+    width: 120%;
+  }
+  
+  /* Responsive / モバイル対応 */
+  @media (max-width: 500px) {
+    .flex-past {
+      grid-template-columns: 1fr 1fr;
+      width: 100%;
+    }
+  
+    .button {
+      width: 90%;
+      font-size: 100%;
+      white-space: nowrap;
+    }
+  
+    .li {
+      width: 90%;
+      font-size: 80%;
+      white-space: nowrap;
+    }
+  
+    .calendar-dropdown {
+      width: 95%;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
+  
+  /* Calendar / DayPicker 用*/
+  .date-picker-container {
+    position: relative;
     width: 100%;
   }
-
-  .button {
-    width: 90%;
-    font-size: 100%;
-    white-space: nowrap;
-    /* 改行しない */
+  
+  .date-picker-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    background-color: white;
   }
-
-  .li {
-    width: 90%;
-    font-size: 80%;
-    white-space: nowrap;
+  
+  .date-nav-button {
+    padding: 0.25rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: #6b7280;
   }
+  
+  .date-display-button {
+    flex: 1;
+    padding: 0.25rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: #374151;
+    text-align: center;
+  }
+  
+  .calendar-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.25rem;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 100;
+    transition: all 0.2s ease;
+    width: 300px;
+    box-shadow: 0px 5px 10px rgba(0,0,0,0.1);
+  }
+  
+  .calendar-open {
+    opacity: 1;
+    pointer-events: all;
+  }
+  
+  .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .month-nav-button {
+    padding: 0.25rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: #374151;
+  }
+  
+  .month-display {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #374151;
+  }
+  
+  .weekday-header {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+  
+  .weekday {
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem;
+    color: #6b7280;
+  }
+  
+  .weekday.sunday {
+    color: #ef4444;
+  }
+  
+  .weekday.saturday {
+    color: #3b82f6;
+  }
+  
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.25rem;
+  }
+  
+  .calendar-day-empty {
+    padding: 0.5rem;
+  }
+  
+  .calendar-day {
+    padding: 0.5rem;
+    border: none;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-weight: 400;
+    background-color: transparent;
+    color: #374151;
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+  
+  .calendar-day:hover {
+    background-color: #f3f4f6;
+  }
+  
+  .calendar-day.sunday {
+    color: #ef4444;
+  }
+  
+  .calendar-day.saturday {
+    color: #3b82f6;
+  }
+  
+  .calendar-day.today {
+    background-color: #efeeee;
+    font-weight: 600;
+  }
+  
+  .calendar-day.selected {
+    background-color: #3b82f6;
+    color: white;
+    font-weight: 600;
+    border-radius: 0.25rem;
+  }
+  
+  .calendar-day.selected:hover {
+    background-color: #3b82f6;
+  }
+  
+  .today-button {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: #374151;
+  }
+  
+  .today-button:hover {
+    background-color: #e5e7eb;
+  }
+  
+
+  /*日ごと／月ごと切替ボタン*/
+.unit-toggle {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  justify-content: center;
+  width: 80%;
+}
+
+.unit-toggle button {
+  flex: 1;
+  padding: 8px 0;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+  background-color: #f0f0f0;
+  color: #374151;
+  transition: all 0.2s ease;
+}
+
+.unit-toggle button.active {
+  background-color: #8884d8;
+  color: white;
 }
