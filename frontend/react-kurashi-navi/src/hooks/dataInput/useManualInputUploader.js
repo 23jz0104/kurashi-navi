@@ -28,13 +28,14 @@ export const useManualInputUploader = () => {
     }];
 
     console.log("送信するデータ:", JSON.stringify(formattedReceipt, null, 1));
+    const userId = sessionStorage.getItem("userId");
 
     try {
       const response = await fetch("https://t08.mydns.jp/kakeibo/public/api/receipt", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-User-ID": "5",
+          "X-User-ID": userId,
           "X-Type-ID": "2", //収入は1、支出は2
         },
         body: JSON.stringify(formattedReceipt),

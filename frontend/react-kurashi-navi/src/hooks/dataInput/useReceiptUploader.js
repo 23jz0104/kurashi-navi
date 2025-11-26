@@ -35,14 +35,15 @@ export const useReceiptUploader = () => {
     }];
 
     console.log("送信するJSON -> ", JSON.stringify(formattedReceipt, null, 1));
+    const userId = sessionStorage.getItem("userId");
 
     try {
       const response = await fetch("https://t08.mydns.jp/kakeibo/public/api/receipt", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-User-ID": "5",  // テスト用の値
-          "X-Type-ID": "2"   // テスト用の値 1が収入　2が支出
+          "X-User-ID": userId,
+          "X-Type-ID": "2"   // 支出をアップロード(2)
         },
         body: JSON.stringify(formattedReceipt),
       });

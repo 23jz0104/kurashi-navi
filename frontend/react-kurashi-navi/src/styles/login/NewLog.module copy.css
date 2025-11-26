@@ -1,0 +1,168 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.main {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 上タブ */
+.flex-log {
+  width: 100%;
+  height: 15%; 
+  background-color: #eeeeee;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* フォーム */
+.flexText {
+  flex: 1;              
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;    
+  gap: 1rem;
+  width: 100%;
+  padding: 1rem;          
+}
+
+/* 入力欄 */
+.inputWrapper {
+  position: relative;
+  width: 50%;
+  max-width: 400px;
+}
+
+.flexText input,
+.flexText select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.inputWrapper .required {
+  position: absolute;
+  top: 50%;
+  right: -2%;
+  transform: translateY(-90%);
+  color: red;
+  font-weight: bold;
+  pointer-events: none;
+  font-size: 16px;
+}
+
+/* 登録ボタン */
+.newBtnLog {
+  padding: 8px 35px;
+  font-size: 14px;
+  color: white;
+  background-color: rgb(75, 102, 189);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* 下枠 */
+.flex-soko {
+  width: 100%;
+  height: 15%;           
+  background-color: #eeeeee;
+  flex-shrink: 0;
+}
+
+
+.errorMessage {
+  color: red;
+  font-size: 14px;
+  margin-top: 6px;
+  text-align: left;
+}
+
+/* スマホ対応 */
+@media (max-width: 768px) {
+  .inputWrapper {
+    width: 90%;
+  }
+}
+
+
+/* カスタムセレクト全体のラッパー */
+.categorySelectWrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* 選択中の表示部分 */
+.selectedCategory {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: white;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+/* 選択テキスト */
+.selectedText {
+  color: #333;
+}
+
+.unselected {
+  color: #aaa;
+}
+
+/* ▼矢印 */
+.arrow {
+  font-size: 12px;
+  color: #666;
+}
+
+/* ドロップダウンリスト */
+.dropdownList {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  max-height: 200px; 
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: white;
+  z-index: 100;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* ドロップダウンの各項目 */
+.dropdownItem {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.dropdownItem:hover {
+  background-color: #f0f0f0;
+}
+
+.dropdownList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dropdownList::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 3px;
+}

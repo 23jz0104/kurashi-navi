@@ -100,8 +100,9 @@ const ConfirmInputData = () => {
             </div>
           </div>
 
-          <SubmitButton 
-            text={"送信"}
+          <SubmitButton
+           disabled={isUploading}
+            text={isUploading ? "登録中" : "送信"}
             onClick={() => handleSubmit(receipt, tax)}
           />
 
