@@ -9,8 +9,10 @@ import { useReceiptForm } from "../../hooks/dataInput/useReceiptForm";
 import { useReceiptUploader } from "../../hooks/dataInput/useReceiptUploader";
 import { Plus, Upload, Camera, CircleAlert, Cross, X } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const ExpenseInput = ({ categories }) => {
+  const navigate = useNavigate();
   const { isUploading, uploadReceipt } = useReceiptUploader();
   const {
     receipt,
@@ -63,7 +65,14 @@ const ExpenseInput = ({ categories }) => {
           </button>
           <button className={styles["ocr-button"]}>
             <Camera size={20} />
-            <span className={styles["ocr-button-text"]}>読み取り</span>
+            <span 
+              className={styles["ocr-button-text"]}
+              onClick={() => {
+                navigate("/camera");
+              }}
+            >
+              読み取り
+            </span>
           </button>
         </div>
       </div>

@@ -114,7 +114,7 @@ const DEFAULT_OCR_RESULT = {
 };
 
 export const useOcrAnalysis = (file) => {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [ocrResult, setOcrResult] = useState(DEFAULT_OCR_RESULT);
   const [error, setError] = useState(null);
   const {isLoading: isCategoriesLoading, categories} = useCategories(2); //レシートは基本的に支出のため支出のカテゴリのみ伝える
@@ -125,6 +125,7 @@ export const useOcrAnalysis = (file) => {
     }
 
     setLoading(true);
+    setError(null);
     const ai = new GoogleGenAI({ apiKey: API_KEY });
 
     const analyzeReceipt = async () => {
@@ -146,7 +147,7 @@ export const useOcrAnalysis = (file) => {
             responseMimeType: "application/json",
             responseSchema: RESPONSE_SCHEMA,
           },
-        });
+        });;
 
         const parsedResult = JSON.parse(result.text);
         setOcrResult(parsedResult);

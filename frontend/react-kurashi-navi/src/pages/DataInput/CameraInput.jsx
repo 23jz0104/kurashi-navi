@@ -14,8 +14,9 @@ const CameraInput = () => {
   const { ocrResult, loading, error } = useOcrAnalysis(file);
 
   useEffect(() => {
-    if(!loading && ocrResult) {
-      navigate("/confirm-input-data", { state: {ocrResult} });
+    if(!loading && ocrResult.products.length > 0) {
+      console.log("ナビゲート実行");
+      navigate("/confirmInputData", { state: {ocrResult} });
     }
   }, [ocrResult, loading, error]);
 
@@ -39,6 +40,7 @@ const CameraInput = () => {
         mainContent={
           <Loader text="解析中"/>
         }
+        hideDataInputButton={true}
       />
     )
   }
@@ -61,7 +63,12 @@ const CameraInput = () => {
           <div className={styles["floating-buttons"]}>
             <div className={styles["button-wrapper"]}>
               <div className={styles["left-section"]}>
-                <button className={styles["back-button"]}>
+                <button 
+                  className={styles["back-button"]}
+                  onClick={() => {
+                    navigate("/dataInput");
+                  }}
+                >
                   <ArrowLeft />
                 </button>
               </div>

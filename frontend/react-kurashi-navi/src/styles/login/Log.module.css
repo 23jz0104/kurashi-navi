@@ -1,107 +1,83 @@
-* {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-}
-
-.main {
-  width: 100%;
-  height: 100vh;
-}
-
-/* 上部タブエリア */
-.flex-log {
-  width: 100%;
-  height: 15%;
-  background-color: #eeeeee;
-  display: flex;
-  justify-content: center; 
-  align-items: center;      
-
-}
-
-/* フォーム全体 */
-.flex-text {
-  width: 100%;
-  height: 70%;
+.main-container {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  max-width: 28rem;
+  height: 100%;
+  margin: 0 auto;
   justify-content: center;
-  gap: 1rem;
-  margin: auto;
 }
 
-.flex-mail {
-  width: 60%;
-  padding: 8px 12px; 
-  border: 1px solid #ccc;
-  border-radius: 5px;  
+.main-inner {
+  border-radius: 0.5rem;
+  overflow: hidden;
 }
 
-
-.flex-pass {
-  width: 60%;
-  padding: 8px 12px; 
-  border: 1px solid #ccc;
-  border-radius: 5px;  
+.main-header {
+  background-color: #2563eb;
+  color: white;
+  text-align: center;
+  padding: 1rem 0;
 }
 
-.inputWrapper {
+.header-icon {
+  margin: 0 auto;
+}
+
+.input-section {
+  padding: 2rem 0.5rem 0rem 0.5rem;
+  background-color: white;
+}
+
+.input-wrapper {
   position: relative;
-  width: 60%;
   margin-bottom: 1rem;
 }
 
-.inputWrapper input {
+.input-field {
   width: 100%;
-  padding: 8px 36px 8px 12px; 
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
-  box-sizing: border-box;
+  padding: 1rem;
+  border: 2px solid #e9ecef;
+  border-radius: 0.5rem;
+  font-size: 1rem; /* 追加: inputと同じフォントサイズ */
+  line-height: 1.5; /* 追加: inputと同じ行高 */
+  text-indent: 1rem;
 }
 
-.inputWrapper .passwordToggle {
+.icon {
   position: absolute;
-  right: 10px;
+  top: 50%;
+  left: 0.75rem;
+  transform: translateY(-50%);
+}
+
+.eye-icon {
+  position: absolute;
+  right: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  cursor: pointer;
-  color: #555;
 }
 
-.sp {
-  font-size: 80%;
-  background-color: transparent;
-  color: rgb(58, 149, 149);
+.forgot-password {
   border: none;
+  background: none;
+  margin-right: auto;
+  color: #667eea;
   cursor: pointer;
+  margin-bottom: 1rem;
 }
 
-/* ログイン */
-.bt {
-  margin-top: 2em;
-  padding: 8px 35px;
-  font-size: 14px;
-  color: white;
-  background-color: rgb(75, 102, 189);
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.error-container {
+  background-color: #fef2f2;
+  display: flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #fecaca ;
+  border-radius: 0.5rem;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  color: #dc2626;
 }
 
-/* 下部余白エリア */
-.flex-soko {
-  width: 100%;
-  height: 15%;
-  background-color: #eeeeee;
-}
-
-
-.errorMessage {
-  color: red;
-  font-size: 14px;
-  margin-top: 6px;
-  text-align: left;
+.error-icon {
+  display: flex;
 }
