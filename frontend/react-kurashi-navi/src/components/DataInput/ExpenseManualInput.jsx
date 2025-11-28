@@ -7,9 +7,10 @@ import ReceiptItemModal from "./ReceiptItemModal";
 import SubmitButton from "../common/SubmitButton";
 import { useReceiptForm } from "../../hooks/dataInput/useReceiptForm";
 import { useReceiptUploader } from "../../hooks/dataInput/useReceiptUploader";
-import { Plus, Upload, Camera, CircleAlert, Cross, X } from "lucide-react";
+import { Plus, Upload, Camera, CircleAlert, Cross, X, Check } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import CompleteModal from "../common/CompleteModal";
 
 const ExpenseInput = ({ categories }) => {
   const navigate = useNavigate();
@@ -48,7 +49,7 @@ const ExpenseInput = ({ categories }) => {
     const result = await uploadReceipt(receipt, tax);
     if (result) {
       setMessage(true);
-      setTimeout(() => setMessage(false), 2000);
+      setTimeout(() => setMessage(false), 1000);
     }
   };
 
@@ -139,7 +140,7 @@ const ExpenseInput = ({ categories }) => {
       </div>
 
       <SubmitButton
-        text="送信"
+        text={isUploading ? "送信中..." : "送信"}
         onClick={handleSubmit}
         disabled={isUploading}
       />
@@ -158,7 +159,7 @@ const ExpenseInput = ({ categories }) => {
       )}
 
       {message && (
-        <p>登録が完了しました！</p>
+        <CompleteModal />
       )}
     </div>
   );
