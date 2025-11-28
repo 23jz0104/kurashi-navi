@@ -76,7 +76,6 @@ export const useIncomeForm = (initialIncome = {
       
       // 成功したらフォームをリセット
       resetForm();
-      alert("登録が完了しました！");
       return result;
     } catch (error) {
       console.error("収入データ登録エラー:", error);
