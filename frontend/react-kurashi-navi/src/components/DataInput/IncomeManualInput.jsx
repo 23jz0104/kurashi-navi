@@ -4,6 +4,7 @@ import Categories from "../common/Categories";
 import SubmitButton from "../common/SubmitButton";
 import { useIncomeForm } from "../../hooks/dataInput/useIncomeForm";
 import { useState } from "react";
+import CompleteModal from "../common/CompleteModal";
 
 const IncomeManualInput = ({ categories }) => {
   const {
@@ -19,7 +20,7 @@ const IncomeManualInput = ({ categories }) => {
     const result = await handleSubmit(); // ← hook の関数を呼ぶ
     if (result) {
       setMessage(true);
-      setTimeout(() => setMessage(false), 2000);
+      setTimeout(() => setMessage(false), 1000);
     }
   };
 
@@ -80,7 +81,7 @@ const IncomeManualInput = ({ categories }) => {
       />
 
       {message && (
-        <p>登録が完了しました！</p>
+        <CompleteModal />
       )}
     </div>
   );
