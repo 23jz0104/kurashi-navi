@@ -8,7 +8,7 @@ const generateCategoriesPrompt = (categories) => {
   return categories.map(cat => `   ${cat.id}: ${cat.category_name}`).join('\n');
 }
 
-const generateOcrPropmt =  (categoryPrompt) => `
+const generateOcrPropmt =  (categoryPrompt) => `  
   あなたはレシート画像を解析するAIです。
 
   次のルールに従って、JSONを抽出してください。
