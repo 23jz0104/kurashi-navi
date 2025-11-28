@@ -3,6 +3,7 @@ import DayPicker from "../common/DayPicker";
 import Categories from "../common/Categories";
 import SubmitButton from "../common/SubmitButton";
 import { useIncomeForm } from "../../hooks/dataInput/useIncomeForm";
+import { useState } from "react";
 
 const IncomeManualInput = ({ categories }) => {
   const {
@@ -11,6 +12,16 @@ const IncomeManualInput = ({ categories }) => {
     handleSubmit,
     isSubmitting
   } = useIncomeForm();
+
+  const [message, setMessage] = useState(false);
+
+  const onSubmit = async () => {
+    const result = await handleSubmit(); // ← hook の関数を呼ぶ
+    if (result) {
+      setMessage(true);
+      setTimeout(() => setMessage(false), 2000);
+    }
+  };
 
   const validateForm = () => {
     if(!receipt.products || receipt.products.length === 0) {
@@ -64,9 +75,13 @@ const IncomeManualInput = ({ categories }) => {
 
       <SubmitButton
         text="送信"
-        onClick={handleSubmit}
+        onClick={onSubmit}
         disabled={isSubmitting}
       />
+
+      {message && (
+        <p>登録が完了しました！</p>
+      )}
     </div>
   );
 };

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { GoogleGenAI, createUserContent, createPartFromUri, Type } from "@google/genai";
 import { useCategories } from "../common/useCategories";
 
-const API_KEY = "AIzaSyDaE9IGHmBNnFgSETBDcqZKv93_W2Q5azI";
+const API_KEY = "";
 
 const generateCategoriesPrompt = (categories) => {
   return categories.map(cat => `   ${cat.id}: ${cat.category_name}`).join('\n');

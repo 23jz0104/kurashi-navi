@@ -83,7 +83,6 @@ function Log() {
         <div className={styles["main-container"]}>
           <div className={styles["main-inner"]}>
             <div className={styles["main-header"]}>
-              <TrendingUp size={28} className={styles["header-icon"]}/>
               <h1>くらしナビ</h1>
             </div>
             <div className={styles["input-section"]}>

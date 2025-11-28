@@ -25,6 +25,7 @@ const ExpenseInput = ({ categories }) => {
   } = useReceiptForm();
 
   const [validationError, setValidationError] = useState(null); //エラーを管理
+  const [message, setMessage] = useState(false);
 
   const validateForm = () => {
     if(!receipt.products || receipt.products.length === 0) {
@@ -46,7 +47,8 @@ const ExpenseInput = ({ categories }) => {
     }
     const result = await uploadReceipt(receipt, tax);
     if (result) {
-      console.log("データ登録完了");
+      setMessage(true);
+      setTimeout(() => setMessage(false), 2000);
     }
   };
 
@@ -153,6 +155,10 @@ const ExpenseInput = ({ categories }) => {
             <X size={16}/>
           </button>
         </div>
+      )}
+
+      {message && (
+        <p>登録が完了しました！</p>
       )}
     </div>
   );
