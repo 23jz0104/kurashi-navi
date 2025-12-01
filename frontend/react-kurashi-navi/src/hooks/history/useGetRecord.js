@@ -14,6 +14,7 @@ export const useGetRecord = (month) => {
 
   useEffect(() => {
     const getRecord = async () => {
+      const userId = sessionStorage.getItem("userId");
       try {
         setIsLoading(true);
 
@@ -26,12 +27,12 @@ export const useGetRecord = (month) => {
         }
 
         // API通信
-        console.log("API通信: useGetRecord.js");
+        console.log("API通信: useGetRecord.js", "ユーザーID: " + userId);
         const response = await fetch(`https://t08.mydns.jp/kakeibo/public/api/records`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "X-User-ID": "5",
+            "X-User-ID": userId,
             "X-YearMonth": month,
           },
         });

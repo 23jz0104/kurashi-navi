@@ -11,6 +11,7 @@ import SubmitButton from "../../components/common/SubmitButton";
 import { useReceiptUploader } from "../../hooks/dataInput/useReceiptUploader";
 import { useCategories } from "../../hooks/common/useCategories";
 import { Plus } from "lucide-react";
+import { useState } from "react";
 
 const ConfirmInputData = () => {
   const location = useLocation();
@@ -18,17 +19,15 @@ const ConfirmInputData = () => {
   const { categories } = useCategories(2); //引数に2を設定して支出カテゴリを取得
   const { isUploading, uploadReceipt} = useReceiptUploader();
   const { receipt, totalAmount, tax, addItem, updateItem, deleteItem, updateReceiptInfo } = useReceiptForm(initialReceipt); //レシートデータを管理する専用のフック
+  const [ message, setMessage ] = useState(false);
   
 
   const handleSubmit = async (receipt, tax) => {
     const result = await uploadReceipt(receipt, tax);
     if(result) {
-      console.log("データ登録完了")
+      setMessage(true);
+      setTimeout(() => setMessage(false), 2000);
     }
-  }
-
-  const printCurrentReceipt = () => {
-    console.log(JSON.stringify(receipt, null, 1));
   }
 
   return (
@@ -100,12 +99,15 @@ const ConfirmInputData = () => {
             </div>
           </div>
 
-          <SubmitButton 
-            text={"送信"}
+          <SubmitButton
+           disabled={isUploading}
+            text={isUploading ? "登録中" : "送信"}
             onClick={() => handleSubmit(receipt, tax)}
           />
 
-          <button onClick={() => printCurrentReceipt()}>コンソールにレシートを出力</button>
+          {message && (
+            <p>登録が完了しました！</p>
+          )}
         </div>
       }
       hideDataInputButton={true}
