@@ -53,9 +53,9 @@ export const useIncomeForm = (initialIncome = {
         ]
       }];
 
-      const userId = "5";
+      const userId = sessionStorage.getItem("userId");
       
-      const response = await fetch("/api/receipt", {
+      const response = await fetch("https://t08.mydns.jp/kakeibo/public/api/receipt", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -76,7 +76,6 @@ export const useIncomeForm = (initialIncome = {
       
       // 成功したらフォームをリセット
       resetForm();
-      alert("登録が完了しました！");
       return result;
     } catch (error) {
       console.error("収入データ登録エラー:", error);

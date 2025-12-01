@@ -1,120 +1,93 @@
-* {
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-}
-
-.main {
-  width: 100%;
-  height: 100vh;
+.main-container {
   display: flex;
   flex-direction: column;
-}
-
-/* 上タブ */
-.flex-log {
-  width: 100%;
-  height: 15%; 
-  background-color: #eeeeee;
-  display: flex;
+  max-width: 28rem;
+  height: 100%;
+  margin: 0 auto;
   justify-content: center;
-  align-items: center;
-  flex-shrink: 0;
 }
 
-/* フォーム */
-.flexText {
-  flex: 1;              
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;    
-  gap: 1rem;
-  width: 100%;
-  padding: 1rem;          
+.main-inner {
+  border-radius: 0.5rem;
+  overflow: hidden;
 }
 
-/* 入力欄 */
-.inputWrapper {
+.main-header {
+  background-color: #2563eb;
+  color: white;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.header-icon {
+  margin: 0 auto;
+}
+
+.input-section {
+  padding: 2rem 0.5rem 0rem 0.5rem;
+  background-color: white;
+}
+
+.input-wrapper {
   position: relative;
-  width: 50%;
-  max-width: 400px;
+  margin-bottom: 1rem;
 }
 
-.flexText input,
-.flexText select {
+.input-field {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
-  box-sizing: border-box;
+  padding: 1rem;
+  border: 2px solid #e9ecef;
+  border-radius: 0.5rem;
+  font-size: 1rem; /* 追加: inputと同じフォントサイズ */
+  line-height: 1.5; /* 追加: inputと同じ行高 */
+  text-indent: 1rem;
 }
 
-.inputWrapper .required {
+.icon {
   position: absolute;
   top: 50%;
-  right: -2%;
-  transform: translateY(-90%);
-  color: red;
-  font-weight: bold;
-  pointer-events: none;
-  font-size: 16px;
+  left: 0.75rem;
+  transform: translateY(-50%);
 }
 
-/* 登録ボタン */
-.newBtnLog {
-  padding: 8px 35px;
-  font-size: 14px;
-  color: white;
-  background-color: rgb(75, 102, 189);
+.eye-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.forgot-password {
   border: none;
-  border-radius: 5px;
+  background: none;
+  margin-right: auto;
+  color: #667eea;
   cursor: pointer;
+  margin-bottom: 1rem;
 }
 
-/* 下枠 */
-.flex-soko {
-  width: 100%;
-  height: 15%;           
-  background-color: #eeeeee;
-  flex-shrink: 0;
+.error-container {
+  background-color: #fef2f2;
+  display: flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #fecaca ;
+  border-radius: 0.5rem;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  color: #dc2626;
 }
 
-
-.errorMessage {
-  color: red;
-  font-size: 14px;
-  margin-top: 6px;
-  text-align: left;
+.error-icon {
+  display: flex;
 }
 
-/* スマホ対応 */
-@media (max-width: 768px) {
-  .inputWrapper {
-    width: 90%;
-  }
-}
-
+/* 謎 */
 
 /* カスタムセレクト全体のラッパー */
 .categorySelectWrapper {
   position: relative;
   width: 100%;
-}
-
-/* 選択中の表示部分 */
-.selectedCategory {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: white;
-  cursor: pointer;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 14px;
 }
 
 /* 選択テキスト */
@@ -123,12 +96,12 @@
 }
 
 .unselected {
-  color: #aaa;
+  color: #757575;
 }
 
 /* ▼矢印 */
 .arrow {
-  font-size: 12px;
+  font-size: 1rem ;
   color: #666;
 }
 

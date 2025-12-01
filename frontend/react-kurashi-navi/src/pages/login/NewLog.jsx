@@ -2,7 +2,9 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import styles from "../../styles/login/NewLog.module.css";
 import TabButton from "../../components/common/TabButton";
-import { EyeOff, Eye } from "lucide-react";
+import { EyeOff, Eye, TrendingUp, CircleAlert, Mail, Lock, Cake, Home } from "lucide-react";
+import Layout from "../../components/common/Layout";
+import SubmitButton from "../../components/common/SubmitButton";
 
 // 生まれた年セレクト
 function YearSelect({ selectedYear, setSelectedYear }) {
@@ -34,11 +36,11 @@ function YearSelect({ selectedYear, setSelectedYear }) {
   return (
     <div className={styles.categorySelectWrapper} ref={wrapperRef}>
       <div
-        className={styles.selectedCategory}
+        className={styles["input-field"]}
         onClick={() => setIsOpen(prev => !prev)}
       >
         <span className={`${styles.selectedText} ${!selected ? styles.unselected : ""}`}>
-          {selected ? selected.label : "生まれた年を選択"}
+          {selected ? selected.label : "生年月日（任意）"}
         </span>
         <span className={styles.arrow}>▾</span>
       </div>
@@ -69,9 +71,10 @@ function NewLog() {
   const [year, setYear] = useState(null);
   const [address, setAddress] = useState("");
   const [errorAddress, setErrorAddress] = useState("");
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState();
   const [showPassword, setShowPassword] = useState(false);
   const [passwordMessage, setPasswordMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const tabs = [
     { id: "login", label: "ログイン", icon: null },
@@ -86,41 +89,48 @@ function NewLog() {
   };
 
   const handleSubmit = async () => {
-    const newErrors = {};
+    console.log("handleSubmit()");
 
-    // 必須チェック
-    if (!email.trim()) {
-      newErrors.form = "メールアドレスを入力してください。";
-    } else {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        newErrors.form = "正しいメールアドレスを入力してください。";
-      }
+    // 必須チェック 後で細かく修正 
+    // if (!email.trim()) {
+    //   newErrors.form = "メールアドレスを入力してください。";
+    // } else {
+    //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    //   if (!emailRegex.test(email)) {
+    //     newErrors.form = "正しいメールアドレスを入力してください。";
+    //   }
+    // }
+
+    // if (!password.trim()) {
+    //   newErrors.form = "パスワードを入力してください。";
+    // } else {
+    //   const passwordRegex = /^.{8,16}$/;
+    //   if (!passwordRegex.test(password)) {
+    //     newErrors.form = "パスワードは8文字以上16文字以内で入力してください。";
+    //   }
+    // }
+
+    // // 生まれた年チェック
+    // const yearToSend = year || null;
+    // if (yearToSend !== null && !Number.isInteger(yearToSend)) {
+    //   newErrors.form = "生まれた年の形式が不正です。";
+    // }
+
+    // // 住所チェック
+    // const addressToSend = address.trim() === "" ? null : address.trim();
+    // if (addressToSend && addressToSend.length > 40) {
+    //   newErrors.form = "住所は40文字以内で入力してください。";
+    // }
+
+    if(!email.trim() || !password.trim()) {
+      console.log("未入力項目あり")
+      setErrors("未入力の項目があります。");
+      return;
     }
 
-    if (!password.trim()) {
-      newErrors.form = "パスワードを入力してください。";
-    } else {
-      const passwordRegex = /^.{8,16}$/;
-      if (!passwordRegex.test(password)) {
-        newErrors.form = "パスワードは8文字以上16文字以内で入力してください。";
-      }
-    }
-
-    // 生まれた年チェック
     const yearToSend = year || null;
-    if (yearToSend !== null && !Number.isInteger(yearToSend)) {
-      newErrors.form = "生まれた年の形式が不正です。";
-    }
-
-    // 住所チェック
     const addressToSend = address.trim() === "" ? null : address.trim();
-    if (addressToSend && addressToSend.length > 40) {
-      newErrors.form = "住所は40文字以内で入力してください。";
-    }
 
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) return;
 
     // API に送るデータ
     const payload = {
@@ -131,6 +141,7 @@ function NewLog() {
     };
 
     try {
+      setIsLoading(true);
       const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -164,83 +175,97 @@ function NewLog() {
 
         }
 
-        setErrors({ form: "登録に失敗しました：" + errorMsg });
+        setErrors("登録に失敗しました。");
       }
     } catch (error) {
       console.error("通信エラー", error);
-      setErrors({ form: "通信エラーが発生しました" });
+      setErrors("通信エラーが発生しました。");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className={styles.main}>
-      <div className={styles["flex-log"]}>
-        <TabButton tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} />
-      </div>
+    <Layout 
+      headerContent={
+        <TabButton 
+          tabs={tabs}
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
+        />
+      }
+      mainContent={
+        <div className={styles["main-container"]}>
+          <div className={styles["main-inner"]}>
+            <div className={styles["main-header"]}>
+              <h1>くらしナビ</h1>
+            </div>
 
-      <div className={styles.flexText}>
-        {/* メールアドレス */}
-        <div className={styles.inputWrapper}>
-          <input
-            type="email"
-            placeholder="メールアドレス"
-            value={email}
-            onChange={(e) => { setEmail(e.target.value); setErrors({}); setPasswordMessage(""); }}
-          />
-          <span className={styles.required}>*</span>
+            <div className={styles["input-section"]}>
+              <div className={styles["input-wrapper"]}>
+                <span className={styles["icon"]}><Mail size={16} /></span>
+                <input
+                  type="email"
+                  placeholder="メールアドレス"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value); 
+                  }}
+                  className={styles["input-field"]}
+                />
+              </div>
+
+              <div className={styles["input-wrapper"]}>
+                <span className={styles["icon"]}><Lock size={16} /></span>
+                <input 
+                  type={showPassword ? "text": "password"}
+                  placeholder="パスワード"
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                  }}
+                  className={styles["input-field"]}
+                />
+                <span
+                  onClick={() => setShowPassword(prev => !prev)}
+                  className={styles["eye-icon"]}
+                >
+                  {showPassword ? <Eye size={16} /> : <EyeOff size={16} />}
+                </span>
+              </div>
+
+              <div className={styles["input-wrapper"]}>
+                <span className={styles["icon"]}><Cake size={16} /></span>
+                <YearSelect selectedYear={year} setSelectedYear={setYear}/>
+              </div>
+
+              <div className={styles["input-wrapper"]}>
+                <span className={styles["icon"]}><Home size={16}/></span>
+                <input 
+                  type="text"
+                  placeholder="住所（任意）"
+                  value={address}
+                  onChange={(e) => {
+                    setAddress(e.target.value)
+                  }}
+                  className={styles["input-field"]}
+                />
+              </div>
+
+              <SubmitButton onClick={handleSubmit}/>
+
+              {errors && (
+                <div className={styles["error-container"]}>
+                  <span className={styles["error-icon"]}><CircleAlert size={16} /></span>
+                  <p>{errors}</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-
-        {/* パスワード */}
-        <div className={styles.inputWrapper} style={{ position: "relative" }}>
-          <input
-            type={showPassword ? "text" : "password"}
-            placeholder="パスワード"
-            value={password}
-            onChange={(e) => { setPassword(e.target.value); setErrors({}); setPasswordMessage(""); }}
-            style={{ paddingRight: "36px" }}
-          />
-          <span className={styles.required}>*</span>
-          <span
-            onClick={() => setShowPassword(prev => !prev)}
-            style={{ position: "absolute", right: "10px", top: "50%", transform: "translateY(-50%)", cursor: "pointer", color: "#555" }}
-          >
-            {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
-          </span>
-        </div>
-
-        {/* 生まれた年 */}
-        <div className={styles.inputWrapper}>
-          <YearSelect selectedYear={year} setSelectedYear={setYear} />
-        </div>
-
-        {/* 住所 */}
-        <div className={styles.inputWrapper}>
-          <input
-            type="text"
-            placeholder="住所"
-            value={address}
-            onChange={(e) => {
-              const val = e.target.value;
-              if (val.length > 40) setErrorAddress("住所は40文字以内で入力してください");
-              else setErrorAddress("");
-              setAddress(val);
-              setPasswordMessage("");
-            }}
-          />
-          {errorAddress && <div className={styles.errorMessage}>{errorAddress}</div>}
-        </div>
-
-        {/* エラー表示 */}
-        {errors.form && <div className={styles.errorMessage}>{errors.form}</div>}
-
-        {/* 成功表示 */}
-        {passwordMessage && <div style={{ color: "green", marginTop: "8px" }}>{passwordMessage}</div>}
-
-        <button className={styles.newBtnLog} onClick={handleSubmit}>新規登録</button>
-      </div>
-
-      <div className={styles["flex-soko"]}></div>
-    </div>
+      }
+      hideNavigation={true}
+    />
   );
 }
 

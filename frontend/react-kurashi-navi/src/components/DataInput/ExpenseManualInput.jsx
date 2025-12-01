@@ -7,10 +7,13 @@ import ReceiptItemModal from "./ReceiptItemModal";
 import SubmitButton from "../common/SubmitButton";
 import { useReceiptForm } from "../../hooks/dataInput/useReceiptForm";
 import { useReceiptUploader } from "../../hooks/dataInput/useReceiptUploader";
-import { Plus, Upload, Camera, CircleAlert, Cross, X } from "lucide-react";
+import { Plus, Upload, Camera, CircleAlert, Cross, X, Check } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import CompleteModal from "../common/CompleteModal";
 
 const ExpenseInput = ({ categories }) => {
+  const navigate = useNavigate();
   const { isUploading, uploadReceipt } = useReceiptUploader();
   const {
     receipt,
@@ -23,6 +26,7 @@ const ExpenseInput = ({ categories }) => {
   } = useReceiptForm();
 
   const [validationError, setValidationError] = useState(null); //エラーを管理
+  const [message, setMessage] = useState(false);
 
   const validateForm = () => {
     if(!receipt.products || receipt.products.length === 0) {
@@ -44,7 +48,8 @@ const ExpenseInput = ({ categories }) => {
     }
     const result = await uploadReceipt(receipt, tax);
     if (result) {
-      console.log("データ登録完了");
+      setMessage(true);
+      setTimeout(() => setMessage(false), 1000);
     }
   };
 
@@ -63,7 +68,14 @@ const ExpenseInput = ({ categories }) => {
           </button>
           <button className={styles["ocr-button"]}>
             <Camera size={20} />
-            <span className={styles["ocr-button-text"]}>読み取り</span>
+            <span 
+              className={styles["ocr-button-text"]}
+              onClick={() => {
+                navigate("/camera");
+              }}
+            >
+              読み取り
+            </span>
           </button>
         </div>
       </div>
@@ -128,7 +140,7 @@ const ExpenseInput = ({ categories }) => {
       </div>
 
       <SubmitButton
-        text="送信"
+        text={isUploading ? "送信中..." : "送信"}
         onClick={handleSubmit}
         disabled={isUploading}
       />
@@ -144,6 +156,10 @@ const ExpenseInput = ({ categories }) => {
             <X size={16}/>
           </button>
         </div>
+      )}
+
+      {message && (
+        <CompleteModal />
       )}
     </div>
   );

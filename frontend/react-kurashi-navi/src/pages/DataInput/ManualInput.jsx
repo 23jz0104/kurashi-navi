@@ -7,7 +7,7 @@ import IncomeManualInput from "../../components/DataInput/IncomeManualInput";
 import { Wallet, TrendingUp } from "lucide-react";
 import { useCategories } from "../../hooks/common/useCategories";
 
-const ConfirmInputData = () => {
+const ManualInputData = () => {
   const [activeTab, setActiveTab] = useState("expense");
   const {categories: incomeCategories} = useCategories(1) //収入用
   const {categories: expenseCategories} = useCategories(2) //支出用
@@ -37,4 +37,4 @@ const ConfirmInputData = () => {
   );
 };
 
-export default ConfirmInputData;
+export default ManualInputData;
