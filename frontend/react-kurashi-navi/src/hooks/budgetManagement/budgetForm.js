@@ -5,7 +5,7 @@ const useBudgetForm = () => {
   const [budgetForm, setBudgetForm] = useState({
     type_id: "",
     category_id: "",
-    budget_rule_id: "",
+    budget_rule_id: "1",
   });
 
   const budget_limit = useNumberInput(0);
