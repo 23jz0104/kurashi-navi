@@ -5,15 +5,17 @@ import styles from "../../styles/History/History.module.css";
 import { useTab } from "../../hooks/common/useTab";
 import MonthPicker from "../../components/common/MonthPicker";
 import { useGetRecord } from "../../hooks/history/useGetRecord";
+import { useGetRecordTest } from "../../hooks/history/useGetRecordTest";
 import { useMonthPicker } from "../../hooks/common/useMonthPicker";
 import { useState } from "react";
 import GraphView from "../../components/common/GraphView";
 import CalendarView from "../../components/common/CalendarView";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const History = () => {
   const { activeTab, handleTabChange } = useTab("graph");
   const { selectedMonth, changeMonth, setMonth, getMonthString } = useMonthPicker();
-  const { isLoading: isRecordLoading, record } = useGetRecord(getMonthString(selectedMonth));
+  const { isLoading: isRecordLoading, record } = useGetRecordTest(getMonthString(selectedMonth)); //必要に応じてTestと切り替え
   const [transactionType, setTransactionType] = useState("expense");
 
   const headerTabs = [
@@ -82,7 +84,9 @@ const History = () => {
     .filter((day) => day.categories.length > 0);
 
   const viewContent = {
-    graph: <GraphView summary={filteredMonthSummaryByType} />,
+    graph: (
+      <GraphView summary={filteredMonthSummaryByType} />
+    ),
     calendar: (
       <CalendarView
         dailySummary={record.daily}
@@ -106,6 +110,7 @@ const History = () => {
             selectedMonth={selectedMonth}
             onMonthChange={changeMonth}
             onMonthSelect={setMonth}
+            isDisabled={isRecordLoading}
           />
 
           <div className={styles["finance-summary"]}>
@@ -156,7 +161,7 @@ const History = () => {
             </div>
             <div className={styles["graph-container"]}>
               {isRecordLoading ? (
-                <div className={styles["loading-text"]}>読み込み中...</div>
+                <LoadingSpinner />
               ) : (
                 viewContent[activeTab]
               )}
@@ -164,63 +169,69 @@ const History = () => {
           </div>
 
           {/* グラフタブ: カテゴリ詳細（支出 or 収入を切り替え） */}
-          {activeTab === "graph" && (
-            <div className={styles["detail"]}>
-              {filteredMonthSummaryByType.map((r, index) => (
-                <div className={styles["flex"]} key={index}>
-                  <span className={styles["category-icon"]}></span>
-                  <span className={styles["category-name"]}>
-                    {r.category_name}
-                  </span>
-                  <span className={styles["category-price"]}>
-                    ¥{r.total.toLocaleString()}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* カレンダータブ: 日付ごとの詳細（支出・収入を同時表示） */}
-          {activeTab === "calendar" && allDailyData.length > 0 && (
-            <div className={styles["detail"]}>
-              {allDailyData.map((day) => {
-                const date = new Date(day.date);
-                const year = date.getFullYear();
-                const month = date.getMonth() + 1;
-                const dayNum = date.getDate();
-                const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
-                const weekday = weekdays[date.getDay()];
-
-                return (
-                  <div key={day.date} className={styles["daily-group"]}>
-                    <div className={styles["date-header"]}>
-                      <span>
-                        {year}年{month}月{dayNum}日 ({weekday})
+          {isRecordLoading ? (
+            <></>
+          ) : (
+            <>
+              {activeTab === "graph" && (
+                <div className={styles["detail"]}>
+                  {filteredMonthSummaryByType.map((r, index) => (
+                    <div className={styles["flex"]} key={index}>
+                      <span className={styles["category-icon"]}></span>
+                      <span className={styles["category-name"]}>
+                        {r.category_name}
+                      </span>
+                      <span className={styles["category-price"]}>
+                        ¥{r.total.toLocaleString()}
                       </span>
                     </div>
-                    <div className={styles["category-list"]}>
-                      {day.categories.map((category, idx) => (
-                        <div key={idx} className={styles["flex"]}>
-                          <span className={styles["category-icon"]}></span>
-                          <span className={styles["category-name"]}>
-                            {category.category_name}
-                          </span>
-                          <span
-                            className={`${styles["category-price"]} ${
-                              category.type_id === "1"
-                                ? styles["income"]
-                                : styles["expense"]
-                            }`}
-                          >
-                            ¥{category.total.toLocaleString()}
+                  ))}
+                </div>
+              )}
+
+              {/* カレンダータブ: 日付ごとの詳細（支出・収入を同時表示） */}
+              {activeTab === "calendar" && allDailyData.length > 0 && (
+                <div className={styles["detail"]}>
+                  {allDailyData.map((day) => {
+                    const date = new Date(day.date);
+                    const year = date.getFullYear();
+                    const month = date.getMonth() + 1;
+                    const dayNum = date.getDate();
+                    const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
+                    const weekday = weekdays[date.getDay()];
+
+                    return (
+                      <div key={day.date} className={styles["daily-group"]}>
+                        <div className={styles["date-header"]}>
+                          <span>
+                            {year}年{month}月{dayNum}日 ({weekday})
                           </span>
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+                        <div className={styles["category-list"]}>
+                          {day.categories.map((category, idx) => (
+                            <div key={idx} className={styles["flex"]}>
+                              <span className={styles["category-icon"]}></span>
+                              <span className={styles["category-name"]}>
+                                {category.category_name}
+                              </span>
+                              <span
+                                className={`${styles["category-price"]} ${
+                                  category.type_id === "1"
+                                    ? styles["income"]
+                                    : styles["expense"]
+                                }`}
+                              >
+                                ¥{category.total.toLocaleString()}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </>
           )}
         </div>
       }
