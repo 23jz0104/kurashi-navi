@@ -3,7 +3,7 @@ import styles from "./MonthPicker.module.css";
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useRef } from "react";
 
-const MonthPicker = ({ selectedMonth, onMonthChange, onMonthSelect }) => {
+const MonthPicker = ({ selectedMonth, onMonthChange, onMonthSelect, isDisabled = false}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMonth, setModalMonth] = useState(() => new Date(selectedMonth));
 
@@ -43,10 +43,12 @@ const MonthPicker = ({ selectedMonth, onMonthChange, onMonthSelect }) => {
   };
 
   const handleChangeMonth = (offset) => {
+    if (isDisabled) return;
     onMonthChange(offset);
   }
 
   const handleSelectMonth = (monthIndex) => {
+    if (isDisabled) return;
     const year = modalMonth.getFullYear();
     onMonthSelect(year, monthIndex);
     setIsModalOpen(false);

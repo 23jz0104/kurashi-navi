@@ -1,12 +1,9 @@
+/**
+ * データをまとめて取得してそれをキャッシュ
+ */
 import { useEffect, useState } from "react";
 
 const recordCache = {}; //一度APIで通信したデータをキャッシュにして保管
-// recordCache構造:
-// {
-//   "2025-10": { monthly: [...], daily: [...] },
-//   "2025-11": { monthly: [...], daily: [...] },
-//   "2025-12": { monthly: [...], daily: [...] }
-// }
 
 export const useGetRecord = (month) => {
   const [record, setRecord] = useState({ monthly: [], daily: [] });

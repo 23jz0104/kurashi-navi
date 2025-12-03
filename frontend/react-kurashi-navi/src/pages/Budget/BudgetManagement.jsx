@@ -9,7 +9,7 @@ import { useMonthPicker } from "../../hooks/common/useMonthPicker";
 
 const BudgetManagement = () => {
   const [activeTab, setActiveTab] = useState("view");
-  const { selectedMonth, changeMonth, setMonth } = useMonthPicker();
+  const { selectedMonth, changeMonth, setMonth, getMonthString } = useMonthPicker();
 
   const tabs = [
     { id: "view", label: "予算確認", icon: null },
@@ -36,7 +36,7 @@ const BudgetManagement = () => {
           />
 
           {/* タブに応じてコンポーネントを切り替え */}
-          {activeTab === "view" && <BudgetView />}
+          {activeTab === "view" && <BudgetView selectedMonth={getMonthString(selectedMonth)}/>}
           {activeTab === "edit" && <BudgetEdit />}
         </div>
       }

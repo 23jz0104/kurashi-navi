@@ -4,8 +4,6 @@ const CalendarView = ({ dailySummary = [], currentMonth }) => {
   const year = currentMonth.getFullYear();
   const month = currentMonth.getMonth();
 
-  console.log(JSON.stringify(dailySummary, null, 1));
-
   if (dailySummary.length === 0) {
     return (
       <div className={styles["empty-state"]}>

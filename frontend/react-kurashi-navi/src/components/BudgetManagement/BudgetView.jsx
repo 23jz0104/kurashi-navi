@@ -1,27 +1,109 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useBudgetApi } from "../../hooks/budgetManagement/useBudgetApi";
+import LoadingSpinner from "../common/LoadingSpinner";
+import styles from "./BudgetView.module.css";
+import { ChevronRight, House } from "lucide-react";
+import { useGetRecordTest } from "../../hooks/history/useGetRecordTest";
 
-const BudgetView = () => {
-  const { isGetLoading, budget, getBudget} = useBudgetApi();
+const BudgetView = ({ selectedMonth }) => {
+  const { isGetLoading, budget, getBudget } = useBudgetApi();
+  const { isLoading: isRecordLoading, record } = useGetRecordTest(selectedMonth);
 
-  //レンダリング時に予算を呼び出し
+  // レンダリング時に予算を呼び出し
   useEffect(() => {
     getBudget();
-  }, []);
+  }, [selectedMonth]);
 
-  return(
+  // 選択した月で budget をフィルタリングする関数
+  const filterBudgetByMonth = (budgetData, targetMonth) => {
+    if (!budgetData || !targetMonth) return [];
+
+    return budgetData.filter((item) => {
+      // created_at から年月を抽出
+      const itemMonth = item.created_at.slice(0, 7);
+      return itemMonth === targetMonth;
+    });
+  };
+
+  // フィルタリングされた予算データ（useMemo で最適化）
+  const filteredBudget = useMemo(() => {
+    return filterBudgetByMonth(budget, selectedMonth);
+  }, [budget, selectedMonth]);
+
+  // カテゴリ名から合計金額を取得する関数
+  const getTotalByCategory = (categoryName) => {
+    if (!record?.monthly) return 0;
+
+    const matchedRecord = record.monthly.find(
+      (item) => item.category_name === categoryName
+    );
+
+    return matchedRecord ? matchedRecord.total : 0;
+  };
+
+  // 進捗率を計算する関数
+  const calculateProgress = (total, limit) => {
+    if (!limit || limit === 0) return 0;
+    return Math.min((total / limit) * 100, 100);
+  };
+
+  return (
     <div>
       <h1>予算確認画面</h1>
-      {isGetLoading ? (
-        <div>読み込み中...</div>
+
+      {isGetLoading || isRecordLoading ? (
+        <LoadingSpinner />
       ) : (
-        <div>
-          {JSON.stringify(budget, null, 1)}
-          {budget}
-        </div>
+        <>
+          {filteredBudget.length !== 0 ? (
+            <>
+              {filteredBudget.map((item) => {
+                const total = getTotalByCategory(item.category_name);
+                const progressPercentage = calculateProgress(
+                  total,
+                  item.budget_limit
+                );
+
+                return (
+                  <div className={styles["budget-container"]} key={item.id}>
+                    <div className={styles["budget-header"]}>
+                      <div className={styles["icon"]}>
+                        <House />
+                      </div>
+                      <div className={styles["budget-title"]}>
+                        {item.category_name}
+                      </div>
+                      <div className={styles["budget-info"]}>
+                        <span>
+                          ¥{Number(item.budget_limit).toLocaleString()}
+                        </span>
+                        <span>/ 月</span>
+                        <span>
+                          <ChevronRight />
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className={styles["budget-progress"]}>
+                      <div className={styles["progress-bar"]}>
+                        <div
+                          className={styles["progress-fill"]}
+                          style={{ width: `${progressPercentage}%` }}
+                        ></div>
+                      </div>
+                      <span>支出 ¥{total.toLocaleString()}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </>
+          ) : (
+            <div>データが存在しません。</div>
+          )}
+        </>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default BudgetView;  
+export default BudgetView;
