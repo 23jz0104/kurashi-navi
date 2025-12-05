@@ -68,13 +68,16 @@ const MonthPicker = ({ selectedMonth, onMonthChange, onMonthSelect, isDisabled =
   };
 
   const toggleModal = () => {
+    if (isDisabled) return;
     setIsModalOpen(prev => !prev);
   };
 
   return(
     <div className={styles["month-picker-container"]}>
 
-      <div className={styles["month-picker-display"]}>
+      <div 
+        className={`${styles["month-picker-display"]} ${isDisabled ? styles["disabled"] : ""}`}
+      >
         <button
           type="button"
           onClick={() => handleChangeMonth(-1)}

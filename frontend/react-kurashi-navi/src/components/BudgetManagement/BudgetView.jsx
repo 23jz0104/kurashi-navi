@@ -47,6 +47,10 @@ const BudgetView = ({ selectedMonth }) => {
     return Math.min((total / limit) * 100, 100);
   };
 
+  const showBudgetInfo = () => {
+
+  }
+
   return (
     <div>
       <h1>予算確認画面</h1>
@@ -65,7 +69,11 @@ const BudgetView = ({ selectedMonth }) => {
                 );
 
                 return (
-                  <div className={styles["budget-container"]} key={item.id}>
+                  <button 
+                    className={styles["budget-container"]} 
+                    key={item.id}
+                    onClick={() => showBudgetInfo()}
+                  >
                     <div className={styles["budget-header"]}>
                       <div className={styles["icon"]}>
                         <House />
@@ -93,7 +101,7 @@ const BudgetView = ({ selectedMonth }) => {
                       </div>
                       <span>支出 ¥{total.toLocaleString()}</span>
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </>
