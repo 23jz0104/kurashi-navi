@@ -4,8 +4,10 @@ import LoadingSpinner from "../common/LoadingSpinner";
 import styles from "./BudgetView.module.css";
 import { ChevronRight, House } from "lucide-react";
 import { useGetRecordTest } from "../../hooks/history/useGetRecordTest";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const BudgetView = ({ selectedMonth }) => {
+  const navigate = useNavigate();
   const { isGetLoading, budget, getBudget } = useBudgetApi();
   const { isLoading: isRecordLoading, record } = useGetRecordTest(selectedMonth);
 
@@ -48,19 +50,17 @@ const BudgetView = ({ selectedMonth }) => {
   };
 
   const showBudgetInfo = () => {
-
+    navigate("/budget-management/edit");
   }
 
   return (
-    <div>
-      <h1>予算確認画面</h1>
-
+    <div className={styles["main-container"]}>
       {isGetLoading || isRecordLoading ? (
         <LoadingSpinner />
       ) : (
         <>
           {filteredBudget.length !== 0 ? (
-            <>
+            <div className={styles["budget-container"]}>
               {filteredBudget.map((item) => {
                 const total = getTotalByCategory(item.category_name);
                 const progressPercentage = calculateProgress(
@@ -70,25 +70,20 @@ const BudgetView = ({ selectedMonth }) => {
 
                 return (
                   <button 
-                    className={styles["budget-container"]} 
+                    className={styles["budget-button"]} 
                     key={item.id}
                     onClick={() => showBudgetInfo()}
                   >
                     <div className={styles["budget-header"]}>
                       <div className={styles["icon"]}>
-                        <House />
-                      </div>
-                      <div className={styles["budget-title"]}>
-                        {item.category_name}
+                        <House size={18}/>
                       </div>
                       <div className={styles["budget-info"]}>
-                        <span>
-                          ¥{Number(item.budget_limit).toLocaleString()}
-                        </span>
-                        <span>/ 月</span>
-                        <span>
-                          <ChevronRight />
-                        </span>
+                        <p className={styles["category-name"]}>{item.category_name}</p>
+                        <p className={styles["budget-price"]}>¥{Number(item.budget_limit).toLocaleString()} / 月</p>
+                      </div>
+                      <div className={styles["raito"]}>
+                        <p>{((total / Number(item.budget_limit)) * 100).toFixed(1)}%</p>
                       </div>
                     </div>
 
@@ -99,12 +94,17 @@ const BudgetView = ({ selectedMonth }) => {
                           style={{ width: `${progressPercentage}%` }}
                         ></div>
                       </div>
-                      <span>支出 ¥{total.toLocaleString()}</span>
+                      <div className={styles["price-info"]}>
+                      <span className={styles["expense-price"]}>
+                        ¥{total.toLocaleString()}
+                      </span>
+                      <span className={styles["rest-price"]}>残り ¥{((Number(item.budget_limit) - total).toLocaleString())}</span>
+                      </div>
                     </div>
                   </button>
                 );
               })}
-            </>
+            </div>
           ) : (
             <div>データが存在しません。</div>
           )}

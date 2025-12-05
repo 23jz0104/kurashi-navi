@@ -31,7 +31,7 @@ function App() {
         <Route path="/statistics" element={<Ninsyo><Statistics /></Ninsyo>} />
         <Route path="/notificationlist" element={<Ninsyo><NotificationList /></Ninsyo>} />
         <Route path="/priceInfo/:productName" element={<Ninsyo><PriceInfo /></Ninsyo>} />
-        <Route path="/budgetManagement" element={<Ninsyo><BudgetManagement /></Ninsyo>} />
+        <Route path="/budget-management" element={<Ninsyo><BudgetManagement /></Ninsyo>} />
         <Route path="/history" element={<Ninsyo><History /></Ninsyo>} />
       </Routes>
     </Router>

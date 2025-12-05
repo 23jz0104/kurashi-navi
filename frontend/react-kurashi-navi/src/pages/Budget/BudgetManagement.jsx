@@ -2,10 +2,10 @@ import { useState } from "react";
 import Layout from "../../components/common/Layout";
 import BudgetView from "../../components/BudgetManagement/BudgetView";
 import TabButton from "../../components/common/TabButton";
-import BudgetEdit from "../../components/BudgetManagement/BudgetEdit";
 import styles from "../../styles/Budget/BudgetManagement.module.css";
 import MonthPicker from "../../components/common/MonthPicker";
 import { useMonthPicker } from "../../hooks/common/useMonthPicker";
+import BudgetCreate from "../../components/BudgetManagement/BudgetCreate";
 
 const BudgetManagement = () => {
   const [activeTab, setActiveTab] = useState("view");
@@ -37,7 +37,7 @@ const BudgetManagement = () => {
 
           {/* タブに応じてコンポーネントを切り替え */}
           {activeTab === "view" && <BudgetView selectedMonth={getMonthString(selectedMonth)}/>}
-          {activeTab === "edit" && <BudgetEdit />}
+          {activeTab === "edit" && <BudgetCreate />}
         </div>
       }
     />

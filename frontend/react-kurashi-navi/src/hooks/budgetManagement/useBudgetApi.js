@@ -22,6 +22,7 @@ export const useBudgetApi = () => {
       }
       const data = await response.json();
       setBudget(data);
+      console.log(JSON.stringify(data, null, 1))
       return data;
     } catch (error) {
       console.log(error);
