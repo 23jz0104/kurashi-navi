@@ -27,8 +27,8 @@ const Layout = ({ headerContent, mainContent, hideNavigation = false, hideDataIn
               </Link>
 
               <Link
-                to="/budgetManagement"
-                className={`${styles["nav-item"]} ${isActive("/budgetManagement") ? styles.active : ""}`}
+                to="/budget-management"
+                className={`${styles["nav-item"]} ${isActive("/budget-management") ? styles.active : ""}`}
               >
                 <Wallet className={styles["nav-icon"]} size={20} />
                 <span className={styles["nav-label"]}>予算</span>

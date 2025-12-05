@@ -57,9 +57,8 @@ export const useGetRecordTest = (month) => {
             total: parseInt(item.total, 10) || 0,
             type_id: item.type_id,
           }));
-
         setRecord({ monthly, daily });
-        console.log("データ取得完了: useGetRecordTest.js");
+
       } catch (error) {
         console.error("データ取得エラー:", error);
         setRecord({ monthly: [], daily: [] });
