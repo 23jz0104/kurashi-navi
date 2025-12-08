@@ -24,6 +24,21 @@
   width: 100%;
 }
 
+.back-button {
+  position: absolute;
+  left: 2rem;
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .main {
   flex: 1;
   overflow-y: auto;
