@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import { useBudgetApi } from "../../hooks/budgetManagement/useBudgetApi";
 import LoadingSpinner from "../common/LoadingSpinner";
 import styles from "./BudgetView.module.css";
-import { ChevronRight, House } from "lucide-react";
+import { ChevronRight, Home, House } from "lucide-react";
 import { useGetRecordTest } from "../../hooks/history/useGetRecordTest";
 import { Navigate, useNavigate } from "react-router-dom";
 
@@ -49,8 +49,8 @@ const BudgetView = ({ selectedMonth }) => {
     return Math.min((total / limit) * 100, 100);
   };
 
-  const showBudgetInfo = () => {
-    navigate("/budget-management/edit");
+  const showBudgetInfo = (item) => {
+    navigate("/budget-management/edit", { state: {budgetData: item}});
   }
 
   return (
@@ -72,7 +72,7 @@ const BudgetView = ({ selectedMonth }) => {
                   <button 
                     className={styles["budget-button"]} 
                     key={item.id}
-                    onClick={() => showBudgetInfo()}
+                    onClick={() => showBudgetInfo({ ...item, total})}
                   >
                     <div className={styles["budget-header"]}>
                       <div className={styles["icon"]}>

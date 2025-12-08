@@ -9,3 +9,13 @@ html, body, #root {
   height: 100%;
   overflow: hidden;
 }
+
+/* input { 
+  vertical-align:middle;
+  position:relative; 
+  margin: 0 4px 2px 0;
+  margin-right:3px; 
+  top:-1px;
+  height: 16px; 
+  line-height: 16px; 
+} */
