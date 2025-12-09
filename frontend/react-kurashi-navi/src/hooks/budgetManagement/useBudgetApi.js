@@ -14,7 +14,10 @@ export const useBudgetApi = () => {
       console.log("API通信: getBudget()");
       const response = await fetch("https://t08.mydns.jp/kakeibo/public/api/budget", {
         method: "GET",
-        headers: { "Content-Type": "application/json", "X-User-ID": userId },
+        headers: { 
+          "Content-Type": "application/json", 
+          "X-User-ID": userId,
+        },
       });
       
       if(!response.ok) {
