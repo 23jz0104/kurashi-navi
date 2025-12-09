@@ -8,6 +8,30 @@
   gap: 1rem;
 }
 
+.add-budget-button {
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+  width: 100%;
+  border: 1px dashed #93C5FD;
+  border-radius: 0.25rem;
+  background-color: #DBEAFE;
+  padding: 1rem 0.5rem;
+}
+
+.add-button-icon {
+  display: flex;
+  background-color: #3B82F6;
+  border-radius: 50%;
+  color: white;
+  padding: 0.5rem;
+  margin-right: 1rem;
+}
+
+.add-budget-title {
+  color: #1E40AF;
+}
+
 .budget-button {
   background-color: white;
   padding: 1rem;

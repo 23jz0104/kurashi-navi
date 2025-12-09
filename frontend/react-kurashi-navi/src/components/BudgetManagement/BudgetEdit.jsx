@@ -7,18 +7,18 @@ import Categories from "../common/Categories";
 import { useCategories } from "../../hooks/common/useCategories";
 import { useState } from "react";
 import SubmitButton from "../common/SubmitButton";
+import LoadingSpinner from "../common/LoadingSpinner";
+import { useBudgetApi } from "../../hooks/budgetManagement/useBudgetApi";
 
 const BudgetEdit = () => {
   const location = useLocation();
-  const selectedBudget = location.state?.budgetData;
-
-  const [selectedCategoryId, setSelectedCategoryId] = useState(
-    selectedBudget.category_id
+  const [selectedBudget, setSelectedBudget] = useState(
+    location.state?.budgetData
   );
+  const { isLoading: isCategoryLoading, categories } = useCategories(2); //収入
+  const { isPatchLoading, patchBudget } = useBudgetApi();
 
-  const { categories: incomeCategories } = useCategories(1); //支出
-  const { categories: expenseCategories } = useCategories(2); //収入
-  const categories = [...incomeCategories, ...expenseCategories];
+  const [message, setMessage] = useState("");
 
   const budget_limit = useNumberInput(
     selectedBudget ? selectedBudget.budget_limit : 0
@@ -34,6 +34,25 @@ const BudgetEdit = () => {
     selectedBudget.budget_limit
   );
 
+  const handleSubmit = async () => {
+    const payload = {
+      id: selectedBudget.id,
+      budget_limit: selectedBudget.budget_limit,
+      category_id: selectedBudget.category_id,
+    }
+    const result = await patchBudget(payload);
+
+    if (result?.status === "success") {
+      setMessage("変更しました。");
+    } else {
+      setMessage("変更に失敗しました。");
+    }
+
+    setTimeout(() => {
+      setMessage("");
+    }, 2000);
+  };
+
   console.log("編集する予算データ;", JSON.stringify(selectedBudget, null, 2));
 
   return (
@@ -41,56 +60,105 @@ const BudgetEdit = () => {
       headerContent={<p>予算編集</p>}
       redirectPath={"/budget-management"}
       mainContent={
-        <div className={styles["main-container"]}>
+        <>
+          {isCategoryLoading ? (
+            <>
+              <LoadingSpinner />
+            </>
+          ) : (
+            <>
+              <div className={styles["main-container"]}>
+                <div className={styles["budget-info-card"]}>
+                  <div className={styles["category-display"]}>
+                    <span className={styles["icon"]}>
+                      <House size={16} />
+                    </span>
+                    <span className={styles["category-name"]}>
+                      {selectedBudget.category_name}
+                    </span>
+                    <span className={styles["usage-percentage"]}>
+                      {selectedBudget.budget_limit > 0
+                        ? (
+                            (selectedBudget.total /
+                              selectedBudget.budget_limit) *
+                            100
+                          ).toFixed(1)
+                        : "0"}
+                      %
+                    </span>
+                  </div>
 
-          <div className={styles["budget-info-card"]}>
-            <div className={styles["category-display"]}>
-              <span><House size={16} /></span>
-              <span>{selectedBudget.category_name}</span>
-              <span className={styles["usage-percentage"]}>{((selectedBudget.total / Number(selectedBudget.budget_limit)) * 100).toFixed(1)}%</span>
-            </div>
+                  <div className={styles["budget-input-container"]}>
+                    <span className={styles["currency-symbol"]}>¥</span>
+                    <input
+                      value={budget_limit.displayValue}
+                      onChange={(e) => {
+                        budget_limit.handleChange(e.target.value);
+                        setSelectedBudget((prev) => ({
+                          ...prev,
+                          budget_limit:
+                            Number(e.target.value.replace(/,/g, "")) || 0,
+                        }));
+                      }}
+                      className={styles["budget-limit-input"]}
+                    />
+                    <span className={styles["per-month"]}> / 月</span>
+                  </div>
 
-            <div className={styles["budget-input-container"]}>
-              <span className={styles["currency-symbol"]}>¥</span>
-              <input
-                value={budget_limit.displayValue}
-                onChange={(e) => budget_limit.handleChange(e.target.value)}
-                className={styles["budget-limit-input"]}
-              />
-              <span className={styles["per-month"]}> / 月</span>
-            </div>
+                  <div className={styles["budget-progress"]}>
+                    <div className={styles["progress-bar"]}>
+                      <div
+                        className={styles["progress-fill"]}
+                        style={{ width: `${progressPercentage}%` }}
+                      ></div>
+                    </div>
 
-            <div className={styles["budget-progress"]}>
-              <div className={styles["progress-bar"]}>
-                <div
-                  className={styles["progress-fill"]}
-                  style={{ width: `${progressPercentage}%` }}
-                ></div>
+                    <div className={styles["price-info"]}>
+                      <span className={styles["expense-price"]}>
+                        使用済み ¥{selectedBudget.total.toLocaleString()}
+                      </span>
+
+                      <span className={styles["rest-price"]}>
+                        残り ¥
+                        {(
+                          Number(selectedBudget.budget_limit) -
+                          selectedBudget.total
+                        ).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles["category-card"]}>
+                  <p>カテゴリ</p>
+                  <Categories
+                    categories={categories}
+                    selectedCategoryId={selectedBudget.category_id}
+                    onSelectedCategory={(id) => {
+                      const selected = categories.find((c) => c.id === id);
+                      setSelectedBudget((prev) => ({
+                        ...prev,
+                        category_id: id,
+                        category_name:
+                          selected?.category_name ?? prev.category_name,
+                      }));
+                    }}
+                  />
+                </div>
+
+                <SubmitButton
+                  disabled={isPatchLoading} 
+                  text={isPatchLoading ? "変更中..." : "変更"}
+                  onClick={() => handleSubmit()}
+                />
+
+                {message && (
+                  <p>{message}</p>
+                )}
               </div>
-
-              <div className={styles["price-info"]}>
-                <span className={styles["expense-price"]}>
-                  ¥{selectedBudget.total.toLocaleString()}
-                </span>
-
-                <span className={styles["rest-price"]}>
-                  残り ¥{(Number(selectedBudget.budget_limit) - selectedBudget.total).toLocaleString()}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <p>カテゴリ</p>
-            <Categories 
-              categories={categories}
-              selectedCategoryId={selectedCategoryId}
-              onSelectedCategory={(id) => setSelectedCategoryId(id)}
-            />
-          </div>
-
-          <SubmitButton text={"変更"}/>
-        </div>
+            </>
+          )}
+        </>
       }
       hideNavigation={true}
     />

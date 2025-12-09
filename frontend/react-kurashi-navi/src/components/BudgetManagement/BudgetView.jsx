@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import { useBudgetApi } from "../../hooks/budgetManagement/useBudgetApi";
 import LoadingSpinner from "../common/LoadingSpinner";
 import styles from "./BudgetView.module.css";
-import { ChevronRight, Home, House } from "lucide-react";
+import { ChevronRight, Home, House, Plus } from "lucide-react";
 import { useGetRecordTest } from "../../hooks/history/useGetRecordTest";
 import { Navigate, useNavigate } from "react-router-dom";
 
@@ -61,6 +61,13 @@ const BudgetView = ({ selectedMonth }) => {
         <>
           {filteredBudget.length !== 0 ? (
             <div className={styles["budget-container"]}>
+              <button 
+                className={styles["add-budget-button"]}
+                onClick={() => console.log("押された")}
+              >
+                <span className={styles["add-button-icon"]}><Plus size={16} /></span>
+                <span className={styles["add-budget-title"]}>予算を追加</span>
+              </button>
               {filteredBudget.map((item) => {
                 const total = getTotalByCategory(item.category_name);
                 const progressPercentage = calculateProgress(

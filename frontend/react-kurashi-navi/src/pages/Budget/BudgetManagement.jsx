@@ -6,14 +6,15 @@ import styles from "../../styles/Budget/BudgetManagement.module.css";
 import MonthPicker from "../../components/common/MonthPicker";
 import { useMonthPicker } from "../../hooks/common/useMonthPicker";
 import BudgetCreate from "../../components/BudgetManagement/BudgetCreate";
+import FixedCostView from "../../components/BudgetManagement/FixedCostView";
 
 const BudgetManagement = () => {
   const [activeTab, setActiveTab] = useState("view");
   const { selectedMonth, changeMonth, setMonth, getMonthString } = useMonthPicker();
 
   const tabs = [
-    { id: "view", label: "予算確認", icon: null },
-    { id: "edit", label: "予算設定", icon: null },
+    { id: "view", label: "予算", icon: null },
+    { id: "fixedCostView", label: "固定費", icon: null },
   ];
 
   return (
@@ -37,7 +38,7 @@ const BudgetManagement = () => {
 
           {/* タブに応じてコンポーネントを切り替え */}
           {activeTab === "view" && <BudgetView selectedMonth={getMonthString(selectedMonth)}/>}
-          {activeTab === "edit" && <BudgetCreate />}
+          {activeTab === "fixedCostView" && <FixedCostView />}
         </div>
       }
     />
