@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 export const useBudgetApi = () => {
   const [isGetLoading, setIsGetLoading] = useState(false); //ロードの状態管理
   const [isPostLoading, setIsPostLoading] = useState(false);
+  const [isPatchLoading, setIsPatchLoading] = useState(false);
   const [budget, setBudget] = useState([]); //予算の状態管理
 
   const userId = sessionStorage.getItem("userId");
@@ -57,5 +58,30 @@ export const useBudgetApi = () => {
     }
   }
 
-  return { isGetLoading, isPostLoading, budget, getBudget, postBudget };
+  const patchBudget = async (payload) => {
+    setIsPatchLoading(true);
+    try {
+      const response = await fetch("https://t08.mydns.jp/kakeibo/public/api/budget", {
+        method: "PATCH",
+        headers: { 
+          "Content-Type": "application/json",
+          "X-ID": payload.id, 
+        },
+        body: JSON.stringify({
+          budget_limit: payload.budget_limit, 
+          category_id: payload.category_id,
+        }),
+      })
+
+      const data = await response.json();
+      JSON.stringify("PATCH通信結果:", JSON.stringify(data, null, 2));
+      return data;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsPatchLoading(false);
+    }
+  }
+
+  return { budget, isGetLoading, isPostLoading, isPatchLoading, getBudget, postBudget, patchBudget };
 }
