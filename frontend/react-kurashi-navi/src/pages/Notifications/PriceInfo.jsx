@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import styles from "../../styles/Notifications/PriceInfo.module.css";
 import { Undo2, ArrowRightLeft } from "lucide-react";
+import Layout from "../../components/common/Layout";
 
 export default function PriceInfo() {
   const { productName } = useParams();
@@ -10,8 +11,8 @@ export default function PriceInfo() {
   const [site, setSite] = useState("rakuten");
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(10);
 
-  // 商品名 or サイト切替で再取得
   useEffect(() => {
     if (!productName) return;
     fetchItems();
@@ -20,19 +21,19 @@ export default function PriceInfo() {
   const fetchItems = async () => {
     setLoading(true);
     setItems([]);
+    setVisibleCount(10);
+
     try {
-      // ← ここをプロキシ経由に変更
       const url =
         site === "rakuten"
-          ? `/api/rakuten?keyword=${encodeURIComponent(productName)}&hits=5`
-          : `/api/yahoo/search?query=${encodeURIComponent(productName)}`;
+          ? `/api/rakuten?keyword=${encodeURIComponent(productName)}&hits=30`
+          : `/api/yahoo/search?query=${encodeURIComponent(productName)}&hits=30`;
 
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
       const data = await res.json();
 
-      // 楽天／Yahoo で共通フォーマットに変換
       let parsedItems = [];
       if (site === "rakuten") {
         parsedItems = (data.Items || []).map((itemWrapper, idx) => {
@@ -47,8 +48,7 @@ export default function PriceInfo() {
           };
         });
       } else {
-        const hits = data.hits || [];
-        parsedItems = hits.map((item, idx) => ({
+        parsedItems = (data.hits || []).map((item, idx) => ({
           id: `yahoo-${item.code || idx}`,
           name: item.name,
           price: parseInt(item.price, 10) || 0,
@@ -67,27 +67,36 @@ export default function PriceInfo() {
     }
   };
 
+  const loadMore = () => {
+    setVisibleCount((prev) => prev + 5);
+  };
+
   return (
-    <div className={styles.container}>
-      {/* 戻るボタン */}
+    <Layout 
+      mainContent={
+        <div className={styles.container}>
       <button className={styles.backBtn} onClick={() => navigate(-1)}>
         <Undo2 />
       </button>
 
       <h2>「{productName}」の価格情報</h2>
 
-      {/* 楽天 / ヤフー 切替 */}
       <div className={styles.switchContainer}>
-        <span className={site === "rakuten" ? styles.activeLabel : ""}>楽天</span>
-
         <button
-          className={styles.switchIconBtn}
-          onClick={() => setSite(site === "rakuten" ? "yahoo" : "rakuten")}
+          className={`${styles.switchBtn} ${site === "rakuten" ? styles.activeLabel : ""}`}
+          onClick={() => setSite("rakuten")}
         >
-          <ArrowRightLeft size={24} />
+          楽天
         </button>
-
-        <span className={site === "yahoo" ? styles.activeLabel : ""}>ヤフー</span>
+        <span className={styles.switchIcon}>
+          <ArrowRightLeft size={24} />
+        </span>
+        <button
+          className={`${styles.switchBtn} ${site === "yahoo" ? styles.activeLabel : ""}`}
+          onClick={() => setSite("yahoo")}
+        >
+          ヤフー
+        </button>
       </div>
 
       {loading ? (
@@ -95,27 +104,37 @@ export default function PriceInfo() {
       ) : items.length === 0 ? (
         <p>商品が見つかりませんでした。</p>
       ) : (
-        <ul className={styles.list}>
-          {items.map((item) => (
-            <li key={item.id} className={styles.itemCard}>
-              {item.image && <img src={item.image} alt={item.name} />}
-              <div>
-                <p className={styles.itemName}>{item.name}</p>
-                <p className={styles.itemPrice}>{item.price.toLocaleString()} 円</p>
-                <p className={styles.shopName}>販売店：{item.shop}</p>
-                <a
-                  className={styles.itemLink}
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  商品ページへ
-                </a>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className={styles.list}>
+            {items.slice(0, visibleCount).map((item) => (
+              <li key={item.id} className={styles.itemCard}>
+                {item.image && <img src={item.image} alt={item.name} />}
+                <div className={styles.itemInfo}>
+                  <p className={styles.itemName}>{item.name}</p>
+                  <p className={styles.itemPrice}>{item.price.toLocaleString()} 円</p>
+                  <p className={styles.shopName}>販売店：{item.shop}</p>
+                  <a
+                    className={styles.itemLink}
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    商品ページへ
+                  </a>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          {visibleCount < items.length && (
+            <button className={styles.moreBtn} onClick={loadMore}>
+              もっと見る
+            </button>
+          )}
+        </>
       )}
     </div>
+      }
+    />
   );
 }

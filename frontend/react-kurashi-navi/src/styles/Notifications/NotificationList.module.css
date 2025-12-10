@@ -195,6 +195,128 @@
   background-color: #e0e0e0;
 }
 
+
+/* カスタムセレクト全体のラッパー */
+.categorySelectWrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* 選択中の表示部分 */
+.selectedCategory {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: white;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+/* 選択テキスト */
+.selectedText {
+  color: #333;
+}
+
+.unselected {
+  color: #aaa;
+}
+
+/* ▼矢印 */
+.arrow {
+  font-size: 12px;
+  color: #666;
+}
+
+/* ドロップダウンリスト */
+.dropdownList {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  max-height: 200px; 
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: white;
+  z-index: 100;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* ドロップダウンの各項目 */
+.dropdownItem {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.dropdownItem:hover {
+  background-color: #f0f0f0;
+}
+
+.dropdownList::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dropdownList::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 3px;
+}
+
+/* ===== 通知ON / OFF スイッチ ===== */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+  margin-top: 8px;
+  vertical-align: middle;
+}
+
+/* チェックボックスを非表示 */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* スライダー背景 */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;               /* top, right, bottom, left: 0 */
+  background-color: #ccc;
+  transition: 0.3s;
+  border-radius: 30px;
+}
+
+/* 丸いツマミ */
+.slider::before {
+  content: "";
+  position: absolute;
+  height: 20px;
+  width: 20px;
+  left: 4px;
+  bottom: 1px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+/* ON 状態 */
+.switch input:checked + .slider {
+  background-color: #4caf50;
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(22px);
+}
+
+
+
 /* レスポンシブ */
 @media (max-width: 400px) {
   .label {
