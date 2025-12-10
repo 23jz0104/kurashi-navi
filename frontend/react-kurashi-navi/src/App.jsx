@@ -6,12 +6,13 @@ import UserInfo from "./pages/MyPages/UserInfo";
 import Statistics from "./pages/mypages/Statistics";
 import NotificationList from "./pages/notifications/NotificationList";
 import PriceInfo from "./pages/Notifications/PriceInfo.jsx";
-import BudgetControl from "./pages/Budget/BudgetControl";
+import BudgetManagement from "./pages/Budget/BudgetManagement.jsx";
 import Ninsyo from "./components/common/Ninsyo";
 import History  from "./pages/History/History";
 import ManualInputData from "./pages/DataInput/ManualInput.jsx";
 import ConfirmInputData from "./pages/DataInput/ConfirmInputData.jsx";
 import CameraInput from "./pages/DataInput/CameraInput.jsx";
+import BudgetEdit from "./components/BudgetManagement/BudgetEdit.jsx";
 
 function App() {
   return (
@@ -31,7 +32,8 @@ function App() {
         <Route path="/statistics" element={<Ninsyo><Statistics /></Ninsyo>} />
         <Route path="/notificationlist" element={<Ninsyo><NotificationList /></Ninsyo>} />
         <Route path="/priceInfo/:productName" element={<Ninsyo><PriceInfo /></Ninsyo>} />
-        <Route path="/budgetcontrol" element={<Ninsyo><BudgetControl /></Ninsyo>} />
+        <Route path="/budget-management" element={<Ninsyo><BudgetManagement /></Ninsyo>} />
+        <Route path="budget-management/edit" element={<Ninsyo><BudgetEdit /></Ninsyo>} />
         <Route path="/history" element={<Ninsyo><History /></Ninsyo>} />
       </Routes>
     </Router>

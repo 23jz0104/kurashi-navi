@@ -1,10 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export const useNumberInput = (initialValue = 0) => {
-  const [displayValue, setDisplayValue] = useState(
-    initialValue > 0 ? initialValue.toLocaleString() : ""
-  );
+  const [displayValue, setDisplayValue] = useState("");
   const [actualValue, setActualValue] = useState(initialValue);
+
+  // 初期値をフォーマットする
+  useEffect(() => {
+    if (initialValue !== undefined && initialValue !== null) {
+      const formatted = Number(initialValue).toLocaleString();
+      setDisplayValue(formatted);
+      setActualValue(Number(initialValue));
+    }
+  }, [initialValue]);
 
   const handleChange = (input) => {
     const cleaned = input.replace(/[^\d,-]/g, "");
@@ -27,9 +34,5 @@ export const useNumberInput = (initialValue = 0) => {
     setActualValue(Number(valueWithSign));
   };
 
-  return { 
-    displayValue,   // 表示用の値（カンマ区切り）
-    actualValue,    // 実際の数値
-    handleChange    // 変更ハンドラー
-  };
-}
+  return { displayValue, actualValue, handleChange };
+};

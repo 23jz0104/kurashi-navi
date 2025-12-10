@@ -1,16 +1,27 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Wallet, List, Bell, User, Plus } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Wallet, List, Bell, User, Plus, ChevronLeft } from "lucide-react";
 import styles from "./Layout.module.css";
 
-const Layout = ({ headerContent, mainContent, hideNavigation = false, hideDataInputButton = false, }) => {
+const Layout = ({ headerContent, mainContent, hideNavigation = false, hideDataInputButton = false, redirectPath}) => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isActive = (path) => location.pathname === path;
 
   return (
     <div className={styles.container}>
-      <header className={styles.header}>{headerContent}</header>
+      <header className={styles.header}>
+        {redirectPath && (
+          <div className={styles["back-button"]}>
+            <ChevronLeft size={20}
+             className={styles["icon"]}
+              onClick={() => navigate(redirectPath)}
+            />
+          </div>
+        )}
+        {headerContent}
+      </header>
       <main className={styles.main}>
         {mainContent}
       </main>
@@ -27,8 +38,8 @@ const Layout = ({ headerContent, mainContent, hideNavigation = false, hideDataIn
               </Link>
 
               <Link
-                to="/budgetcontrol"
-                className={`${styles["nav-item"]} ${isActive("/budgetcontrol") ? styles.active : ""}`}
+                to="/budget-management"
+                className={`${styles["nav-item"]} ${isActive("/budget-management") ? styles.active : ""}`}
               >
                 <Wallet className={styles["nav-icon"]} size={20} />
                 <span className={styles["nav-label"]}>予算</span>

@@ -79,7 +79,8 @@
 .graph-container {
   position: relative;
   width: 100%;
-  height: 19rem;
+  /* height: 19rem; */
+  min-height: 30vh;
   display: flex;
   padding: 1rem 0;
   border-bottom: 1px solid #999999;
@@ -118,12 +119,14 @@
 
 .category-name {
   flex: 1;
+  color: #4B5563;
 }
 
 .category-price {
   display: flex;
   align-items: center;
   font-size: 0.75rem;
+  color: #1F2937;
 }
 
 .category-price.income {

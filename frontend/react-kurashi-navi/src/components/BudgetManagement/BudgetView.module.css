@@ -1,0 +1,98 @@
+.main-container {
+  margin: 1rem 0;
+}
+
+.budget-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.add-budget-button {
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+  width: 100%;
+  border: 1px dashed #93C5FD;
+  border-radius: 0.25rem;
+  background-color: #DBEAFE;
+  padding: 1rem 0.5rem;
+}
+
+.add-button-icon {
+  display: flex;
+  background-color: #3B82F6;
+  border-radius: 50%;
+  color: white;
+  padding: 0.5rem;
+  margin-right: 1rem;
+}
+
+.add-budget-title {
+  color: #1E40AF;
+}
+
+.budget-button {
+  background-color: white;
+  padding: 1rem;
+  border: none;
+  border-radius: 0.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.budget-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.icon {
+  display: flex;
+  background-color: white;
+  padding: 0.5rem;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); 
+}
+
+.budget-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.category-name {
+  display: flex;
+  margin-left: 0;
+  font-weight: bold;
+}
+
+.budget-price {
+  display: flex;
+  color: #6B7280;
+  font-size: 0.8rem;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 0.5rem;
+  background-color: white;
+  background: #e5e5e5;
+  border-radius: 10rem;
+  margin: 1rem 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: black;
+  border-radius: 10rem;
+}
+
+.price-info {
+  display: flex;
+  justify-content: space-between;
+}
+
+.rest-price {
+  font-size: 0.8rem;
+  color: #6B7280;
+}
