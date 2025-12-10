@@ -1,0 +1,140 @@
+/* 全体レイアウト */
+.flex-list {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+.tableWrapper {
+  width: 100%;
+  max-width: 700px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
+}
+
+/* タイトル */
+.tableWrapper h2 {
+  margin-bottom: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* テーブル */
+.deviceTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.deviceTable thead tr {
+  background: #f5f5f5;
+}
+
+.deviceTable th,
+.deviceTable td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
+.deviceTable th {
+  font-weight: bold;
+}
+
+/* 削除ボタン */
+.deleteBtn {
+  background: #ff4f4f;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.deleteBtn:hover {
+  background: #d43636;
+}
+
+/* 戻るボタン */
+.modoru {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+.modoru svg {
+  width: 28px;
+  height: 28px;
+  color: #333;
+}
+
+/* スイッチ（通知ON/OFF） */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 25px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #4caf50;
+}
+
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
+
+/* メッセージ */
+.success {
+  color: green;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.error {
+  color: red;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* 端末一覧ブロック */
+.flex-userinfo {
+  width: 100%;
+}
+
