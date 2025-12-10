@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "../../styles/MyPages/MyPage.module.css";
 import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";
-import { Settings, LogOut, ChartBar } from "lucide-react";
+import { Settings, LogOut, ChartBar,UserPen  } from "lucide-react";
 
 function MyPage() {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ function MyPage() {
       <ul className={styles.ul}>
         <li className={styles.li}>
           <button className={styles.button} onClick={goToUserInfo}>
-            <Settings />登録情報
+            <UserPen  />登録情報
           </button>
         </li>
         <li className={styles.li}>
@@ -36,7 +36,7 @@ function MyPage() {
         </li>
         <li className={styles.li}>
           <button className={styles.button} onClick={goSetting}>
-            <ChartBar />設定
+            <Settings />設定
           </button>
         </li>
         <li className={styles.li}>

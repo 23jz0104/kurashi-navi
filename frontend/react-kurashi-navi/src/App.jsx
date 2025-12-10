@@ -4,7 +4,8 @@ import NewLog from "./pages/login/NewLog";
 import MyPage from "./pages/MyPages/MyPage";
 import UserInfo from "./pages/MyPages/UserInfo";
 import Statistics from "./pages/mypages/Statistics";
-import NotificationList from "./pages/notifications/NotificationList";
+import Setting from "./pages/MyPages/Setting.jsx";
+import NotificationList from "./pages/Notifications/NotificationList";
 import PriceInfo from "./pages/Notifications/PriceInfo.jsx";
 import BudgetManagement from "./pages/Budget/BudgetManagement.jsx";
 import Ninsyo from "./components/common/Ninsyo";
@@ -35,6 +36,7 @@ function App() {
         <Route path="/budget-management" element={<Ninsyo><BudgetManagement /></Ninsyo>} />
         <Route path="budget-management/edit" element={<Ninsyo><BudgetEdit /></Ninsyo>} />
         <Route path="/history" element={<Ninsyo><History /></Ninsyo>} />
+        <Route path="/Setting" element={<Ninsyo><Setting /></Ninsyo>} />
       </Routes>
     </Router>
   );

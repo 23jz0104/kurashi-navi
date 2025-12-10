@@ -247,7 +247,7 @@ function UserInfo() {
 
             try {
               console.log("DEBUG userId:", userId);
-              const res = await fetch("https://t08pushtest.mydns.jp/kakeibo/public/api/user", {
+              const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/user", {
                 method: "DELETE",
                 headers: {
                   "Content-Type": "application/json",
