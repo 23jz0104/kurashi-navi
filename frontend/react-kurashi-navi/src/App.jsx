@@ -14,6 +14,7 @@ import ManualInputData from "./pages/DataInput/ManualInput.jsx";
 import ConfirmInputData from "./pages/DataInput/ConfirmInputData.jsx";
 import CameraInput from "./pages/DataInput/CameraInput.jsx";
 import BudgetEdit from "./components/BudgetManagement/BudgetEdit.jsx";
+import BudgetCreate from "./components/BudgetManagement/BudgetCreate.jsx";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         <Route path="/notificationlist" element={<Ninsyo><NotificationList /></Ninsyo>} />
         <Route path="/priceInfo/:productName" element={<Ninsyo><PriceInfo /></Ninsyo>} />
         <Route path="/budget-management" element={<Ninsyo><BudgetManagement /></Ninsyo>} />
+        <Route path="/budget-management/create" element={<Ninsyo><BudgetCreate /></Ninsyo>} />
         <Route path="budget-management/edit" element={<Ninsyo><BudgetEdit /></Ninsyo>} />
         <Route path="/history" element={<Ninsyo><History /></Ninsyo>} />
         <Route path="/Setting" element={<Ninsyo><Setting /></Ninsyo>} />

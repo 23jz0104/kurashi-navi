@@ -51,7 +51,7 @@ const BudgetView = ({ selectedMonth }) => {
 
   const showBudgetInfo = (item) => {
     navigate("/budget-management/edit", { state: {budgetData: item}});
-  }
+  };
 
   return (
     <div className={styles["main-container"]}>
@@ -63,7 +63,9 @@ const BudgetView = ({ selectedMonth }) => {
             <div className={styles["budget-container"]}>
               <button 
                 className={styles["add-budget-button"]}
-                onClick={() => console.log("押された")}
+                onClick={() => {
+                  navigate("/budget-management/create");
+                }}
               >
                 <span className={styles["add-button-icon"]}><Plus size={16} /></span>
                 <span className={styles["add-budget-title"]}>予算を追加</span>

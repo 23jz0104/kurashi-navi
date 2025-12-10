@@ -1,0 +1,70 @@
+.main-container {
+  max-width: 28rem;
+  margin: 0 auto;
+  color: #374151;
+}
+
+.budget-info-card {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 0.25rem;
+  padding: 1rem;
+}
+
+.category-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  line-height: 1;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.category-name {
+  margin-left: 0.5rem;
+}
+
+.budget-input-container {
+  display: flex;
+  align-items: center;
+  line-height: 2;
+  border-bottom: #E5E7EB 1px solid;
+  gap: 1rem;
+}
+
+.currency-symbol {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.budget-limit-input {
+  flex: 1;
+  width: 80%;
+  font-size: 1.5rem;
+  border: none;
+  font-weight: bold;
+  margin-top: 4px;
+}
+
+.budget-limit-input:focus {
+  outline: none;
+}
+
+.per-month {
+  margin-left: auto;
+  font-size: 0.9rem;
+}
+
+.category-card {
+  margin: 1rem 0;
+  padding: 0.5rem;
+  background-color: white;
+}
