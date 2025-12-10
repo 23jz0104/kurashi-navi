@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Wallet, List, Bell, User, Plus, ChevronLeft } from "lucide-react";
 import styles from "./Layout.module.css";
 
-const Layout = ({ headerContent, mainContent, hideNavigation = false, hideDataInputButton = false, redirectPath}) => {
+const Layout = ({ headerContent, mainContent, hideNavigation = false, hideDataInputButton = false, redirectPath, state = null}) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -16,7 +16,7 @@ const Layout = ({ headerContent, mainContent, hideNavigation = false, hideDataIn
           <div className={styles["back-button"]}>
             <ChevronLeft size={20}
              className={styles["icon"]}
-              onClick={() => navigate(redirectPath)}
+              onClick={() => navigate(redirectPath, {state})}
             />
           </div>
         )}

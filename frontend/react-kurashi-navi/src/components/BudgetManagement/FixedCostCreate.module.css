@@ -1,0 +1,74 @@
+.main-container {
+  max-width: 28rem;
+  margin: 0 auto;
+}
+
+/* トグルボタンコンテナ */
+.toggle-button-container {
+  background: white;
+  border-radius: 12px;
+  padding: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 16px;
+}
+
+/* トグルの内部（ボタンを横並びにする親要素） */
+.toggle-inner {
+  position: relative;
+  display: flex;
+}
+
+/* スライドする背景 */
+.toggle-slider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 8px;
+  z-index: 1;
+}
+
+/* 支出が選択されているとき */
+.slider-expense {
+  left: 0;
+  background-color: #3b82f6;
+}
+
+/* 収入が選択されているとき */
+.slider-income {
+  left: 50%;
+  background-color: #3b82f6;
+}
+
+/* ボタン共通スタイル */
+.toggle-button {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+/* アクティブなボタン（白文字） */
+.toggle-button.active {
+  color: #ffffff;
+}
+
+/* ホバー効果（デスクトップ用） */
+.toggle-button:hover {
+  opacity: 0.9;
+}
+
+.input-card {
+  padding: 1rem;
+  background-color: white;
+}

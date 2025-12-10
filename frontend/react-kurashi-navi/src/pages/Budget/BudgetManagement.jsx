@@ -1,16 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Layout from "../../components/common/Layout";
 import BudgetView from "../../components/BudgetManagement/BudgetView";
 import TabButton from "../../components/common/TabButton";
 import styles from "../../styles/Budget/BudgetManagement.module.css";
-import MonthPicker from "../../components/common/MonthPicker";
-import { useMonthPicker } from "../../hooks/common/useMonthPicker";
-import BudgetCreate from "../../components/BudgetManagement/BudgetCreate";
 import FixedCostView from "../../components/BudgetManagement/FixedCostView";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const BudgetManagement = () => {
-  const [activeTab, setActiveTab] = useState("view");
-  const { selectedMonth, changeMonth, setMonth, getMonthString } = useMonthPicker();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const initialTab = location.state?.initialTab ?? "view";
+  const [activeTab, setActiveTab] = useState(initialTab);
+
+  useEffect(() => {
+    if (location.state?.initialTab) {
+      navigate(location.pathname, {
+        replace: true,
+        state: null,
+      });
+    }
+  }, []);
 
   const tabs = [
     { id: "view", label: "予算", icon: null },
@@ -28,16 +37,8 @@ const BudgetManagement = () => {
       }
       mainContent={
         <div className={styles["main-container"]}>
-          
-          {/* 共通の画面上部のカレンダー */}
-          <MonthPicker
-            selectedMonth={selectedMonth}
-            onMonthChange={changeMonth}
-            onMonthSelect={setMonth}
-          />
-
           {/* タブに応じてコンポーネントを切り替え */}
-          {activeTab === "view" && <BudgetView selectedMonth={getMonthString(selectedMonth)}/>}
+          {activeTab === "view" && <BudgetView/>}
           {activeTab === "fixedCostView" && <FixedCostView />}
         </div>
       }
