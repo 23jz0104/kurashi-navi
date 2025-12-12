@@ -33,15 +33,36 @@ const DropdownModal = ( { title = "タイトル", children = "要素"}) => {
     setIsOpen(false);
   }
 
+  // return (
+  //   <div className={styles["dropdown-container"]} ref={dropdownRef}>
+  //     <button className={styles["dropdown-button"]} onClick={handleToggle}>
+  //       {title}
+  //     </button>
+        
+  //     <div className={`${styles["dropdown-menu"]} ${isOpen ? styles["open"] : ""}`}>
+  //       {typeof children === 'function' ? children(closeModal) : children}
+  //     </div>
+  //   </div>
+  // );
   return (
-    <div className={styles["dropdown-container"]} ref={dropdownRef}>
+    <div className={styles["dropdown-container"]}>
       <button className={styles["dropdown-button"]} onClick={handleToggle}>
         {title}
       </button>
-        
-      <div className={`${styles["dropdown-menu"]} ${isOpen ? styles["open"] : ""}`}>
-        {typeof children === 'function' ? children(closeModal) : children}
-      </div>
+  
+      {isOpen && (
+        <div
+          className={styles["modal-overlay"]}
+          onClick={closeModal}
+        >
+          <div
+            className={styles["dropdown-menu"]}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {typeof children === "function" ? children(closeModal) : children}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
