@@ -91,6 +91,34 @@ const ReceiptItemForm = ({
         />
       </div>
 
+      {/* 税率 */}
+      <div className={styles["input-group"]}>
+        <label>税率</label>
+        <div className={styles["tax-radio-group"]}>
+          <label className={styles["tax-radio-item"]}>
+            <input
+              type="radio"
+              name={`${idPrefix}-tax-rate`}
+              value={8}
+              checked={initialValues.tax_rate === 8}
+              onChange={(e) => onFieldChange("tax_rate", Number(e.target.value))}
+            />
+            8%
+          </label>
+
+          <label className={styles["tax-radio-item"]}>
+            <input
+              type="radio"
+              name={`${idPrefix}-tax-rate`}
+              value={10}
+              checked={initialValues.tax_rate === 10}
+              onChange={(e) => onFieldChange("tax_rate", Number(e.target.value))}
+            />
+            10%
+          </label>
+        </div>
+      </div>
+
       {/* カテゴリ選択 */}
       <Categories
         categories={categories}

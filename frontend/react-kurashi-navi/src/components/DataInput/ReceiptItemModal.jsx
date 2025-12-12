@@ -25,6 +25,7 @@ const ReceiptItemModal = ({
           quantity: 1,  
           discount: 0,
           category_id: null,
+          tax_rate: 10,     // 初期値10%
         }
   );
 
@@ -62,7 +63,8 @@ const ReceiptItemModal = ({
         finalData.product_name,
         finalData.product_price,
         finalData.quantity,
-        finalData.discount || 0
+        finalData.discount || 0,
+        finalData.tax_rate    // 税率追加
       );
     }
 
