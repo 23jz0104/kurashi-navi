@@ -43,12 +43,19 @@ export const useReceiptForm = (initialReceipt = {
     const totalTax = Object.values(taxByRate).reduce((a, b) => a + b, 0);
 
     setTotalAmount(subTotal);
+
+    const tax_details = {
+      tax_8_percent: taxByRate[8] || 0,
+      tax_10_percent: taxByRate[10] || 0,
+    };
+
     setTax(taxByRate);
 
     // 合計金額（税抜 + 税額合計）
     setReceipt((prev) => ({
       ...prev,
       total_amount: subTotal + totalTax,
+      tax_details,
     }));
   }, [receipt.products]);
 
