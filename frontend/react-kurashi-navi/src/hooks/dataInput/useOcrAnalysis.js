@@ -12,16 +12,16 @@ const generateCategoriesPrompt = (categories) => {
   return categories.map(cat => `   ${cat.id}: ${cat.category_name}`).join('\n');
 }
 
-const generateOcrPropmt =  (categoryPrompt) => `  
+const generateOcrPrompt =  (categoryPrompt) => `  
   レシート画像を解析し、JSON形式で出力してください
   必要な項目:
   shop_name:      店舗名 (不明の場合は"不明")
   shop_address:   住所 (不明の場合は"不明")
-  purchase_day:   購買日 (YYYY-MM-DDTHH:mm:SSの形式で出力)
+  purchase_day:   購買日 (YYYY-MM-DDTHH:mm:ssの形式で出力)
   product_name:   商品名
-  product_price:  単価 (複数購入の場合は個数を数量で割る)
+  product_price:  単価 (複数購入の場合は個数を数量で割る)、値は1個しか存在しない
   discount:       値引/割引/まとめ買い (適用する商品は値段の下の行に値引/割引/まとめ買いが記載される)
-  tax_rate:       商品ごとの消費税の税率
+  tax_rate:       商品ごとの消費税の税率 (products配列内の商品に対してのみ適用)
   total_amount:   合計金額 (税込みの合計金額)
   
   【補足】
@@ -29,9 +29,10 @@ const generateOcrPropmt =  (categoryPrompt) => `
   商品のすべての内容(値引を含む情報)の記載は次の商品名または合計の行まで、前の商品の値引情報を誤って扱わないように
 
   消費税:
-  税率に応じて「消費税(8%)」か「消費税(10%)」に分けてください。
+  商品として扱わないようにしてください
+  税率に応じて「消費税(8%)」はtax_8_percentに、「消費税(10%)」はtax_10_percentに分けてください。
   商品名または商品の値段の横(前か後の場合両方もあります)に「*/軽/※」が記載された場合税率を8%として扱ってください
-  それ以外の商品の商品税は10%として扱う
+  明記しない商品は10%として扱う
   
   値引/割引/まとめ買い:
   独立の商品で扱いしない
@@ -57,13 +58,23 @@ const RESPONSE_SCHEMA = {
           quantity: { type: Type.INTEGER },
           tax_rate: { type: Type.INTEGER },
         },
-        required: ["product_name", "category_id", "product_price", "discount", "quantity", "tax_rate"],
+        required: ["product_name", "category_id", "product_price", "quantity", "tax_rate"],
       },
     },
+    // 合計
     total_amount: { type: Type.INTEGER },
-    // taxRate: { type: Type.INTEGER },
+    
+    // 消費税
+    tax_details: {
+      type: Type.OBJECT,
+      properties: {
+        tax_8_percent: { type: Type.INTEGER }, // 8%の消費税額
+        tax_10_percent: { type: Type.INTEGER }, // 10%の消費税額
+      },
+      required: ["tax_8_percent", "tax_10_percent"],
+    },
   },
-  required: ["shop_name", "shop_address", "purchase_day", "products", "total_amount"],
+  required: ["shop_name", "shop_address", "purchase_day", "products", "total_amount", "tax_details"],
 };
 
 // デフォルトのOCR結果
@@ -73,7 +84,10 @@ const DEFAULT_OCR_RESULT = {
   purchase_day: "",
   products: [],
   total_amount: 0,
-  taxRate: 0,
+  tax_details: {
+    tax_8_percent: 0,
+    tax_10_percent: 0,
+  },
 };
 
 export const useOcrAnalysis = (file) => {
@@ -94,7 +108,7 @@ export const useOcrAnalysis = (file) => {
     const analyzeReceipt = async () => {
       try {
         const categoryPrompt = generateCategoriesPrompt(categories);
-        const ocrPrompt = generateOcrPropmt(categoryPrompt);
+        const ocrPrompt = generateOcrPrompt(categoryPrompt);
         const uploadFile = await ai.files.upload({
           file: file,
           config: { mimeType: file.type },
