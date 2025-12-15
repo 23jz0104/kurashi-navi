@@ -39,6 +39,16 @@
   justify-content: center;
 }
 
+/* ケバブメニュー */
+.kebab-menu-button {
+  position: absolute;
+  right: 2rem;
+  display: flex;
+  align-items: center;
+  border: none;
+  background: none;
+}
+
 .main {
   flex: 1;
   overflow-y: auto;
