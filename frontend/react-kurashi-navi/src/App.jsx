@@ -20,7 +20,7 @@ import FixedCostView from "./components/BudgetManagement/FixedCostView.jsx";
 
 function App() {
   return (
-    <Router>
+    <Router basename="/combine_test/">
       <Routes>
         {/* 認証不要 */}
         <Route path="/" element={<Log />} />

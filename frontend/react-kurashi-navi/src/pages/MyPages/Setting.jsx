@@ -4,6 +4,19 @@ import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";
 import { Undo2 } from "lucide-react";
 import styles from "../../styles/MyPages/Setting.module.css";
+import { initializeApp } from "firebase/app";
+import { getMessaging, getToken } from "firebase/messaging";
+
+// ---------- Firebase 設定 ----------
+const firebaseConfig = {
+  apiKey: "AIzaSyDtjnrrDg2MKCL1pWxXJ7_m3x14N8OCbts",
+  authDomain: "pushnotification-4ebe3.firebaseapp.com",
+  projectId: "pushnotification-4ebe3",
+  storageBucket: "pushnotification-4ebe3.firebasestorage.app",
+  messagingSenderId: "843469470605",
+  appId: "1:843469470605:web:94356b50ab8c7718021bc4"
+};
+const app = initializeApp(firebaseConfig);
 
 function Setting() {
   const navigate = useNavigate();
@@ -16,7 +29,6 @@ function Setting() {
   const [successMessage, setSuccessMessage] = useState("");
 
   const tabs = [{ id: "devices", label: "設定" }];
-
   const headerContent = (
     <div style={{ display: "flex", alignItems: "center" }}>
       <button className={styles.modoru} onClick={() => navigate("/mypage")}>
@@ -27,47 +39,71 @@ function Setting() {
   );
 
   // ---------- 端末名取得 ----------
-  const getDeviceName = () => {
-    const ua = navigator.userAgent || "unknown";
+  // const getDeviceName = () => {
+  //   const ua = navigator.userAgent || "unknown";
+  //   if (/Windows/i.test(ua)) return "Windows PC";
+  //   if (/Macintosh|Mac OS X/i.test(ua)) return "Mac";
+  //   if (/iPhone/i.test(ua)) return "iPhone";
+  //   if (/iPad/i.test(ua)) return "iPad";
+  //   if (/Android/i.test(ua)) return "Android";
+  //   return "ブラウザ端末";
+  // };
 
-    if (/Windows/i.test(ua)) return "Windows PC";
-    if (/Macintosh|Mac OS X/i.test(ua)) return "Mac";
-    if (/iPhone/i.test(ua)) {
-      const match = ua.match(/OS (\d+)_?(\d+)?/);
-      return match ? `iPhone iOS ${match[1]}.${match[2] || 0}` : "iPhone";
-    }
-    if (/iPad/i.test(ua)) {
-      const match = ua.match(/OS (\d+)_?(\d+)?/);
-      return match ? `iPad iOS ${match[1]}.${match[2] || 0}` : "iPad";
-    }
-    if (/Android/i.test(ua)) {
-      const match = ua.match(/Android.*; (.+?) Build/);
-      return match ? match[1] : "Android";
-    }
-    return "ブラウザ端末";
-  };
+  // ---------- OS判定 ----------
+function getOS() {
+  const platform = navigator.platform.toLowerCase();
+  const ua = navigator.userAgent.toLowerCase();
 
-  const getFcmToken = () => "dummy-fcm-token-browser";
-  const getToday = () => new Date().toISOString().split("T")[0]; // YYYY-MM-DD
+  if (/win/.test(platform)) return "Windows";
+  if (/mac/.test(platform)) return "Mac";
+  if (/iphone|ipad|ipod/.test(ua)) return "iOS";
+  if (/android/.test(ua)) return "Android";
+  if (/linux/.test(platform)) return "Linux";
+  return "Unknown OS";
+}
+
+// ---------- ブラウザ判定 ----------
+function getBrowser() {
+  const ua = navigator.userAgent.toLowerCase();
+
+  if (/chrome|crios/.test(ua) && !/edge|edg|opr/.test(ua)) return "Chrome";
+  if (/safari/.test(ua) && !/chrome|crios|opr|edge|edg/.test(ua)) return "Safari";
+  if (/firefox/.test(ua)) return "Firefox";
+  if (/msie|trident/.test(ua)) return "Internet Explorer";
+  if (/edg/.test(ua)) return "Edge";
+  if (/opr/.test(ua)) return "Opera";
+  return "Unknown Browser";
+}
+
+// ---------- デバイス名取得 ----------
+function getDeviceName() {
+  const os = getOS();
+  const browser = getBrowser();
+  return `${os} (${browser})`;
+}
+
+  const getToday = () => new Date().toISOString().split("T")[0];
 
   // ---------- 端末一覧取得 ----------
   const fetchDevices = async () => {
     if (!userId) return;
     try {
-      const res = await fetch(
-        "https://t08.mydns.jp/kakeibo/public/api/settings",
-        { headers: { "X-User-ID": userId } }
-      );
-
+      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/settings", {
+        headers: { "X-User-ID": userId }
+      });
       if (res.ok) {
         const data = await res.json();
-        const devicesWithDate = data.map((d) => ({
+        // console.log("端末一覧データ:", data);
+        const devicesWithDate = data.map(d => ({
           ...d,
-          registered_date: d.registered_date || getToday(),
+          registered_date: d.registered_date || getToday()
         }));
         setDevices(devicesWithDate);
+        console.log("Fetched devices:", devicesWithDate);
+        return devicesWithDate;
       } else if (res.status === 404) {
-        await registerDevice();
+        // 端末未登録でも自動登録はしない
+        setDevices([]);
       } else {
         setErrorMessage("端末一覧取得に失敗しました");
       }
@@ -81,149 +117,119 @@ function Setting() {
     fetchDevices();
   }, [userId]);
 
-  // ---------- 端末登録 ----------
+  <button onClick={registerDevice}>この端末を登録</button>
+
+  // ---------- FCM トークン取得 & 端末登録 ----------
   const registerDevice = async () => {
     if (!userId) return;
-    const today = getToday();
-
     try {
-      const res = await fetch(
-        "https://t08.mydns.jp/kakeibo/public/api/settings",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "X-User-ID": userId },
-          body: JSON.stringify({
-            device_info: getDeviceName(),
-            device_name: getDeviceName(),
-            fcm_token: getFcmToken(),
-            registered_date: today,
-          }),
-        }
-      );
-
+      const registration = await navigator.serviceWorker.register("/combine_test/firebase-messaging-sw.js");
+      const messaging = getMessaging(app);
+      const token = await getToken(messaging, {
+        vapidKey: "BH3VSel6Cdam2EREeJ9iyYLoJcOYpqGHd7JXULxSCmfsULrVMaedjv81VF7h53RhJmfcHCsq-dSoJVjHB58lxjQ",
+        serviceWorkerRegistration: registration
+      });
+      if (!token) throw new Error("FCMトークン取得失敗");
+  
+      const deviceInfo = getDeviceName();
+      const today = getToday();
+  
+      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/settings", {
+        method: "POST", // 既存なら backend で update
+        headers: {
+          "Content-Type": "application/json",
+          "X-User-ID": userId
+        },
+        body: JSON.stringify({
+          device_info: deviceInfo,
+          device_name: deviceInfo,
+          fcm_token: token,
+          registered_date: today
+        })
+      });
+  
       const data = await res.json().catch(() => ({}));
-
-      if (res.ok) {
-        const deviceId = data.device?.ID;
-
-        console.log("保存する deviceId =", deviceId);
-
-        sessionStorage.setItem("currentDeviceId", String(deviceId));
-
-        const newDevice = {
-          id: deviceId,
-          device_info: getDeviceName(),
-          device_notification_enable: "1",
-          fcm_token: getFcmToken(),
-          registered_date: today,
-        };
-
-        setDevices((prev) => [...prev, newDevice]);
-
-      } else if (
-        data.message?.includes("already") ||
-        data.message?.includes("registered")
-      ) {
-        fetchDevices();
+  
+      if (res.ok || data.message?.includes("already")) {
+        // 既存端末なら fetchDevices で一覧更新
+        await fetchDevices();
+        setSuccessMessage("端末登録済み（更新）");
       } else {
         setErrorMessage(data.message || "端末登録失敗");
       }
-
     } catch (err) {
       console.error(err);
       setErrorMessage("通信エラーが発生しました");
     }
   };
-
-
 
   // ---------- 通知切替 ----------
   const toggleNotification = async (device) => {
-    const oldValue = device.device_notification_enable;
-    const newValue = oldValue === "1" ? "0" : "1";
-
-    // UI 反映
-    setDevices((prev) =>
-      prev.map((d) =>
-        d.id === device.id ? { ...d, device_notification_enable: newValue } : d
-      )
-    );
-
+    console.log("Toggling device:", device.id, "current value:", device.device_notification_enable);
     try {
-      const res = await fetch(
-        "https://t08.mydns.jp/kakeibo/public/api/settings",
-        {
-          method: "PATCH",
-          headers: {
-            "X-User-ID": userId,
-            "X-FCM-Token": device.fcm_token,
-          },
+      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/settings", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-User-ID": userId,
+          "X-Setting-ID": device.id
         }
-      );
-
+      });
+  
+      console.log("Toggling device", device.id, "userId", userId);
       const data = await res.json();
+      console.log("Response from backend:", data);
+  
+      if (res.ok && data.status === "success") {
+        // ★デバッグログ 1: APIレスポンスの値と型をチェック
+        console.log("API New Value:", data.new_value, "Type:", typeof data.new_value); 
 
-      if (!res.ok) {
-        // 失敗 → 元に戻す
-        setDevices((prev) =>
-          prev.map((d) =>
-            d.id === device.id ? { ...d, device_notification_enable: oldValue } : d
-          )
+        const receivedValue = Number(data.new_value);
+        
+        // ★デバッグログ 2: Number() 変換後の値と型をチェック
+        console.log("Converted Value:", receivedValue, "Type:", typeof receivedValue); 
+
+        setDevices(prev =>
+            prev.map(d =>
+                d.id === device.id ? 
+                { 
+                    ...d, 
+                    device_notification_enable: receivedValue // 確実な数値（0または1）をセット
+                } 
+                : d
+            )
         );
+        
+        // ★デバッグログ 3: State更新後の状態をチェック（次回のレンダリング前なので注意）
+        console.log("Toggled device ID:", device.id, "Set to:", receivedValue);
+        
+    } else {
         setErrorMessage(data.message || "通知設定更新失敗");
-        return;
       }
-
-      // 成功 → ON / OFF のメッセージを分ける
-      if (newValue === "1") {
-        setSuccessMessage("通知を ON にしました");
-      } else {
-        setSuccessMessage("通知を OFF にしました");
-      }
-
     } catch (err) {
       console.error(err);
       setErrorMessage("通信エラーが発生しました");
-
-      // 元に戻す
-      setDevices((prev) =>
-        prev.map((d) =>
-          d.id === device.id ? { ...d, device_notification_enable: oldValue } : d
-        )
-      );
     }
   };
-
-
+  
   // ---------- 削除 ----------
-  const removeDevice = async (deviceId) => {
+  const removeDevice = async deviceId => {
     if (!window.confirm("本当に削除しますか？")) return;
 
     try {
-      const res = await fetch(
-        "https://t08.mydns.jp/kakeibo/public/api/settings",
-        {
-          method: "DELETE",
-          headers: { "X-User-ID": userId, "X-Device-ID": deviceId },
-        }
-      );
-
+      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/settings", {
+        method: "DELETE",
+        headers: { "X-User-ID": userId, "X-Device-ID": deviceId }
+      });
       const data = await res.json().catch(() => ({}));
 
       if (res.ok) {
-        const currentDeviceId = sessionStorage.getItem("currentDeviceId");
-
-        if (deviceId === currentDeviceId) {
-
+        if (deviceId === sessionStorage.getItem("currentDeviceId")) {
           sessionStorage.clear();
           navigate("/log");
         } else {
-          //  他の端末なら → 一覧だけ更新
-          setSuccessMessage("削除しました");
-          setDevices((prev) => prev.filter((d) => d.id !== deviceId));
-          console.log("削除したい deviceId =", deviceId);
-          console.log("currentDeviceId =", sessionStorage.getItem("currentDeviceId"));
-
+          setDevices(prev => prev.filter(d => d.id !== deviceId));
+          setSuccessMessage("端末削除成功");
         }
       } else {
         setErrorMessage(data.message || "削除失敗");
@@ -239,49 +245,46 @@ function Setting() {
       headerContent={headerContent}
       mainContent={
         <div className={styles["flex-list"]}>
-          <div className={styles.tableWrapper}>
-            <h2>登録端末</h2>
-
-            {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-            {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
-
-            <table className={styles.deviceTable}>
-              <thead>
-                <tr>
-                  <th>端末名</th>
-                  <th>登録日</th>
-                  <th>通知</th>
-                  <th>削除</th>
+          <button onClick={registerDevice}>この端末を登録</button>
+          <h2>端末管理</h2>
+          {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+          {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}          
+          <table className={styles.deviceTable}>
+            <thead>
+              <tr>
+                <th>端末名</th>
+                <th>登録日</th>
+                <th>通知</th>
+                <th>削除</th>
+              </tr>
+            </thead>
+            <tbody>
+              {devices.map((device, index) => (
+                <tr key={device.id ?? index}>
+                  <td>{device.device_info}</td>
+                  <td>{device.registered_date}</td>
+                  <td>
+                    <label className={styles.switch}>
+                      <input
+                        type="checkbox"
+                        checked={!!device.device_notification_enable}
+                        onChange={() => toggleNotification(device)}
+                      />
+                      <span className={styles.slider}></span>
+                    </label>
+                  </td>
+                  <td>
+                    <button
+                      className={styles.deleteBtn}
+                      onClick={() => removeDevice(device.id)}
+                    >
+                      削除
+                    </button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {devices.map((device, index) => (
-                  <tr key={device.id ?? index}>
-                    <td>{device.device_info}</td>
-                    <td>{device.registered_date}</td>
-                    <td>
-                      <label className={styles.switch}>
-                        <input
-                          type="checkbox"
-                          checked={device.device_notification_enable === '1'}
-                          onChange={() => toggleNotification(device)}
-                        />
-                        <span className={styles.slider}></span>
-                      </label>
-                    </td>
-                    <td>
-                      <button
-                        className={styles.deleteBtn}
-                        onClick={() => removeDevice(device.id)}
-                      >
-                        削除
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
       }
     />

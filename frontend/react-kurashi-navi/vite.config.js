@@ -35,7 +35,7 @@ import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  // base: "/front_test/",
+  base: "/combine_test/",
   plugins: [react()],
   server: {
     // CORS回避用プロキシ

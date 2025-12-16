@@ -2,79 +2,42 @@ import { useState, useEffect } from "react";
 import { GoogleGenAI, createUserContent, createPartFromUri, Type } from "@google/genai";
 import { useCategories } from "../common/useCategories";
 
-const API_KEY = "";
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+
+if (!API_KEY) {
+  console.warn("APIキーが設定されていません (.env を確認してください)");
+}
 
 const generateCategoriesPrompt = (categories) => {
   return categories.map(cat => `   ${cat.id}: ${cat.category_name}`).join('\n');
 }
 
-const generateOcrPropmt =  (categoryPrompt) => `  
-  あなたはレシート画像を解析するAIです。
+const generateOcrPrompt =  (categoryPrompt) => `  
+  レシート画像を解析し、JSON形式で出力してください
+  必要な項目:
+  shop_name:      店舗名 (不明の場合は"不明")
+  shop_address:   住所 (不明の場合は"不明")
+  purchase_day:   購買日 (YYYY-MM-DDTHH:mm:ssの形式で出力)
+  product_name:   商品名
+  product_price:  単価 (複数購入の場合は個数を数量で割る)、値は1個しか存在しない
+  discount:       値引/割引/まとめ買い (適用する商品は値段の下の行に値引/割引/まとめ買いが記載される)
+  tax_rate:       商品ごとの消費税の税率 (products配列内の商品に対してのみ適用)
+  total_amount:   合計金額 (税込みの合計金額)
+  
+  【補足】
+  商品:
+  商品のすべての内容(値引を含む情報)の記載は次の商品名または合計の行まで、前の商品の値引情報を誤って扱わないように
 
-  次のルールに従って、JSONを抽出してください。
-  出力はJSONのみで行います（説明文やコメントは禁止）。
-
-  【ルール】
-  - 計算が発生する場合はPythonを用いて実行すること。
-  - shop_nameはレシート上部の店舗名。不明なら "不明"。
-  - shop_addressはレシートの店舗名の住所。不明なら "不明"。
-  - purchase_dayは日付。フォーマットは "yyyy-MM-dd HH:mm:ss" とする。(日付が検出できない、または不完全な場合は今日の日付とする。時刻に関しても同様で、検出できない場合は00:00:00とする。）
-  - product_nameは商品名。
-  - quantityは数量。解析にあたり数量が検出できない場合は1としてカウント。
-  - product_priceは単価。product_nameに対応する金額が合計金額の場合はproduct_priceをquantityで割る。(表示するのは税別の価格)
-  - discountは、その商品に対する割引金額（絶対値、例: 50円引きなら50）。
-
-  【重要: 割引の処理方法】
-  - レシートに「値引」「割引」などの表記がある場合、それは独立した商品ではありません。
-  - 割引は必ず直前または関連する商品のdiscountフィールドに統合してください。
-  - 割引だけを持つ独立したproductsレコードを作成してはいけません。
-  - 各商品のdiscountフィールドに適切な割引額を設定し、割引がない場合は0とします。
-  - 「値引」「割引」といった名前の商品アイテムをproductsに含めないでください。
-  - 割引金額に関しては1個あたりの金額を計算する必要はありません。そのままの値を出力してください。
-
-  - category_idは以下の分類ルールに従い、整数で出力する。
-   ${categoryPrompt}
-    99: その他（上記以外）
-
-  - 小計・合計・お預かり金などは含めない。
-  - total_amountは税率を含めた合計金額。商品の価格と数量から適切な合計金額をもとめ、税率を乗じて算出すること。
-    尚、レシートに合計金額が表示されており、かつ、それが税込み価格であればそれを利用してもよい。
-  - taxRateは税率。
-  - 適切なインデントで出力すること。
-
-  【出力例】
-  割引がある場合の正しい出力:
-  {
-    "products": [
-      {
-        "product_name": "商品A",
-        "category_id": 1,
-        "product_price": 200,
-        "discount": 50,
-        "quantity": 1
-      }
-    ]
-  }
-
-  誤った出力（このような出力は禁止）:
-  {
-    "products": [
-      {
-        "product_name": "商品A",
-        "category_id": 1,
-        "product_price": 200,
-        "discount": 0,
-        "quantity": 1
-      },
-      {
-        "product_name": "値引",
-        "category_id": 99,
-        "product_price": 0,
-        "discount": 50,
-        "quantity": 1
-      }
-    ]
-  }
+  消費税:
+  商品として扱わないようにしてください
+  税率に応じて「消費税(8%)」はtax_8_percentに、「消費税(10%)」はtax_10_percentに分けてください。
+  商品名または商品の値段の横(前か後の場合両方もあります)に「*/軽/※」が記載された場合税率を8%として扱ってください
+  明記しない商品は10%として扱う
+  
+  値引/割引/まとめ買い:
+  独立の商品で扱いしない
+  引く金額は合計金額の上で記載される場合があります、その際に該当する商品は商品名の行の下に値引/割引/まとめ買いの記述があります
+  category_idは以下の分類ルール(${categoryPrompt}、99: その他(上記以外))に従い、整数で出力する
 `;
 
 const RESPONSE_SCHEMA = {
@@ -93,14 +56,25 @@ const RESPONSE_SCHEMA = {
           product_price: { type: Type.INTEGER },
           discount: { type: Type.INTEGER },
           quantity: { type: Type.INTEGER },
+          tax_rate: { type: Type.INTEGER },
         },
-        required: ["product_name", "category_id", "product_price", "discount", "quantity"],
+        required: ["product_name", "category_id", "product_price", "quantity", "tax_rate"],
       },
     },
+    // 合計
     total_amount: { type: Type.INTEGER },
-    taxRate: { type: Type.INTEGER },
+    
+    // 消費税
+    tax_details: {
+      type: Type.OBJECT,
+      properties: {
+        tax_8_percent: { type: Type.INTEGER }, // 8%の消費税額
+        tax_10_percent: { type: Type.INTEGER }, // 10%の消費税額
+      },
+      required: ["tax_8_percent", "tax_10_percent"],
+    },
   },
-  required: ["shop_name", "shop_address", "purchase_day", "products", "total_amount", "taxRate"],
+  required: ["shop_name", "shop_address", "purchase_day", "products", "total_amount", "tax_details"],
 };
 
 // デフォルトのOCR結果
@@ -110,7 +84,10 @@ const DEFAULT_OCR_RESULT = {
   purchase_day: "",
   products: [],
   total_amount: 0,
-  taxRate: 0,
+  tax_details: {
+    tax_8_percent: 0,
+    tax_10_percent: 0,
+  },
 };
 
 export const useOcrAnalysis = (file) => {
@@ -131,7 +108,7 @@ export const useOcrAnalysis = (file) => {
     const analyzeReceipt = async () => {
       try {
         const categoryPrompt = generateCategoriesPrompt(categories);
-        const ocrPrompt = generateOcrPropmt(categoryPrompt);
+        const ocrPrompt = generateOcrPrompt(categoryPrompt);
         const uploadFile = await ai.files.upload({
           file: file,
           config: { mimeType: file.type },
@@ -150,6 +127,7 @@ export const useOcrAnalysis = (file) => {
         });;
 
         const parsedResult = JSON.parse(result.text);
+        console.log("OCR解析結果(JSON):", parsedResult);
         setOcrResult(parsedResult);
       } catch (error) {
         console.log("analyzeReceipt()でエラー : ", error);

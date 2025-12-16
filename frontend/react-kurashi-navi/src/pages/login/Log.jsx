@@ -83,9 +83,12 @@ function Log() {
         <div className={styles["main-container"]}>
           <div className={styles["main-inner"]}>
             <div className={styles["main-header"]}>
-              <h1>くらしナビ</h1>
+              <h1>くらしナビ(仮)</h1>
             </div>
-            <div className={styles["input-section"]}>
+            <form onSubmit={(e) => { 
+              e.preventDefault(); 
+              handleLogin();}} 
+              className={styles["input-section"]}>
               <div className={styles["input-wrapper"]}>
                 <span className={styles["icon"]}><Mail size={16} /></span> 
                 <input 
@@ -133,7 +136,7 @@ function Log() {
                   <p>{errorMessage}</p>
                 </div>
               )}
-            </div>
+            </form>
           </div>
         </div>
       }
