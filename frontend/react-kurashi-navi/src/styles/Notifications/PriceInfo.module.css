@@ -1,0 +1,170 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Helvetica", "Arial", sans-serif;
+  background-color: #f5f5f5;
+}
+
+.container {
+  padding: 16px;
+  max-width: 480px; 
+  margin: 0 auto;
+}
+
+/* 戻るボタン */
+.backBtn {
+  padding: 6px 12px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  border: none;
+  border-radius: 6px;
+  background-color: #656ac6;
+  color: white;
+  cursor: pointer;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+}
+
+/* 楽天 / ヤフー切替ボタン */
+.switchContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.switchLabel {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0;
+  border-radius: 6px;
+  border: 1px solid #656ac6;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: white;
+  color: #656ac6;
+}
+
+.switchLabel.active {
+  background-color: #656ac6;
+  color: white;
+}
+
+.switchIconBtn {
+  background: none;
+  border: none;
+  cursor: default;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 商品リスト / カード */
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.itemCard {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  background: white;
+  border-radius: 8px;
+  padding: 12px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  align-items: center;
+}
+
+.itemCard img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.itemName {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.itemPrice {
+  color: #e60023;
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+.shopName {
+  font-size: 12px;
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.itemLink {
+  color: #2196f3;
+  font-size: 12px;
+  text-decoration: underline;
+}
+
+/* もっと見るボタン */
+.moreBtn {
+  display: block;
+  margin: 16px auto;
+  padding: 10px 20px;
+  background-color: #656ac6;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.moreBtn:hover {
+  background-color: #5452a0;
+}
+
+
+/* 切替ボタンコンテナ */
+.switchContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+/* 楽天 / ヤフーボタン */
+.switchBtn {
+  flex: 1;
+  padding: 8px 0;
+  border-radius: 6px;
+  border: 1px solid #656ac6;
+  background-color: white;
+  color: #656ac6;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.activeLabel {
+  background-color: #656ac6;
+  color: white;
+}
+
+.switchIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none; 
+  color: #656ac6;
+}

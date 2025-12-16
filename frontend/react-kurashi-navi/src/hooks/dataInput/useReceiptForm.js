@@ -1,0 +1,62 @@
+import { useEffect, useState } from "react";
+
+export const useReceiptForm = (initialReceipt = {
+  shop_name: "",
+  shop_address: "",
+  purchase_day: new Date().toISOString().split('T')[0],
+  products: [],
+  total_amount: "0",
+  taxRate: 8,
+}) => {
+  const [receipt, setReceipt] = useState(initialReceipt);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [tax, setTax] = useState(0);
+
+  useEffect(() => {
+    if(!receipt) return;
+
+    const subTotals = receipt.products.reduce((sum, item) => {
+      const product_price = item.product_price;
+      const quantity = item.quantity;
+      const discount = item.discount;
+      return sum + (product_price * quantity) - discount;
+    }, 0);
+
+    const tax = Math.floor(subTotals * (receipt.taxRate / 100));
+
+    setTotalAmount(subTotals);
+    setTax(tax);
+    setReceipt(prev => ({ ...prev, total_amount: subTotals + tax}));
+  }, [receipt.products, receipt.taxRate]);
+
+  const addItem = (category_id, product_name, product_price, quantity, discount) => {
+    const newItem = {category_id, product_name, product_price, quantity, discount};
+
+    setReceipt(prev => ({
+      ...prev,
+      products: [...prev.products, newItem],
+    }));
+  };
+
+  const updateItem = (index, updates) => {
+    setReceipt(prev => {
+      const newProducts = [...prev.products];
+      newProducts[index] = { ...newProducts[index], ...updates };
+      return { ...prev, products: newProducts };
+    });
+  };
+
+  const deleteItem = (index) => {
+    setReceipt(prev => {
+      const newProducts = [...prev.products];
+      newProducts.splice(index, 1);
+      return { ...prev, products: newProducts};
+    });
+  };
+
+  const updateReceiptInfo = (field, value) => {
+    setReceipt(prev => ({ ...prev, [field]: value}));
+  };
+  
+  return { receipt, totalAmount, tax, addItem, updateItem, deleteItem, updateReceiptInfo };
+};

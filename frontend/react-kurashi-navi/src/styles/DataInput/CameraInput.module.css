@@ -1,0 +1,72 @@
+.camera-container {
+  background-color: #000;
+  position: relative;
+}
+
+.floating-buttons {
+  position: fixed;
+  bottom: 8rem;
+  left: 0;
+  right: 0;
+  padding: 0 2rem;
+}
+
+.button-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 28rem;
+  margin: 0 auto;
+}
+
+.left-section {
+  flex: 1;
+  display: flex;
+  justify-content: flex-start;
+}
+
+
+.center-section {
+  flex-shrink: 0;
+  margin: 0 1rem;
+}
+
+.right-section {
+  flex: 1;
+}
+
+.back-button {
+  width: 3.5rem;
+  height: 3.5rem;
+  background-color: #2563eb;
+  border: 1px solid white;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.1);
+}
+
+.back-button:active {
+  transform: scale(0.95);
+}
+
+.camera-button {
+  width: 5rem;
+  height: 5rem;
+  background-color: #2563eb;
+  border: 1px solid white;
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.1);
+}
+
+.camera-button:active {
+  transform: scale(0.95);
+}
