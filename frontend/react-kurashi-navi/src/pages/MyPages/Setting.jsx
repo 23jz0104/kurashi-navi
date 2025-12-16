@@ -117,7 +117,7 @@ function getDeviceName() {
     fetchDevices();
   }, [userId]);
 
-  <button onClick={registerDevice}>この端末を登録</button>
+  <button onClick={() => registerDevice()}>この端末を登録</button>
 
   // ---------- FCM トークン取得 & 端末登録 ----------
   const registerDevice = async () => {

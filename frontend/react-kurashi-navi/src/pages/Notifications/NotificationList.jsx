@@ -4,7 +4,7 @@ import styles from '../../styles/Notifications/NotificationList.module.css';
 import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";
 import { CircleAlert } from 'lucide-react';
-import { getFcmToken } from "../../firebase";
+// import { getFcmToken } from "../../firebase";
 
 // 1時間ごとの選択コンポーネント
 function NotificationHourSelect({ selectedHour, setSelectedHour }) {
