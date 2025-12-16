@@ -52,7 +52,6 @@ const FixedCostEdit = () => {
       hideNavigation={true}
       redirectPath={"/budget-management"}
       state={{"initialTab": "fixedCostView"}}
-      showKebabMenu={true}
       headerContent={<p>固定費編集</p>}
       mainContent={
         <>
