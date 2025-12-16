@@ -128,6 +128,10 @@ const BudgetView = () => {
                   </span>
                 </div>
               </div>
+
+              {/* <div>
+                <ChevronRight size={16} />
+              </div> */}
             </button>
           );
         })}

@@ -53,8 +53,6 @@ const BudgetEdit = () => {
     }, 2000);
   };
 
-  console.log("編集する予算データ;", JSON.stringify(selectedBudget, null, 2));
-
   return (
     <Layout
       headerContent={<p>予算編集</p>}

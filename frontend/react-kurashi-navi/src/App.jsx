@@ -17,6 +17,7 @@ import BudgetEdit from "./components/BudgetManagement/BudgetEdit.jsx";
 import BudgetCreate from "./components/BudgetManagement/BudgetCreate.jsx";
 import FixedCostCreate from "./components/BudgetManagement/FixedCostCreate.jsx";
 import FixedCostView from "./components/BudgetManagement/FixedCostView.jsx";
+import FixedCostEdit from "./components/BudgetManagement/FixedCostEdit.jsx";
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
         <Route path="/budget-management/create" element={<Ninsyo><BudgetCreate /></Ninsyo>} />
         <Route path="budget-management/edit" element={<Ninsyo><BudgetEdit /></Ninsyo>} />
         <Route path="/budget-management/fixed-cost-create" element={<Ninsyo><FixedCostCreate /></Ninsyo>}></Route>
+        <Route path="/budget-management/fixed-cost-edit" element={<Ninsyo><FixedCostEdit /></Ninsyo>}></Route>
         <Route path="/history" element={<Ninsyo><History /></Ninsyo>} />
         <Route path="/Setting" element={<Ninsyo><Setting /></Ninsyo>} />
       </Routes>
