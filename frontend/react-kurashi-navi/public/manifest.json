@@ -1,0 +1,10 @@
+{
+    "$schema": "https://json.schemastore.org/web-manifest-combined.json",
+    "name": "kakeibo combine test",
+    "short_name": "kakeibo",
+    "start_url": ".",
+    "display_override": ["window-control-overlay", "minimal-ui"],
+    "display": "standalone",
+    "background_color": "#fff",
+    "description": "結合テスト"
+}
