@@ -17,6 +17,7 @@ import BudgetEdit from "./components/BudgetManagement/BudgetEdit.jsx";
 import BudgetCreate from "./components/BudgetManagement/BudgetCreate.jsx";
 import FixedCostCreate from "./components/BudgetManagement/FixedCostCreate.jsx";
 import FixedCostView from "./components/BudgetManagement/FixedCostView.jsx";
+import FixedCostEdit from "./components/BudgetManagement/FixedCostEdit.jsx";
 
 function App() {
   return (
