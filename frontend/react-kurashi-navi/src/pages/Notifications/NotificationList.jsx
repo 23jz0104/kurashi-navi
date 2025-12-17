@@ -66,6 +66,7 @@ function NotificationList() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("userinfo");
   const [isAdding, setIsAdding] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [productName, setProductName] = useState("");
   const [intervalDays, setIntervalDays] = useState('');
   const [notificationHour, setNotificationHour] = useState(9);
@@ -91,7 +92,7 @@ function NotificationList() {
     );
 
     try {
-      const res = await fetch("/api/notification", {
+      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/notification", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -122,23 +123,24 @@ function NotificationList() {
         const normalized = data.notifications.map(n => {
           const timestamp = n.NOTIFICATION_TIMESTAMP ?? n.notification_timestamp;
 
-          const resetDay = timestamp
+          const serverDate = timestamp
             ? new Date(timestamp.replace(" ", "T"))
             : getToday();
-
-          resetDay.setHours(0, 0, 0, 0);
+          serverDate.setHours(0, 0, 0, 0);
 
           const interval = Number(n.NOTIFICATION_PERIOD ?? n.notification_period ?? 0);
 
-          const scheduled = new Date(resetDay);
-          scheduled.setDate(scheduled.getDate() + interval);
+          const scheduled = new Date(serverDate);
+
+          const calculatedResetDay = new Date(scheduled);
+          calculatedResetDay.setDate(calculatedResetDay.getDate() - interval);
 
           return {
             id: n.ID ?? n.id,
             productName: n.PRODUCT_NAME ?? n.product_name ?? '不明',
             intervalDays: interval,
-            resetDay: resetDay,
-            scheduledDate: scheduled,
+            resetDay: calculatedResetDay, 
+            scheduledDate: scheduled,     
             enabled: Number(n.NOTIFICATION_ENABLE ?? n.notification_enable) === 1,
             notificationHour: Number(n.NOTIFICATION_HOUR ?? n.notification_hour ?? 9)
           };
@@ -163,17 +165,25 @@ function NotificationList() {
   const handleSave = async () => {
     // 1. バリデーション
     if (!productName) return setError('商品名を入力してください');
-  
+
+    const isDuplicate = notifications.some(n => n.productName === productName);
+    if (isDuplicate) return setError('その商品はすでに登録されています');
+
+    if (isSaving) return;
+
+    setIsSaving(true); // ロック開始
+    setError("");
+
     try {
-      // ▼▼▼ 追加: Firebaseトークン送信（失敗しても商品は追加する） ▼▼▼
+      //  Firebaseトークン送信（失敗しても無視） 
       try {
         const fcmToken = await getFcmToken();
         if (fcmToken) {
-          const settingsRes = await fetch("/api/settings", {
+          await fetch("https://t08.mydns.jp/kakeibo/public/api/settings", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "X-User-ID": userId 
+              "X-User-ID": userId
             },
             body: JSON.stringify({
               fcm_token: fcmToken,
@@ -181,20 +191,13 @@ function NotificationList() {
               device_name: "PC Browser"
             })
           });
-          
-          // 既に登録済み(400)でもOKとする
-          if (!settingsRes.ok && settingsRes.status !== 400) {
-             console.warn("トークン保存に失敗しましたが続行します");
-          }
         }
       } catch (tokenError) {
-        // トークン取得や送信のエラーは無視して商品追加へ進む
         console.error("トークン処理エラー(無視):", tokenError);
       }
-      // ▲▲▲ ここまで ▲▲▲
 
-      // 3. 本来の商品追加処理（NOTIFICATIONSテーブルへの保存）
-      const res = await fetch("/api/notification", {
+      // 3. 商品追加処理
+      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/notification", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -207,11 +210,11 @@ function NotificationList() {
           notification_min: 0
         })
       });
-  
+
       const data = await res.json();
-  
+
       if (res.ok && data.status === "success") {
-        fetchNotifications();
+        await fetchNotifications();
         setIsAdding(false);
         setProductName("");
         setIntervalDays("");
@@ -223,26 +226,26 @@ function NotificationList() {
     } catch (e) {
       console.error(e);
       setError("通信エラー");
+    } finally {
+      setIsSaving(false);
     }
   };
 
   // 通知削除
   const handleDelete = async (id) => {
+    if (!window.confirm("本当に削除しますか？")) return;
+
     try {
-      const res = await fetch("/api/notification", {
+      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/notification", {
         method: "DELETE",
         headers: {
           "X-User-ID": userId,
           "X-Notification-ID": id
         }
       });
-
       const data = await res.json();
-
       if (res.ok && data.status === 'success') {
         fetchNotifications();
-      } else {
-        console.error(data);
       }
     } catch (e) {
       console.error(e);
@@ -252,7 +255,7 @@ function NotificationList() {
   // 補充ボタン
   const handleRefilled = async (item) => {
     try {
-      const res = await fetch("/api/notification", {
+      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/notification", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -260,17 +263,13 @@ function NotificationList() {
           "X-Notification-ID": item.id
         },
         body: JSON.stringify({
-                    notification_enable: 1,
-                    notification_period: item.intervalDays 
-                  })
+          notification_enable: item.enabled ? 1 : 0,
+          notification_period: item.intervalDays
+        })
       });
-
       const data = await res.json();
-
       if (res.ok && data.status === "success") {
         fetchNotifications();
-      } else {
-        console.error("更新失敗:", data.message);
       }
     } catch (e) {
       console.error("通信エラー:", e);
@@ -320,8 +319,13 @@ function NotificationList() {
           {error && <p style={{ color: 'red', marginTop: '4px' }}>{error}</p>}
 
           <div className={styles.buttonGroup}>
-            <button className={styles.save} onClick={handleSave}>
-              保存
+            <button
+              className={styles.save}
+              onClick={handleSave}
+              disabled={isSaving}
+              style={{ opacity: isSaving ? 0.6 : 1, cursor: isSaving ? 'not-allowed' : 'pointer' }}
+            >
+              {isSaving ? "保存中..." : "保存"}
             </button>
             <button
               className={styles.cancel}
@@ -332,6 +336,7 @@ function NotificationList() {
                 setIntervalDays('');
                 setNotificationHour(9);
               }}
+              disabled={isSaving}
             >
               キャンセル
             </button>
@@ -344,29 +349,32 @@ function NotificationList() {
           ) : (
             <ul className={styles.notificationList}>
               {notifications.map((item) => {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
+                const today = getToday();
 
-                const scheduledDate = new Date(item.resetDay);
+                const scheduledDate = item.scheduledDate;
 
-                const remainingDays = Math.ceil(
+                const remainingDays = Math.round(
                   (scheduledDate - today) / (1000 * 60 * 60 * 24)
                 );
 
-                const daysPassed = Math.max(item.intervalDays - remainingDays, 0);
+                const displayRemainingDays = Math.max(0, remainingDays);
 
-                const progressPercent = Math.min(
-                  (daysPassed / item.intervalDays) * 100,
-                  100
-                );
+                // 進捗率の計算ロジック
+                const elapsedMs = today - item.resetDay;
+                const daysPassedReal = Math.floor(elapsedMs / (1000 * 60 * 60 * 24));
+                const daysPassedSafe = Math.max(0, daysPassedReal);
+                const totalDuration = Math.max(item.intervalDays, daysPassedSafe + displayRemainingDays);
+
+                const progressPercent = totalDuration > 0
+                  ? (daysPassedSafe / totalDuration) * 100
+                  : 0;
 
                 return (
                   <li key={item.id} className={styles.notificationItem}>
                     <div className={styles.notificationWrapper}>
                       <div className={styles.verticalBar}></div>
-
                       <div className={styles.notificationContent}>
-                      <span className={styles.date}>
+                        <span className={styles.date}>
                           予定補充日:{" "}
                           <strong>{scheduledDate.toLocaleDateString()}</strong>
                           {"　"}時間帯指定:
@@ -409,7 +417,6 @@ function NotificationList() {
                           </span>
                         )}
 
-                        {/* 進捗バー */}
                         <div className={styles.progressBar}>
                           <div
                             className={styles.progressFill}
