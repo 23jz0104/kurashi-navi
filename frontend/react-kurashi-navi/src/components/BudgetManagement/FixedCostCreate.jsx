@@ -109,11 +109,12 @@ const FixedCostCreate = () => {
                         Number(e.target.value.replace(/,/g, "") || 0),
                     }));
                   }}
+                  className={styles["currency-input"]}
                 />
                 <span> / 月</span>
               </div>
 
-              <div className={styles["info-card"]}>
+              <div className={styles["category-card"]}>
                 <p>カテゴリ</p>
                 <Categories 
                   categories={transactionType === "expense" ? expenseCategories : incomeCategories}

@@ -81,6 +81,22 @@ function NotificationList() {
     return today;
   };
 
+  const [today, setToday] = useState(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  });
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const d = new Date();
+      d.setHours(0, 0, 0, 0);
+      setToday(d);
+    }, 60 * 60 * 1000); // 1時間に1回
+
+    return () => clearInterval(interval);
+  }, []);
+
   // 通知ON/OFF切り替え
   const handleToggleNotification = async (item) => {
     const newValue = item.enabled ? 0 : 1;
@@ -353,21 +369,18 @@ function NotificationList() {
 
                 const scheduledDate = item.scheduledDate;
 
-                const remainingDays = Math.round(
+                const rawRemainingDays = Math.ceil(
                   (scheduledDate - today) / (1000 * 60 * 60 * 24)
                 );
 
-                const displayRemainingDays = Math.max(0, remainingDays);
+                const displayRemainingDays = Math.max(0, rawRemainingDays);
 
-                // 進捗率の計算ロジック
-                const elapsedMs = today - item.resetDay;
-                const daysPassedReal = Math.floor(elapsedMs / (1000 * 60 * 60 * 24));
-                const daysPassedSafe = Math.max(0, daysPassedReal);
-                const totalDuration = Math.max(item.intervalDays, daysPassedSafe + displayRemainingDays);
+                const daysPassed = Math.min(
+                  item.intervalDays,
+                  Math.max(item.intervalDays - rawRemainingDays, 0)
+                );
 
-                const progressPercent = totalDuration > 0
-                  ? (daysPassedSafe / totalDuration) * 100
-                  : 0;
+                const progressPercent = (daysPassed / item.intervalDays) * 100;
 
                 return (
                   <li key={item.id} className={styles.notificationItem}>
@@ -396,17 +409,17 @@ function NotificationList() {
                           <span className={styles.slider}></span>
                         </label>
 
-                        {remainingDays < 0 ? (
+                        {rawRemainingDays < 0 ? (
                           <span className={styles.soon}>
                             <CircleAlert color="red" />
                             補充日が過ぎました！すぐに補充してください！
                           </span>
-                        ) : remainingDays === 0 ? (
+                        ) : rawRemainingDays === 0 ? (
                           <span className={styles.today}>
                             <CircleAlert color="red" />
                             補充日です！！
                           </span>
-                        ) : remainingDays <= 3 ? (
+                        ) : rawRemainingDays <= 3 ? (
                           <span className={styles.soon}>
                             <CircleAlert color="#FFC107" />
                             まもなく、補充目安日になります！！
@@ -437,7 +450,7 @@ function NotificationList() {
                         </div>
 
                         <span className={styles.remaining}>
-                          あと <strong>{remainingDays}</strong> 日（1回 / {item.intervalDays} 日）
+                          あと <strong>{displayRemainingDays}</strong> 日（1回 / {item.intervalDays} 日）
                         </span>
 
                         <div className={styles.refilledDelete}>
