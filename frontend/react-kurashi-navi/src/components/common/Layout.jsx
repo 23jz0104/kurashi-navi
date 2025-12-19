@@ -59,12 +59,14 @@ const Layout = ({ headerContent, mainContent, hideNavigation = false, disableDat
                 <span className={styles["nav-label"]}>予算</span>
               </Link>
 
-              {/* {!hideDataInputButton && (
+              {/* 旧「＋」ボタン 
+              {!hideDataInputButton && (
                 <Link to="/dataInput">
                   <button className={styles["navigate-datainput"]}><Plus size={16} /></button>
                 </Link>
               )} */}
               
+              {/* 「＋」ボタン: データ入力関連ページであれば無効化 */}
               {isPlusDisabled ? (
                 <button
                   className={`${styles["navigate-datainput"]} ${styles.disabled}`}
