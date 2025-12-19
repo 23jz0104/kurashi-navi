@@ -182,20 +182,12 @@ function NotificationList() {
     // 1. バリデーション
     if (!productName) return setError('商品名を入力してください');
 
-    const isDuplicate = notifications.some(n => n.productName === productName);
-    if (isDuplicate) return setError('その商品はすでに登録されています');
-
-    if (isSaving) return;
-
-    setIsSaving(true); // ロック開始
-    setError("");
-
     try {
       //  Firebaseトークン送信（失敗しても無視） 
       try {
         const fcmToken = await getFcmToken();
         if (fcmToken) {
-          await fetch("https://t08.mydns.jp/kakeibo/public/api/settings", {
+          const settingsRes = await fetch("https://t08.mydns.jp/kakeibo/public/api/settings", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -207,12 +199,17 @@ function NotificationList() {
               device_name: "PC Browser"
             })
           });
+
+          // 既に登録済み(400)でもOKとする
+          if (!settingsRes.ok && settingsRes.status !== 400) {
+            console.warn("トークン保存に失敗しましたが続行します");
+          }
         }
       } catch (tokenError) {
         console.error("トークン処理エラー(無視):", tokenError);
       }
 
-      // 3. 商品追加処理
+      // 3. 本来の商品追加処理（NOTIFICATIONSテーブルへの保存）
       const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/notification", {
         method: "POST",
         headers: {
@@ -270,6 +267,21 @@ function NotificationList() {
 
   // 補充ボタン
   const handleRefilled = async (item) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const nextResetDay = new Date(today);
+    nextResetDay.setDate(today.getDate() + item.intervalDays);
+
+    // 🔑 見た目用の初期残り日数を保存
+    const initialDays =
+      Math.ceil((nextResetDay - today) / (1000 * 60 * 60 * 24));
+
+    localStorage.setItem(
+      `progressBase_${item.id}`,
+      initialDays
+    );
+
     try {
       const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/notification", {
         method: "PATCH",
@@ -279,18 +291,20 @@ function NotificationList() {
           "X-Notification-ID": item.id
         },
         body: JSON.stringify({
-          notification_enable: item.enabled ? 1 : 0,
-          notification_period: item.intervalDays
+          notification_enable: 1,
+          notification_period: item.intervalDays,
+          reset_day: nextResetDay.toISOString()
         })
       });
-      const data = await res.json();
-      if (res.ok && data.status === "success") {
+
+      if (res.ok) {
         fetchNotifications();
       }
     } catch (e) {
       console.error("通信エラー:", e);
     }
   };
+
 
   const headerContent = (
     <TabButton
@@ -367,20 +381,48 @@ function NotificationList() {
               {notifications.map((item) => {
                 const today = getToday();
 
-                const scheduledDate = item.scheduledDate;
+                const scheduledDate = new Date(item.resetDay);
+                scheduledDate.setHours(0, 0, 0, 0);
 
                 const rawRemainingDays = Math.ceil(
                   (scheduledDate - today) / (1000 * 60 * 60 * 24)
                 );
 
-                const displayRemainingDays = Math.max(0, rawRemainingDays);
-
-                const daysPassed = Math.min(
-                  item.intervalDays,
-                  Math.max(item.intervalDays - rawRemainingDays, 0)
+                const storedBaseDays = Number(
+                  localStorage.getItem(`progressBase_${item.id}`)
                 );
 
-                const progressPercent = (daysPassed / item.intervalDays) * 100;
+                let baseDays =
+                  !storedBaseDays || storedBaseDays < remainingDays
+                    ? remainingDays
+                    : storedBaseDays;
+
+                // 0・負数対策
+                if (baseDays <= 0) {
+                  baseDays = item.intervalDays > 0 ? item.intervalDays : 1;
+                }
+
+                // 保存
+                localStorage.setItem(`progressBase_${item.id}`, baseDays);
+
+                // console.log({
+                //   remainingDays,
+                //   baseDays,
+                //   intervalDays: item.intervalDays
+                // });
+
+                let progressPercent;
+                if (remainingDays <= 0) {
+                  progressPercent = 100;
+                } else {
+                  progressPercent = Math.max(
+                    0,
+                    Math.min(
+                      ((baseDays - remainingDays) / baseDays) * 100,
+                      100
+                    )
+                  );
+                }
 
                 return (
                   <li key={item.id} className={styles.notificationItem}>
@@ -450,7 +492,7 @@ function NotificationList() {
                         </div>
 
                         <span className={styles.remaining}>
-                          あと <strong>{displayRemainingDays}</strong> 日（1回 / {item.intervalDays} 日）
+                          あと <strong>{Math.max(remainingDays, 0)}</strong> 日（1回 / {item.intervalDays} 日）
                         </span>
 
                         <div className={styles.refilledDelete}>
