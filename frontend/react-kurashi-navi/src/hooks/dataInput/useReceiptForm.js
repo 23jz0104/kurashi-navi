@@ -6,26 +6,11 @@ export const useReceiptForm = (initialReceipt = {
   purchase_day: new Date().toISOString().split("T")[0],
   products: [],
   total_amount: "0",
-  tax_details: {
-    tax_8_percent: 0,
-    tax_10_percent: 0,
-  },
-  is_tax_included: false, // デフォルトで税抜きのレシート
 }) => {
   const [receipt, setReceipt] = useState(initialReceipt);
+
   const [totalAmount, setTotalAmount] = useState(0);
-  const [tax, setTax] = useState({}); // 多税率のオブジェクト
-
-  // 税込み・税抜き処理
-  useEffect(() => {
-    if (!receipt.products.length) return;
-
-    if (receipt.is_tax_included) {
-      calcTaxIncluded();
-    } else {
-      calcTaxExcluded();
-    }
-  }, [receipt.products, receipt.is_tax_included]);
+  const [tax, setTax] = useState({}); // ← 多税率なのでオブジェクトに変更
 
   useEffect(() => {
     if (!receipt) return;
