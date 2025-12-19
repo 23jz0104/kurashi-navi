@@ -111,7 +111,7 @@ const ConfirmInputData = () => {
         </div>
       }
       // hideDataInputButton={true}
-      // disableDataInputButton={true} // 「+」を無効化
+      disableDataInputButton={true} // 「+」を無効化
     />
   )
 }

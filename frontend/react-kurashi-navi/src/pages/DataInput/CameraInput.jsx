@@ -41,7 +41,7 @@ const CameraInput = () => {
           <Loader text="解析中"/>
         }
         // hideDataInputButton={true}
-        // disableDataInputButton={true} // 「+」を無効化
+        disableDataInputButton={true} // 「+」を無効化
       />
     )
   }
@@ -92,7 +92,7 @@ const CameraInput = () => {
         </div>
       }
       // hideDataInputButton={true}
-      // disableDataInputButton={true} // 「+」を無効化
+      disableDataInputButton={true} // 「+」を無効化
     />
   )
 }
