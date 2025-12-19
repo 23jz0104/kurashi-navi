@@ -32,7 +32,8 @@ const ManualInputData = () => {
           {activeTab === "income" && <IncomeManualInput categories={incomeCategories}/>}
         </>
       }
-      hideDataInputButton={true}
+      // hideDataInputButton={true}
+      // disableDataInputButton={true} // 「+」を無効化
     />
   );
 };

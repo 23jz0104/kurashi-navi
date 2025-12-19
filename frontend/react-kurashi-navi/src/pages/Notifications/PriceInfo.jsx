@@ -4,6 +4,10 @@ import styles from "../../styles/Notifications/PriceInfo.module.css";
 import { Undo2, ArrowRightLeft } from "lucide-react";
 import Layout from "../../components/common/Layout";
 
+const getBaseUrl = () => {
+  return window.location.origin + "/kakeibo/public";
+};
+
 export default function PriceInfo() {
   const { productName } = useParams();
   const navigate = useNavigate();
@@ -12,6 +16,8 @@ export default function PriceInfo() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [visibleCount, setVisibleCount] = useState(10);
+
+  const baseUrl = getBaseUrl();
 
   useEffect(() => {
     if (!productName) return;
@@ -24,11 +30,14 @@ export default function PriceInfo() {
     setVisibleCount(10);
 
     try {
-      const url =
+      const apiQuery =
         site === "rakuten"
-          ? `/api/rakuten?keyword=${encodeURIComponent(productName)}&hits=30`
-          : `/api/yahoo/search?query=${encodeURIComponent(productName)}&hits=30`;
+          ? `api/rakuten?keyword=${encodeURIComponent(productName)}&hits=30`
+          : `api/yahoo/search?query=${encodeURIComponent(productName)}&hits=30`;
 
+      const url = `${baseUrl}/${apiQuery}`;
+      // console.log(url);      
+      
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
@@ -84,8 +93,7 @@ export default function PriceInfo() {
       <div className={styles.switchContainer}>
         <button
           className={`${styles.switchBtn} ${site === "rakuten" ? styles.activeLabel : ""}`}
-          onClick={() => setSite("rakuten")}
-        >
+          onClick={() => setSite("rakuten")}>
           楽天
         </button>
         <span className={styles.switchIcon}>
@@ -93,8 +101,7 @@ export default function PriceInfo() {
         </span>
         <button
           className={`${styles.switchBtn} ${site === "yahoo" ? styles.activeLabel : ""}`}
-          onClick={() => setSite("yahoo")}
-        >
+          onClick={() => setSite("yahoo")}>
           ヤフー
         </button>
       </div>
