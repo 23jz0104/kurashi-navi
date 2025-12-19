@@ -91,7 +91,7 @@ function NotificationList() {
     );
 
     try {
-      const res = await fetch("/api/notification", {
+      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/notification", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -163,17 +163,17 @@ function NotificationList() {
   const handleSave = async () => {
     // 1. バリデーション
     if (!productName) return setError('商品名を入力してください');
-  
+
     try {
       // ▼▼▼ 追加: Firebaseトークン送信（失敗しても商品は追加する） ▼▼▼
       try {
         const fcmToken = await getFcmToken();
         if (fcmToken) {
-          const settingsRes = await fetch("/api/settings", {
+          const settingsRes = await fetch("https://t08.mydns.jp/kakeibo/public/api/settings", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "X-User-ID": userId 
+              "X-User-ID": userId
             },
             body: JSON.stringify({
               fcm_token: fcmToken,
@@ -181,10 +181,10 @@ function NotificationList() {
               device_name: "PC Browser"
             })
           });
-          
+
           // 既に登録済み(400)でもOKとする
           if (!settingsRes.ok && settingsRes.status !== 400) {
-             console.warn("トークン保存に失敗しましたが続行します");
+            console.warn("トークン保存に失敗しましたが続行します");
           }
         }
       } catch (tokenError) {
@@ -194,7 +194,7 @@ function NotificationList() {
       // ▲▲▲ ここまで ▲▲▲
 
       // 3. 本来の商品追加処理（NOTIFICATIONSテーブルへの保存）
-      const res = await fetch("/api/notification", {
+      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/notification", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -207,9 +207,9 @@ function NotificationList() {
           notification_min: 0
         })
       });
-  
+
       const data = await res.json();
-  
+
       if (res.ok && data.status === "success") {
         fetchNotifications();
         setIsAdding(false);
@@ -229,7 +229,7 @@ function NotificationList() {
   // 通知削除
   const handleDelete = async (id) => {
     try {
-      const res = await fetch("/api/notification", {
+      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/notification", {
         method: "DELETE",
         headers: {
           "X-User-ID": userId,
@@ -251,8 +251,23 @@ function NotificationList() {
 
   // 補充ボタン
   const handleRefilled = async (item) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const nextResetDay = new Date(today);
+    nextResetDay.setDate(today.getDate() + item.intervalDays);
+
+    // 🔑 見た目用の初期残り日数を保存
+    const initialDays =
+      Math.ceil((nextResetDay - today) / (1000 * 60 * 60 * 24));
+
+    localStorage.setItem(
+      `progressBase_${item.id}`,
+      initialDays
+    );
+
     try {
-      const res = await fetch("/api/notification", {
+      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/notification", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -260,22 +275,20 @@ function NotificationList() {
           "X-Notification-ID": item.id
         },
         body: JSON.stringify({
-                    notification_enable: 1,
-                    notification_period: item.intervalDays 
-                  })
+          notification_enable: 1,
+          notification_period: item.intervalDays,
+          reset_day: nextResetDay.toISOString()
+        })
       });
 
-      const data = await res.json();
-
-      if (res.ok && data.status === "success") {
+      if (res.ok) {
         fetchNotifications();
-      } else {
-        console.error("更新失敗:", data.message);
       }
     } catch (e) {
       console.error("通信エラー:", e);
     }
   };
+
 
   const headerContent = (
     <TabButton
@@ -348,17 +361,47 @@ function NotificationList() {
                 today.setHours(0, 0, 0, 0);
 
                 const scheduledDate = new Date(item.resetDay);
+                scheduledDate.setHours(0, 0, 0, 0);
 
                 const remainingDays = Math.ceil(
                   (scheduledDate - today) / (1000 * 60 * 60 * 24)
                 );
 
-                const daysPassed = Math.max(item.intervalDays - remainingDays, 0);
-
-                const progressPercent = Math.min(
-                  (daysPassed / item.intervalDays) * 100,
-                  100
+                const storedBaseDays = Number(
+                  localStorage.getItem(`progressBase_${item.id}`)
                 );
+
+                let baseDays =
+                  !storedBaseDays || storedBaseDays < remainingDays
+                    ? remainingDays
+                    : storedBaseDays;
+
+                // 0・負数対策
+                if (baseDays <= 0) {
+                  baseDays = item.intervalDays > 0 ? item.intervalDays : 1;
+                }
+
+                // 保存
+                localStorage.setItem(`progressBase_${item.id}`, baseDays);
+
+                // console.log({
+                //   remainingDays,
+                //   baseDays,
+                //   intervalDays: item.intervalDays
+                // });
+
+                let progressPercent;
+                if (remainingDays <= 0) {
+                  progressPercent = 100;
+                } else {
+                  progressPercent = Math.max(
+                    0,
+                    Math.min(
+                      ((baseDays - remainingDays) / baseDays) * 100,
+                      100
+                    )
+                  );
+                }
 
                 return (
                   <li key={item.id} className={styles.notificationItem}>
@@ -366,7 +409,7 @@ function NotificationList() {
                       <div className={styles.verticalBar}></div>
 
                       <div className={styles.notificationContent}>
-                      <span className={styles.date}>
+                        <span className={styles.date}>
                           予定補充日:{" "}
                           <strong>{scheduledDate.toLocaleDateString()}</strong>
                           {"　"}時間帯指定:
@@ -430,7 +473,7 @@ function NotificationList() {
                         </div>
 
                         <span className={styles.remaining}>
-                          あと <strong>{remainingDays}</strong> 日（1回 / {item.intervalDays} 日）
+                          あと <strong>{Math.max(remainingDays, 0)}</strong> 日（1回 / {item.intervalDays} 日）
                         </span>
 
                         <div className={styles.refilledDelete}>
