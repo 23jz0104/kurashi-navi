@@ -267,36 +267,41 @@ function NotificationList() {
 
   // 補充ボタン
   const handleRefilled = async (item) => {
+
+    // 今日（0時固定）
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    // 次回補充予定日 = 今日 + intervalDays
     const nextResetDay = new Date(today);
     nextResetDay.setDate(today.getDate() + item.intervalDays);
 
-    // 🔑 見た目用の初期残り日数を保存
-    const initialDays =
-      Math.ceil((nextResetDay - today) / (1000 * 60 * 60 * 24));
-
-    localStorage.setItem(
-      `progressBase_${item.id}`,
-      initialDays
+    const baseDays = Math.max(
+      Math.ceil((nextResetDay - today) / (1000 * 60 * 60 * 24)),
+      1
     );
 
-    try {
-      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/notification", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "X-User-ID": userId,
-          "X-Notification-ID": item.id
-        },
-        body: JSON.stringify({
-          notification_enable: 1,
-          notification_period: item.intervalDays,
-          reset_day: nextResetDay.toISOString()
-        })
-      });
+    // 進捗バー用の基準日数を保存
+    localStorage.setItem(`progressBase_${item.id}`, baseDays);
 
+    try {
+      const res = await fetch(
+        "https://t08.mydns.jp/kakeibo/public/api/notification",
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "X-User-ID": userId,
+            "X-Notification-ID": item.id
+          },
+          body: JSON.stringify({
+            notification_enable: 1,
+            notification_period: item.intervalDays,
+            reset_day: nextResetDay.toISOString()
+          })
+        }
+      );
+  
       if (res.ok) {
         fetchNotifications();
       }
@@ -388,6 +393,8 @@ function NotificationList() {
                   (scheduledDate - today) / (1000 * 60 * 60 * 24)
                 );
 
+
+                // localStorage から取得
                 const storedBaseDays = Number(
                   localStorage.getItem(`progressBase_${item.id}`)
                 );
@@ -396,11 +403,14 @@ function NotificationList() {
                   !storedBaseDays || storedBaseDays < remainingDays
                     ? remainingDays
                     : storedBaseDays;
-
-                // 0・負数対策
+                    
+                // 0・負数防止
                 if (baseDays <= 0) {
                   baseDays = item.intervalDays > 0 ? item.intervalDays : 1;
                 }
+
+                // 補正後を保存
+                localStorage.setItem(`progressBase_${item.id}`, baseDays);
 
                 // 保存
                 localStorage.setItem(`progressBase_${item.id}`, baseDays);
@@ -417,11 +427,19 @@ function NotificationList() {
                 } else {
                   progressPercent = Math.max(
                     0,
-                    Math.min(
-                      ((baseDays - remainingDays) / baseDays) * 100,
-                      100
-                    )
+                    Math.min(((baseDays - remainingDays) / baseDays) * 100, 100)
                   );
+
+                  // console.log({
+                  //   id: item.id,
+                  //   product: item.productName,
+                  //   today: today.toISOString().slice(0, 10),
+                  //   scheduledDate: scheduledDate.toISOString().slice(0, 10),
+                  //   remainingDays,
+                  //   storedBaseDays,
+                  //   baseDays,
+                  //   progressPercent
+                  // });
                 }
 
                 return (
