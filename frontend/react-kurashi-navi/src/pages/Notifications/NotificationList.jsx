@@ -129,37 +129,48 @@ function NotificationList() {
   // 通知取得
   const fetchNotifications = async () => {
     try {
-      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/notification", {
-        headers: { "x-user-id": userId }
-      });
+      const res = await fetch(
+        "https://t08.mydns.jp/kakeibo/public/api/notification",
+        { headers: { "x-user-id": userId } }
+      );
       const data = await res.json();
-
-      if (res.ok && data.status === 'success') {
+  
+      if (res.ok && data.status === "success") {
         const normalized = data.notifications.map(n => {
-          const timestamp = n.NOTIFICATION_TIMESTAMP ?? n.notification_timestamp;
-
-          const resetDay = timestamp
+          const timestamp =
+            n.NOTIFICATION_TIMESTAMP ?? n.notification_timestamp;
+  
+          // notification_timestamp = 次回予定補充日
+          const scheduledDate = timestamp
             ? new Date(timestamp.replace(" ", "T"))
             : getToday();
-
-          resetDay.setHours(0, 0, 0, 0);
-
-          const interval = Number(n.NOTIFICATION_PERIOD ?? n.notification_period ?? 0);
-
-          const scheduled = new Date(resetDay);
-          scheduled.setDate(scheduled.getDate() + interval);
-
+  
+          scheduledDate.setHours(0, 0, 0, 0);
+  
+          const interval = Number(
+            n.NOTIFICATION_PERIOD ?? n.notification_period ?? 0
+          );
+  
           return {
             id: n.ID ?? n.id,
-            productName: n.PRODUCT_NAME ?? n.product_name ?? '不明',
+            productName: n.PRODUCT_NAME ?? n.product_name ?? "不明",
             intervalDays: interval,
-            resetDay: resetDay,
-            scheduledDate: scheduled,
-            enabled: Number(n.NOTIFICATION_ENABLE ?? n.notification_enable) === 1,
-            notificationHour: Number(n.NOTIFICATION_HOUR ?? n.notification_hour ?? 9)
+            scheduledDate, 
+            enabled:
+              Number(n.NOTIFICATION_ENABLE ?? n.notification_enable) === 1,
+            notificationHour: Number(
+              n.NOTIFICATION_HOUR ?? n.notification_hour ?? 9
+            )
           };
         });
-
+  
+        //並び替え
+        normalized.sort((a, b) => {
+          const dateDiff = a.scheduledDate - b.scheduledDate;
+          if (dateDiff !== 0) return dateDiff;
+          return a.notificationHour - b.notificationHour;
+        });
+  
         setNotifications(normalized);
       } else if (res.status === 404 && data.message === "no records found") {
         setNotifications([]);
@@ -186,7 +197,7 @@ function NotificationList() {
         // ServiceWorkerの登録 (パスが正しいか確認してください)
         const registration = await navigator.serviceWorker.register("/combine_test/firebase-messaging-sw.js");
         const messaging = getMessaging(app);
-        
+
         // VAPIDキーを使ってトークンを取得
         const token = await getToken(messaging, {
           vapidKey: "BH3VSel6Cdam2EREeJ9iyYLoJcOYpqGHd7JXULxSCmfsULrVMaedjv81VF7h53RhJmfcHCsq-dSoJVjHB58lxjQ",
@@ -309,6 +320,7 @@ function NotificationList() {
       console.error("通信エラー:", e);
     }
   };
+  
 
   const headerContent = (
     <TabButton
@@ -380,7 +392,7 @@ function NotificationList() {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
 
-                const scheduledDate = new Date(item.resetDay);
+                const scheduledDate = new Date(item.scheduledDate);
                 scheduledDate.setHours(0, 0, 0, 0);
 
                 const remainingDays = Math.ceil(

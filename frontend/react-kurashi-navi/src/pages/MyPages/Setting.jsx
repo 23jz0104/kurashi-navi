@@ -77,15 +77,19 @@ function Setting() {
       const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/settings", {
         headers: { "X-User-ID": userId }
       });
+
       if (res.ok) {
         const data = await res.json();
-        const devicesWithDate = data.map(d => ({
+
+        const deviceList = data.devices || [];
+
+        const devicesWithDate = deviceList.map(d => ({
           ...d,
           registered_date: d.registered_date || getToday()
         }));
+
         setDevices(devicesWithDate);
-        console.log("Fetched devices:", devicesWithDate);
-        return devicesWithDate;
+        // console.log("Fetched devices:", devicesWithDate);
       } else if (res.status === 404) {
         setDevices([]);
       } else {
@@ -177,11 +181,11 @@ function Setting() {
         setDevices(prev =>
           prev.map(d =>
             d.id === device.id ?
-            {
-              ...d,
-              device_notification_enable: finalValue
-            }
-            : d
+              {
+                ...d,
+                device_notification_enable: finalValue
+              }
+              : d
           )
         );
         console.log("State updated to:", finalValue);
@@ -231,13 +235,13 @@ function Setting() {
           <button className={styles.modoru} onClick={() => navigate("/mypage")}>
             <Undo2 />
           </button>
-          
+
           <button className={styles.bt} onClick={registerDevice}>この端末を登録</button>
           <h2>端末管理</h2>
-          
+
           {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
           {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
-          
+
           <table className={styles.deviceTable}>
             <thead>
               <tr>
