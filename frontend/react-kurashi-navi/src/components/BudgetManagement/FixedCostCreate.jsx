@@ -102,6 +102,8 @@ const FixedCostCreate = () => {
               <div className={styles["input-card"]}>
                 <span className={styles["currency-symbol"]}>¥</span>
                 <input
+                  type="text"
+                  inputMode="numeric"
                   value={fixedCost.displayValue}
                   onChange={(e) => {
                     fixedCost.handleChange(e.target.value);
