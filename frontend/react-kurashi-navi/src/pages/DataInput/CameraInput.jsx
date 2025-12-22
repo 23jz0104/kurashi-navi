@@ -16,7 +16,8 @@ const CameraInput = () => {
   useEffect(() => {
     if(!loading && ocrResult.products.length > 0) {
       console.log("ナビゲート実行");
-      navigate("/confirmInputData", { state: {ocrResult} });
+      // navigate("/confirmInputData", { state: {ocrResult} });
+      navigate("/dataInput", { state: {ocrResult} });
     }
   }, [ocrResult, loading, error]);
 

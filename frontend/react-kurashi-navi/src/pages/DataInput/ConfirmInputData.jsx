@@ -30,6 +30,8 @@ const ConfirmInputData = () => {
     }
   }
 
+  // console.log("入力確認ページ");
+
   return (
     <Layout 
       headerContent={

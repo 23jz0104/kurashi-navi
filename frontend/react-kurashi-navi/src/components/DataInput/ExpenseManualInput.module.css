@@ -94,5 +94,5 @@
   border: none;
   color: #dc2626;
   background: none;
-  margin-left: auto;  /* ✅ これだけでOK！ */
+  margin-left: auto;
 }
