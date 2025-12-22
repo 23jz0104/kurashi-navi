@@ -4,7 +4,7 @@ import { Wallet, List, Bell, User, Plus, ChevronLeft, MoreVertical, Trash2 } fro
 import styles from "./Layout.module.css";
 
 // const Layout = ({ headerContent, mainContent, hideNavigation = false, hideDataInputButton = false, redirectPath, state = null, showKebabMenu = false}) => {
-const Layout = ({ headerContent, mainContent, hideNavigation = false, disableDataInputButton = false, redirectPath, state = null, showKebabMenu = false}) => {
+const Layout = ({ headerContent, mainContent, hideNavigation = false, disableDataInputButton = false, redirectPath, state = null, showKebabMenu = false, onDeleteButtonClick}) => {
   const location = useLocation();
   const navigate = useNavigate();
 
