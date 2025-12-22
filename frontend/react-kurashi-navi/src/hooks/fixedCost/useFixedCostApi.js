@@ -4,6 +4,7 @@ export const useFixedCostApi = () => {
   const [fixedCost, setFixedCost] = useState({});
   const [isGetLoading, setIsGetLoading] = useState(false);
   const [isPostLoading, setIsPostLoading] = useState(false);
+  const [isPatchLoading, setIsPatchLoading] = useState(false);
 
   const userId = sessionStorage.getItem("userId");
 
@@ -61,5 +62,35 @@ export const useFixedCostApi = () => {
     }
   }
 
-  return { fixedCost, isGetLoading, isPostLoading, getFixedCost, postFixedCost };
+  const patchFixedCost = async (payload) => {
+    setIsPatchLoading(true);
+    try {
+      console.log("API通信: patchFixedCost()");
+      const response = await fetch("https://t08.mydns.jp/kakeibo/public/api/fixedcost", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-ID": payload.id,
+        },
+        body: JSON.stringify({
+          cost: payload.cost,
+          category_id: payload.category_id,
+        }),
+      });
+
+      if(!response.ok) {
+        console.log(response.status + "エラー", response);
+      }
+
+      const data = await response.json();
+      console.log("データ更新完了: patchFixedCost()");
+      return data;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsPatchLoading(false);
+    }
+  }
+
+  return { fixedCost, isGetLoading, isPostLoading, isPatchLoading, getFixedCost, postFixedCost, patchFixedCost };
 }
