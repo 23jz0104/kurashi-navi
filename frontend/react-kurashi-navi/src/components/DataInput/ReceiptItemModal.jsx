@@ -35,39 +35,41 @@ const ReceiptItemModal = ({
 
   const handleSubmit = () => {
     // バリデーション
-    if (
-      !formData.category_id ||
-      !formData.product_name ||
-      formData.product_price === null ||
-      formData.product_price === undefined
-    ) {
+    if (!formData.category_id || !formData.product_name || formData.product_price === null) {
       alert("カテゴリ、商品名、金額は必須です。");
       return;
     }
+    // // 数量のデフォルト処理
+    // const finalQuantity =
+    //   formData.quantity === null || formData.quantity === 0
+    //     ? 1
+    //     : formData.quantity;
 
-    // 数量のデフォルト処理
-    const finalQuantity =
-      formData.quantity === null || formData.quantity === 0
-        ? 1
-        : formData.quantity;
+    // const finalData = { ...formData, quantity: finalQuantity };
 
-    const finalData = { ...formData, quantity: finalQuantity };
+    // if (isEditMode) {
+    //   // 編集モード: updateItem(index, updates)
+    //   onSubmit(index, finalData);
+    // } else {
+    //   // 追加モード: addItem(categoryId, productName, price, quantity, discount)
+    //   onSubmit(
+    //     finalData.category_id,
+    //     finalData.product_name,
+    //     finalData.product_price,
+    //     finalData.quantity,
+    //     finalData.discount || 0,
+    //     finalData.tax_rate    // 税率追加
+    //   );
+    // }
+    const finalData = { ...formData, quantity: formData.quantity || 1 };
 
     if (isEditMode) {
-      // 編集モード: updateItem(index, updates)
       onSubmit(index, finalData);
-    } else {
-      // 追加モード: addItem(categoryId, productName, price, quantity, discount)
-      onSubmit(
-        finalData.category_id,
-        finalData.product_name,
-        finalData.product_price,
-        finalData.quantity,
-        finalData.discount || 0,
-        finalData.tax_rate    // 税率追加
-      );
     }
-
+    else {
+      onSubmit(finalData);
+    }
+    
     closeModal();
   };
 

@@ -23,7 +23,6 @@ export const useReceiptForm = (
 
   const calculated = useMemo(() => {
     const products = receipt.products ?? [];
-
     let grossTotal = 0; // 税込合計
     let netTotal = 0;   // 税抜合計
     const taxByRate = {};
@@ -39,8 +38,9 @@ export const useReceiptForm = (
 
       const amount = price * qty - discount;
 
-      if (!totalByRate[rate]) totalByRate[rate] = 0;
-      totalByRate[rate] += amount;
+      // if (!totalByRate[rate]) totalByRate[rate] = 0;
+      // totalByRate[rate] += amount;
+      totalByRate[rate] = (totalByRate[rate] || 0) + amount;
     });
 
     Object.entries(totalByRate).forEach(([rateStr, amount]) => {
@@ -49,14 +49,12 @@ export const useReceiptForm = (
       if (priceMode === "inclusive") {
         const tax = Math.floor((amount * rate) / (100 + rate));
         const net = amount - tax;
-
         grossTotal += amount;
         netTotal += net;
         taxByRate[rate] = tax;
-      } else {
-        // 税抜
+      }
+      else {
         const tax = Math.floor(amount * (rate / 100));
-
         netTotal += amount;
         grossTotal += amount + tax;
         taxByRate[rate] = tax;
@@ -77,7 +75,7 @@ export const useReceiptForm = (
       products: [...prev.products, item],
     }));
   };
-
+  
   const updateItem = (index, updates) => {
     setReceipt((prev) => {
       const products = [...prev.products];

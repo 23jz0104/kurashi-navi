@@ -7,11 +7,10 @@ import ReceiptItemModal from "./ReceiptItemModal";
 import SubmitButton from "../common/SubmitButton";
 import CompleteModal from "../common/CompleteModal";
 import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useReceiptForm } from "../../hooks/dataInput/useReceiptForm";
 import { useReceiptUploader } from "../../hooks/dataInput/useReceiptUploader";
 import { Plus, Upload, Camera, CircleAlert, X } from "lucide-react";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 console.log("手動入力ページ");
@@ -19,7 +18,6 @@ console.log("手動入力ページ");
 const ExpenseInput = ({ categories }) => {
   const navigate = useNavigate();
   const { isUploading, uploadReceipt } = useReceiptUploader();
-
   const location = useLocation();
 
   const {
@@ -44,10 +42,9 @@ const ExpenseInput = ({ categories }) => {
     return null;
   };
 
+  // OCR 結果が location.state にある場合、receipt に反映
   useEffect(() => {
-    console.log("location.state =", location.state);
     if (!location.state?.ocrResult) return;
-  
     setReceipt((prev) => ({
       ...prev,
       ...location.state.ocrResult,
@@ -62,10 +59,7 @@ const ExpenseInput = ({ categories }) => {
       return;
     }
 
-    const result = await uploadReceipt(
-      receipt,
-      calculated.taxByRate // ★ tax ではなく calculated
-    );
+    const result = await uploadReceipt(receipt, calculated.taxByRate);
 
     if (result) {
       setMessage(true);
@@ -75,6 +69,7 @@ const ExpenseInput = ({ categories }) => {
 
   return (
     <div className={styles["form-container"]}>
+      {/* OCR ボタン */}
       <div className={styles["ocr-container"]}>
         <div className={styles["ocr-buttons"]}>
           <button className={styles["ocr-button"]}>
@@ -92,16 +87,13 @@ const ExpenseInput = ({ categories }) => {
         </div>
       </div>
 
-      <ReceiptHeader
-        receipt={receipt}
-        updateReceiptInfo={updateReceiptInfo}
-      />
+      {/* レシート情報 */}
+      <ReceiptHeader receipt={receipt} updateReceiptInfo={updateReceiptInfo} />
 
+      {/* 税率切替ボタン */}
       <div className={styles["price-mode-container"]}>
         <span className={styles["price-mode-label"]}>レシートタイプ：</span>
-
         <button
-          type="checkbox"
           className={styles["price-mode-text-toggle"]}
           onClick={() =>
             setPriceMode(priceMode === "exclusive" ? "inclusive" : "exclusive")
@@ -111,18 +103,14 @@ const ExpenseInput = ({ categories }) => {
         </button>
       </div>
 
-      <ReceiptSummry
-        totalAmount={calculated.subTotal}
-        tax={calculated.taxByRate}
-      />
+      {/* 集計 */}
+      <ReceiptSummry totalAmount={calculated.subTotal} tax={calculated.taxByRate} />
 
+      {/* 項目リスト */}
       <div className={styles["item-container"]}>
         <div className={styles["item-list"]}>
           {receipt.products.map((item, index) => (
-            <DropdownModal
-              key={index}
-              title={<ReceiptItemPreview item={item} />}
-            >
+            <DropdownModal key={index} title={<ReceiptItemPreview item={item} />}>
               {(closeModal) => (
                 <ReceiptItemModal
                   mode="edit"
@@ -146,9 +134,7 @@ const ExpenseInput = ({ categories }) => {
                 >
                   <Plus />
                 </span>
-                <span className={styles["product-name"]}>
-                  項目を追加する
-                </span>
+                <span className={styles["product-name"]}>項目を追加する</span>
               </>
             }
           >
@@ -164,12 +150,14 @@ const ExpenseInput = ({ categories }) => {
         </div>
       </div>
 
+      {/* 送信ボタン */}
       <SubmitButton
         text={isUploading ? "送信中..." : "送信"}
         onClick={handleSubmit}
         disabled={isUploading}
       />
 
+      {/* エラーメッセージ */}
       {validationError && (
         <div className={styles["error-container"]}>
           <CircleAlert size={16} />
@@ -180,6 +168,7 @@ const ExpenseInput = ({ categories }) => {
         </div>
       )}
 
+      {/* 完了モーダル */}
       {message && <CompleteModal />}
     </div>
   );
