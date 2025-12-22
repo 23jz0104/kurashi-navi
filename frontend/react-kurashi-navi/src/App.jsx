@@ -21,6 +21,7 @@ import FixedCostEdit from "./components/BudgetManagement/FixedCostEdit.jsx";
 function App() {
   return (
     <Router basename="/combine_test/">
+    {/* <Router basename="/debug/"> */}
       <Routes>
 
         <Route path="/" element={<Log />} />

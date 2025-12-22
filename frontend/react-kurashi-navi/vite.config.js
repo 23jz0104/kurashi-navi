@@ -36,6 +36,7 @@ const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(file
 
 export default defineConfig({
   base: "/combine_test/",
+  // base: "/debug/",
   plugins: [react()],
   server: {
     // CORS回避用プロキシ

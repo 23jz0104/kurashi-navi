@@ -102,6 +102,8 @@ const FixedCostCreate = () => {
               <div className={styles["input-card"]}>
                 <span className={styles["currency-symbol"]}>¥</span>
                 <input
+                  type="text"
+                  inputMode="numeric"
                   value={fixedCost.displayValue}
                   onChange={(e) => {
                     fixedCost.handleChange(e.target.value);
@@ -114,6 +116,10 @@ const FixedCostCreate = () => {
                   className={styles["currency-input"]}
                 />
                 <span> / 月</span>
+              </div>
+
+              <div className={styles["payment-schedule-card"]}>
+                <label>{transactionType === "expense" ? "支払日" : "収入日"}</label>
               </div>
 
               <div className={styles["category-card"]}>

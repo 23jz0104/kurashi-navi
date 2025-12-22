@@ -19,7 +19,7 @@ export const useCategories = (typeId) => {
         
         if(!response.ok) {
           console.log(response.status + "エラー", response);
-        } 
+        }
   
         const data = await response.json();
         setCategories(data);

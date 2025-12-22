@@ -131,6 +131,8 @@ const FixedCostEdit = () => {
                 <div className={styles["fixed-cost-amount"]}>
                   <span>¥</span>
                   <input
+                    type="text"
+                    inputMode="numeric"
                     value={fixedCost.displayValue}
                     onChange={(e) => {
                       fixedCost.handleChange(e.target.value);

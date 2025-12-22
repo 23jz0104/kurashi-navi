@@ -63,7 +63,9 @@ const BudgetCreate = () => {
                 
                 <div className={styles["budget-input-container"]}>
                   <span className={styles["currency-symbol"]}>¥</span>
-                  <input 
+                  <input
+                    type="text"
+                    inputMode="numeric"
                     value={budget_limit.displayValue}
                     onChange={(e) => {
                       budget_limit.handleChange(e.target.value);

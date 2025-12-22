@@ -100,6 +100,12 @@
   font-size: 0.9rem;
 }
 
+.payment-schedule-card {
+  display: flex;
+  padding: 1rem;
+  background-color: white;
+}
+
 .category-card {
   display: flex;
   flex-direction: column;
