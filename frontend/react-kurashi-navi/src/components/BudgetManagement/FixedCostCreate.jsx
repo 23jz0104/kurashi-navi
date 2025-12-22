@@ -116,6 +116,10 @@ const FixedCostCreate = () => {
                 <span> / 月</span>
               </div>
 
+              <div className={styles["payment-schedule-card"]}>
+                <label>{transactionType === "expense" ? "支払日" : "収入日"}</label>
+              </div>
+
               <div className={styles["category-card"]}>
                 <p>カテゴリ</p>
                 <Categories 
