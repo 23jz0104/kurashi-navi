@@ -1,12 +1,12 @@
 // components/DataInput/ReceiptItemModal.jsx
-import { useState } from "react";
-import { Trash2 } from "lucide-react";
 import SubmitButton from "../common/SubmitButton";
 import ReceiptItemForm from "./ReceiptItemForm";
 import styles from "../../styles/DataInput/ConfirmInputData.module.css";
+import { useState } from "react";
+import { Trash2 } from "lucide-react";
 
 const ReceiptItemModal = ({
-  mode = "add", // "add" | "edit"
+  mode = "add",
   item = null,
   index = null,
   onSubmit,
@@ -25,7 +25,7 @@ const ReceiptItemModal = ({
           quantity: 1,  
           discount: 0,
           category_id: null,
-          tax_rate: 10,     // 初期値10%
+          tax_rate: 10,
         }
   );
 
@@ -39,28 +39,7 @@ const ReceiptItemModal = ({
       alert("カテゴリ、商品名、金額は必須です。");
       return;
     }
-    // // 数量のデフォルト処理
-    // const finalQuantity =
-    //   formData.quantity === null || formData.quantity === 0
-    //     ? 1
-    //     : formData.quantity;
 
-    // const finalData = { ...formData, quantity: finalQuantity };
-
-    // if (isEditMode) {
-    //   // 編集モード: updateItem(index, updates)
-    //   onSubmit(index, finalData);
-    // } else {
-    //   // 追加モード: addItem(categoryId, productName, price, quantity, discount)
-    //   onSubmit(
-    //     finalData.category_id,
-    //     finalData.product_name,
-    //     finalData.product_price,
-    //     finalData.quantity,
-    //     finalData.discount || 0,
-    //     finalData.tax_rate    // 税率追加
-    //   );
-    // }
     const finalData = { ...formData, quantity: formData.quantity || 1 };
 
     if (isEditMode) {
@@ -69,7 +48,7 @@ const ReceiptItemModal = ({
     else {
       onSubmit(finalData);
     }
-    
+
     closeModal();
   };
 
