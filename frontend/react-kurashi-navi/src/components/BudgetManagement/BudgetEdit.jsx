@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Layout from "../common/Layout";
 import styles from "./BudgetEdit.module.css";
 import { useNumberInput } from "../../hooks/common/useNumberInput";
@@ -11,14 +11,18 @@ import LoadingSpinner from "../common/LoadingSpinner";
 import { useBudgetApi } from "../../hooks/budgetManagement/useBudgetApi";
 
 const BudgetEdit = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const [selectedBudget, setSelectedBudget] = useState(
     location.state?.budgetData
   );
+  const {isDeleteLoading, deleteBudget} = useBudgetApi();
   const { isLoading: isCategoryLoading, categories } = useCategories(2); //収入
   const { isPatchLoading, patchBudget } = useBudgetApi();
 
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [message, setMessage] = useState("");
+  const [deleteMessage, setDeleteMessage] = useState("");
 
   const budget_limit = useNumberInput(
     selectedBudget ? selectedBudget.budget_limit : 0
@@ -53,8 +57,21 @@ const BudgetEdit = () => {
     }, 2000);
   };
 
+  const handleDelete = () => {
+    setShowDeleteDialog(true);
+  }
+
+  const deleteSubmit = async () => {
+    const result = await deleteBudget(selectedBudget.id);
+
+    if(result?.status === "success") {
+      navigate("/budget-management");
+    }
+  }
+
   return (
     <Layout
+      onDeleteButtonClick={handleDelete}
       headerContent={<p>予算編集</p>}
       redirectPath={"/budget-management"}
       mainContent={
@@ -153,6 +170,36 @@ const BudgetEdit = () => {
                 {message && (
                   <p>{message}</p>
                 )}
+
+                {showDeleteDialog && (
+                  <div className={styles["delete-dialog"]}>
+                    <div className={styles["dialog-content"]}>
+
+                      {isDeleteLoading ? (
+                        <LoadingSpinner />
+                      ) : (
+                        <>
+                          <p className={styles["confirm-text"]}>予算を削除しますか？</p>
+                            <div className={styles["dialog-buttons"]}>
+                              <button 
+                                className={styles["button-cancel"]}
+                                onClick={() => setShowDeleteDialog(false)}
+                              >
+                                キャンセル
+                              </button>
+                              <button 
+                                className={styles["button-delete"]}
+                                onClick={() => deleteSubmit()}
+                                disabled={isDeleteLoading}
+                              >
+                                削除
+                              </button>
+                            </div>
+                          </>
+                        )}
+                    </div>
+                  </div>
+                )}
               </div>
             </>
           )}
@@ -164,3 +211,4 @@ const BudgetEdit = () => {
 };
 
 export default BudgetEdit;
+ 

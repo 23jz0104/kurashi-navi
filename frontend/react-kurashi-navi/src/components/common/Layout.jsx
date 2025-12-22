@@ -1,9 +1,9 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Wallet, List, Bell, User, Plus, ChevronLeft, MoreVertical } from "lucide-react";
+import { Wallet, List, Bell, User, Plus, ChevronLeft, MoreVertical, Trash2 } from "lucide-react";
 import styles from "./Layout.module.css";
 
-const Layout = ({ headerContent, mainContent, hideNavigation = false, hideDataInputButton = false, redirectPath, state = null, showKebabMenu = false}) => {
+const Layout = ({ headerContent, mainContent, hideNavigation = false, hideDataInputButton = false, redirectPath, state = null, onDeleteButtonClick = false}) => {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -21,9 +21,9 @@ const Layout = ({ headerContent, mainContent, hideNavigation = false, hideDataIn
           </div>
         )}
         {headerContent}
-        {showKebabMenu && (
-          <button className={styles["kebab-menu-button"]}>
-            <MoreVertical size={18} />
+        {onDeleteButtonClick && (
+          <button className={styles["delete-button"]} onClick={() => onDeleteButtonClick()}>
+            <Trash2 size={20} />
           </button>
         )}
       </header>
