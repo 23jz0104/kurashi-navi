@@ -15,8 +15,7 @@ import ConfirmInputData from "./pages/DataInput/ConfirmInputData.jsx";
 import CameraInput from "./pages/DataInput/CameraInput.jsx";
 import BudgetEdit from "./components/BudgetManagement/BudgetEdit.jsx";
 import BudgetCreate from "./components/BudgetManagement/BudgetCreate.jsx";
-import FixedCostCreate from "./components/BudgetManagement/FixedCostCreate.jsx";
-import FixedCostView from "./components/BudgetManagement/FixedCostView.jsx";
+import FixedCostCreate from "./components/BudgetManagement/FixedCostCreate.jsx";  
 import FixedCostEdit from "./components/BudgetManagement/FixedCostEdit.jsx";
 
 function App() {
@@ -40,6 +39,7 @@ function App() {
         <Route path="/budget-management/create" element={<BudgetCreate />} />
         <Route path="/budget-management/edit" element={<BudgetEdit />} />
         <Route path="/budget-management/fixed-cost-create" element={<FixedCostCreate />} />
+        <Route path="/budget-management/fixed-cost-edit" element={<FixedCostEdit />} />
         <Route path="/history" element={<History />} />
         <Route path="/Setting" element={<Setting />} />
       </Routes>
