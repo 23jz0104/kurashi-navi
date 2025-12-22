@@ -5,6 +5,7 @@ export const useFixedCostApi = () => {
   const [isGetLoading, setIsGetLoading] = useState(false);
   const [isPostLoading, setIsPostLoading] = useState(false);
   const [isPatchLoading, setIsPatchLoading] = useState(false);
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
 
   const userId = sessionStorage.getItem("userId");
 
@@ -92,5 +93,30 @@ export const useFixedCostApi = () => {
     }
   }
 
-  return { fixedCost, isGetLoading, isPostLoading, isPatchLoading, getFixedCost, postFixedCost, patchFixedCost };
+  const deleteFixedCost = async (id) => {
+    setIsDeleteLoading(true);
+    try {
+      console.log("API通信: deleteFixedCost()");
+      const response = await fetch("https://t08.mydns.jp/kakeibo/public/api/fixedcost", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "X-ID": id,
+        }
+      });
+
+      if(!response.ok) {
+        throw new Error(`削除失敗: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsDeleteLoading(false);
+    }
+  }
+
+  return { fixedCost, isGetLoading, isPostLoading, isPatchLoading, isDeleteLoading, getFixedCost, postFixedCost, patchFixedCost, deleteFixedCost};
 }

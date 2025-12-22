@@ -21,7 +21,7 @@ const app = initializeApp(firebaseConfig);
 function Setting() {
   const navigate = useNavigate();
   const userId = sessionStorage.getItem("userId");
-  const currentDeviceId = sessionStorage.getItem("currentDeviceId");
+  // const currentDeviceId = sessionStorage.getItem("currentDeviceId"); // 未使用ならコメントアウトのままでOK
 
   const [activeTab, setActiveTab] = useState("devices");
   const [devices, setDevices] = useState([]);
@@ -29,58 +29,44 @@ function Setting() {
   const [successMessage, setSuccessMessage] = useState("");
 
   const tabs = [{ id: "devices", label: "設定" }];
+
+  // 戻るボタン
   const headerContent = (
-    <div style={{ display: "flex", alignItems: "center" }}>
-      <button className={styles.modoru} onClick={() => navigate("/mypage")}>
-        <Undo2 />
-      </button>
-      <TabButton tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
-    </div>
+    <TabButton tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />
   );
 
-  // ---------- 端末名取得 ----------
-  // const getDeviceName = () => {
-  //   const ua = navigator.userAgent || "unknown";
-  //   if (/Windows/i.test(ua)) return "Windows PC";
-  //   if (/Macintosh|Mac OS X/i.test(ua)) return "Mac";
-  //   if (/iPhone/i.test(ua)) return "iPhone";
-  //   if (/iPad/i.test(ua)) return "iPad";
-  //   if (/Android/i.test(ua)) return "Android";
-  //   return "ブラウザ端末";
-  // };
-
   // ---------- OS判定 ----------
-function getOS() {
-  const platform = navigator.platform.toLowerCase();
-  const ua = navigator.userAgent.toLowerCase();
+  function getOS() {
+    const platform = navigator.platform.toLowerCase();
+    const ua = navigator.userAgent.toLowerCase();
 
-  if (/win/.test(platform)) return "Windows";
-  if (/mac/.test(platform)) return "Mac";
-  if (/iphone|ipad|ipod/.test(ua)) return "iOS";
-  if (/android/.test(ua)) return "Android";
-  if (/linux/.test(platform)) return "Linux";
-  return "Unknown OS";
-}
+    if (/win/.test(platform)) return "Windows";
+    if (/mac/.test(platform)) return "Mac";
+    if (/iphone|ipad|ipod/.test(ua)) return "iOS";
+    if (/android/.test(ua)) return "Android";
+    if (/linux/.test(platform)) return "Linux";
+    return "Unknown OS";
+  }
 
-// ---------- ブラウザ判定 ----------
-function getBrowser() {
-  const ua = navigator.userAgent.toLowerCase();
+  // ---------- ブラウザ判定 ----------
+  function getBrowser() {
+    const ua = navigator.userAgent.toLowerCase();
 
-  if (/chrome|crios/.test(ua) && !/edge|edg|opr/.test(ua)) return "Chrome";
-  if (/safari/.test(ua) && !/chrome|crios|opr|edge|edg/.test(ua)) return "Safari";
-  if (/firefox/.test(ua)) return "Firefox";
-  if (/msie|trident/.test(ua)) return "Internet Explorer";
-  if (/edg/.test(ua)) return "Edge";
-  if (/opr/.test(ua)) return "Opera";
-  return "Unknown Browser";
-}
+    if (/chrome|crios/.test(ua) && !/edge|edg|opr/.test(ua)) return "Chrome";
+    if (/safari/.test(ua) && !/chrome|crios|opr|edge|edg/.test(ua)) return "Safari";
+    if (/firefox/.test(ua)) return "Firefox";
+    if (/msie|trident/.test(ua)) return "Internet Explorer";
+    if (/edg/.test(ua)) return "Edge";
+    if (/opr/.test(ua)) return "Opera";
+    return "Unknown Browser";
+  }
 
-// ---------- デバイス名取得 ----------
-function getDeviceName() {
-  const os = getOS();
-  const browser = getBrowser();
-  return `${os} (${browser})`;
-}
+  // ---------- デバイス名取得 ----------
+  function getDeviceName() {
+    const os = getOS();
+    const browser = getBrowser();
+    return `${os} (${browser})`;
+  }
 
   const getToday = () => new Date().toISOString().split("T")[0];
 
@@ -91,18 +77,20 @@ function getDeviceName() {
       const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/settings", {
         headers: { "X-User-ID": userId }
       });
+
       if (res.ok) {
         const data = await res.json();
-        // console.log("端末一覧データ:", data);
-        const devicesWithDate = data.map(d => ({
+
+        const deviceList = data.devices || [];
+
+        const devicesWithDate = deviceList.map(d => ({
           ...d,
           registered_date: d.registered_date || getToday()
         }));
+
         setDevices(devicesWithDate);
-        console.log("Fetched devices:", devicesWithDate);
-        return devicesWithDate;
+        // console.log("Fetched devices:", devicesWithDate);
       } else if (res.status === 404) {
-        // 端末未登録でも自動登録はしない
         setDevices([]);
       } else {
         setErrorMessage("端末一覧取得に失敗しました");
@@ -117,8 +105,6 @@ function getDeviceName() {
     fetchDevices();
   }, [userId]);
 
-  <button onClick={() => registerDevice()}>この端末を登録</button>
-
   // ---------- FCM トークン取得 & 端末登録 ----------
   const registerDevice = async () => {
     if (!userId) return;
@@ -130,12 +116,12 @@ function getDeviceName() {
         serviceWorkerRegistration: registration
       });
       if (!token) throw new Error("FCMトークン取得失敗");
-  
+
       const deviceInfo = getDeviceName();
       const today = getToday();
-  
+
       const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/settings", {
-        method: "POST", // 既存なら backend で update
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           "X-User-ID": userId
@@ -147,11 +133,10 @@ function getDeviceName() {
           registered_date: today
         })
       });
-  
+
       const data = await res.json().catch(() => ({}));
-  
+
       if (res.ok || data.message?.includes("already")) {
-        // 既存端末なら fetchDevices で一覧更新
         await fetchDevices();
         setSuccessMessage("端末登録済み（更新）");
       } else {
@@ -163,9 +148,15 @@ function getDeviceName() {
     }
   };
 
-  // ---------- 通知切替 ----------
+  // ---------- 通知切替 (修正済み) ----------
   const toggleNotification = async (device) => {
-    console.log("Toggling device:", device.id, "current value:", device.device_notification_enable);
+    // 現在の値を数値化 (APIの型安全のため)
+    const currentValue = Number(device.device_notification_enable);
+    // 反転させる (1なら0へ、0なら1へ)
+    const nextValue = currentValue === 1 ? 0 : 1;
+
+    console.log(`Toggling device: ${device.id} from ${currentValue} to ${nextValue}`);
+
     try {
       const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/settings", {
         method: "PATCH",
@@ -173,37 +164,32 @@ function getDeviceName() {
           "Content-Type": "application/json",
           "X-User-ID": userId,
           "X-Setting-ID": device.id
-        }
+        },
+        // ▼ bodyを追加して変更後の値を送信
+        body: JSON.stringify({
+          device_notification_enable: nextValue
+        })
       });
-  
-      console.log("Toggling device", device.id, "userId", userId);
+
       const data = await res.json();
       console.log("Response from backend:", data);
-  
-      if (res.ok && data.status === "success") {
-        // ★デバッグログ 1: APIレスポンスの値と型をチェック
-        console.log("API New Value:", data.new_value, "Type:", typeof data.new_value); 
 
-        const receivedValue = Number(data.new_value);
-        
-        // ★デバッグログ 2: Number() 変換後の値と型をチェック
-        console.log("Converted Value:", receivedValue, "Type:", typeof receivedValue); 
+      if (res.ok) {
+        // APIから新しい値が返ってきたらそれを使い、無ければ予測値(nextValue)を使う
+        const finalValue = (data.new_value !== undefined) ? Number(data.new_value) : nextValue;
 
         setDevices(prev =>
-            prev.map(d =>
-                d.id === device.id ? 
-                { 
-                    ...d, 
-                    device_notification_enable: receivedValue // 確実な数値（0または1）をセット
-                } 
-                : d
-            )
+          prev.map(d =>
+            d.id === device.id ?
+              {
+                ...d,
+                device_notification_enable: finalValue
+              }
+              : d
+          )
         );
-        
-        // ★デバッグログ 3: State更新後の状態をチェック（次回のレンダリング前なので注意）
-        console.log("Toggled device ID:", device.id, "Set to:", receivedValue);
-        
-    } else {
+        console.log("State updated to:", finalValue);
+      } else {
         setErrorMessage(data.message || "通知設定更新失敗");
       }
     } catch (err) {
@@ -211,7 +197,7 @@ function getDeviceName() {
       setErrorMessage("通信エラーが発生しました");
     }
   };
-  
+
   // ---------- 削除 ----------
   const removeDevice = async deviceId => {
     if (!window.confirm("本当に削除しますか？")) return;
@@ -245,10 +231,17 @@ function getDeviceName() {
       headerContent={headerContent}
       mainContent={
         <div className={styles["flex-list"]}>
-          <button onClick={registerDevice}>この端末を登録</button>
+          {/* 戻るボタンをここに配置 */}
+          <button className={styles.modoru} onClick={() => navigate("/mypage")}>
+            <Undo2 />
+          </button>
+
+          <button className={styles.bt} onClick={registerDevice}>この端末を登録</button>
           <h2>端末管理</h2>
+
           {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-          {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}          
+          {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
+
           <table className={styles.deviceTable}>
             <thead>
               <tr>
@@ -267,7 +260,8 @@ function getDeviceName() {
                     <label className={styles.switch}>
                       <input
                         type="checkbox"
-                        checked={!!device.device_notification_enable}
+                        // 数値の 1 は true, 0 は false として扱う
+                        checked={Number(device.device_notification_enable) === 1}
                         onChange={() => toggleNotification(device)}
                       />
                       <span className={styles.slider}></span>

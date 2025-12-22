@@ -1,44 +1,46 @@
+// constants/icons.js
 import {
-  // --- 支出カテゴリのアイコン ---
-  Utensils,     // 食費
-  TrainFront,   // 交通費
-  Lightbulb,    // 光熱費
-  Volleyball,   // 趣味・娯楽
-  ShoppingBag,  // 日用品
-  TicketCheck,  // 割引
-  CircleHelp,   // その他
+  Wallet,
+  DollarSign,
+  Briefcase,
+  UtensilsCrossed,
+  Train,
+  Zap,
+  Gamepad2,
+  ShoppingBag,
+  Receipt,
+  HelpCircle
+} from 'lucide-react';
 
-  // --- 収入カテゴリのアイコン ---
-  Wallet,       // 給与 
-  Gift,         // 賞与 
-  Laptop,       // 副業 
-  DollarSign,   // その他 
-} from "lucide-react";
+// アイコンマッピング
+const iconMap = {
+  'Wallet': Wallet,
+  'DollarSign': DollarSign,
+  'Briefcase': Briefcase,
+  'UtensilsCrossed': UtensilsCrossed,
+  'Train': Train,
+  'Zap': Zap,
+  'Gamepad2': Gamepad2,
+  'ShoppingBag': ShoppingBag,
+  'Receipt': Receipt,
+};
 
 /**
- * アイコン名（文字列）と、実際のReactコンポーネントを紐付ける対応表
+ * アイコン名から対応するLucideアイコンコンポーネントを取得
+ * @param {string} iconName - アイコン名（例: 'Wallet', 'DollarSign'）
+ * @returns {React.Component} - Lucideアイコンコンポーネント（見つからない場合はHelpCircle）
  */
-const ICON_MAP = {
-  // 支出
-  Utensils: <Utensils size={16} />,
-  TrainFront: <TrainFront size={16} />,
-  Lightbulb: <Lightbulb size={16} />,
-  Volleyball: <Volleyball size={16} />,
-  ShoppingBag: <ShoppingBag size={16} />,
-  TicketCheck: <TicketCheck size={16} />,
-  CircleHelp: <CircleHelp size={16} />,
-  
-  // 収入
-  Wallet: <Wallet size={16} />,
-  Gift: <Gift size={16} />,
-  Laptop: <Laptop size={16} />,
-  DollarSign: <DollarSign size={16} />,
-
-  // デフォルト
-  Default: <CircleHelp size={16} />,
+export const getIcon = (iconName) => {
+  return iconMap[iconName] || HelpCircle;
 };
 
-/* アイコンの名前に応じてマッピングされたアイコンを返す関数 */
-export const getIconComponent = (iconName) => {
-  return ICON_MAP[iconName] || ICON_MAP.Default;
+/**
+ * アイコンが存在するかチェック
+ * @param {string} iconName - アイコン名
+ * @returns {boolean}
+ */
+export const hasIcon = (iconName) => {
+  return iconName in iconMap;
 };
+
+export default iconMap;

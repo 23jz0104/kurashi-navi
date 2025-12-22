@@ -8,8 +8,10 @@ import { useNumberInput } from "../../hooks/common/useNumberInput";
 import Categories from "../common/Categories";
 import SubmitButton from "../common/SubmitButton";
 import { useBudgetApi } from "../../hooks/budgetManagement/useBudgetApi";
+import { useNavigate } from "react-router-dom";
 
 const BudgetCreate = () => {
+  const navigate = useNavigate();
   const { isLoading: isCategoryLoading, categories } = useCategories(2); //支出
   const budget_limit = useNumberInput(0);
   const [budgetForm, setBudgetForm] = useState({});
@@ -25,8 +27,8 @@ const BudgetCreate = () => {
     const result = await postBudget(payload);
 
     if (result?.status === "success") {
-      setMessage("登録しました。");
       setBudgetForm({});
+      navigate("/budget-management");
     } else {
       setMessage("変更に失敗しました。");
     }
@@ -61,7 +63,9 @@ const BudgetCreate = () => {
                 
                 <div className={styles["budget-input-container"]}>
                   <span className={styles["currency-symbol"]}>¥</span>
-                  <input 
+                  <input
+                    type="text"
+                    inputMode="numeric"
                     value={budget_limit.displayValue}
                     onChange={(e) => {
                       budget_limit.handleChange(e.target.value);

@@ -33,20 +33,19 @@
   cursor: pointer;
 }
 
+.delete-button {
+  position: absolute;
+  right: 2rem;
+  background: none;
+  border: none;
+  color: red;
+  cursor: pointer;
+}
+
 .icon {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-/* ケバブメニュー */
-.kebab-menu-button {
-  position: absolute;
-  right: 2rem;
-  display: flex;
-  align-items: center;
-  border: none;
-  background: none;
 }
 
 .main {

@@ -7,8 +7,10 @@ import styles from "./FixedCostCreate.module.css";
 import { useNumberInput } from "../../hooks/common/useNumberInput";
 import SubmitButton from "../common/SubmitButton";
 import { useFixedCostApi } from "../../hooks/fixedCost/useFixedCostApi";
+import { useNavigate } from "react-router-dom";
 
 const FixedCostCreate = () => {
+  const navigate = useNavigate();
   const {isLoading: isIncomeCategoryLoading, categories: incomeCategories} = useCategories(1); //収入
   const {isLoading: isExpenseCategoryLoading, categories: expenseCategories} = useCategories(2); //支出
   const [transactionType, setTransactionType] = useState("expense");
@@ -32,8 +34,8 @@ const FixedCostCreate = () => {
     const result = await postFixedCost(payload);
 
     if (result?.status === "success") {
-      setMessage("登録しました。");
       setFixedCostForm({});
+      navigate("/budget-management", {state: {"initialTab": "fixedCostView"}});
     } else {
       setMessage("登録に失敗しました。");
     }
@@ -100,6 +102,8 @@ const FixedCostCreate = () => {
               <div className={styles["input-card"]}>
                 <span className={styles["currency-symbol"]}>¥</span>
                 <input
+                  type="text"
+                  inputMode="numeric"
                   value={fixedCost.displayValue}
                   onChange={(e) => {
                     fixedCost.handleChange(e.target.value);
@@ -112,6 +116,10 @@ const FixedCostCreate = () => {
                   className={styles["currency-input"]}
                 />
                 <span> / 月</span>
+              </div>
+
+              <div className={styles["payment-schedule-card"]}>
+                <label>{transactionType === "expense" ? "支払日" : "収入日"}</label>
               </div>
 
               <div className={styles["category-card"]}>

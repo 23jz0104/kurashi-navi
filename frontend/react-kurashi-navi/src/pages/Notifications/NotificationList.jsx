@@ -4,7 +4,23 @@ import styles from '../../styles/Notifications/NotificationList.module.css';
 import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";
 import { CircleAlert } from 'lucide-react';
-// import { getFcmToken } from "../../firebase";
+
+// 1. Firebase関連のインポートを追加
+import { initializeApp } from "firebase/app";
+import { getMessaging, getToken } from "firebase/messaging";
+
+//  2. Firebase設定をここに直接書く
+const firebaseConfig = {
+  apiKey: "AIzaSyDtjnrrDg2MKCL1pWxXJ7_m3x14N8OCbts",
+  authDomain: "pushnotification-4ebe3.firebaseapp.com",
+  projectId: "pushnotification-4ebe3",
+  storageBucket: "pushnotification-4ebe3.firebasestorage.app",
+  messagingSenderId: "843469470605",
+  appId: "1:843469470605:web:94356b50ab8c7718021bc4"
+};
+
+// アプリの初期化（このファイルが読み込まれた時に実行される）
+const app = initializeApp(firebaseConfig);
 
 // 1時間ごとの選択コンポーネント
 function NotificationHourSelect({ selectedHour, setSelectedHour }) {
@@ -66,7 +82,6 @@ function NotificationList() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("userinfo");
   const [isAdding, setIsAdding] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
   const [productName, setProductName] = useState("");
   const [intervalDays, setIntervalDays] = useState('');
   const [notificationHour, setNotificationHour] = useState(9);
@@ -80,22 +95,6 @@ function NotificationList() {
     today.setHours(0, 0, 0, 0);
     return today;
   };
-
-  const [today, setToday] = useState(() => {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    return d;
-  });
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const d = new Date();
-      d.setHours(0, 0, 0, 0);
-      setToday(d);
-    }, 60 * 60 * 1000); // 1時間に1回
-
-    return () => clearInterval(interval);
-  }, []);
 
   // 通知ON/OFF切り替え
   const handleToggleNotification = async (item) => {
@@ -130,38 +129,48 @@ function NotificationList() {
   // 通知取得
   const fetchNotifications = async () => {
     try {
-      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/notification", {
-        headers: { "x-user-id": userId }
-      });
+      const res = await fetch(
+        "https://t08.mydns.jp/kakeibo/public/api/notification",
+        { headers: { "x-user-id": userId } }
+      );
       const data = await res.json();
-
-      if (res.ok && data.status === 'success') {
+  
+      if (res.ok && data.status === "success") {
         const normalized = data.notifications.map(n => {
-          const timestamp = n.NOTIFICATION_TIMESTAMP ?? n.notification_timestamp;
-
-          const serverDate = timestamp
+          const timestamp =
+            n.NOTIFICATION_TIMESTAMP ?? n.notification_timestamp;
+  
+          // notification_timestamp = 次回予定補充日
+          const scheduledDate = timestamp
             ? new Date(timestamp.replace(" ", "T"))
             : getToday();
-          serverDate.setHours(0, 0, 0, 0);
-
-          const interval = Number(n.NOTIFICATION_PERIOD ?? n.notification_period ?? 0);
-
-          const scheduled = new Date(serverDate);
-
-          const calculatedResetDay = new Date(scheduled);
-          calculatedResetDay.setDate(calculatedResetDay.getDate() - interval);
-
+  
+          scheduledDate.setHours(0, 0, 0, 0);
+  
+          const interval = Number(
+            n.NOTIFICATION_PERIOD ?? n.notification_period ?? 0
+          );
+  
           return {
             id: n.ID ?? n.id,
-            productName: n.PRODUCT_NAME ?? n.product_name ?? '不明',
+            productName: n.PRODUCT_NAME ?? n.product_name ?? "不明",
             intervalDays: interval,
-            resetDay: calculatedResetDay, 
-            scheduledDate: scheduled,     
-            enabled: Number(n.NOTIFICATION_ENABLE ?? n.notification_enable) === 1,
-            notificationHour: Number(n.NOTIFICATION_HOUR ?? n.notification_hour ?? 9)
+            scheduledDate, 
+            enabled:
+              Number(n.NOTIFICATION_ENABLE ?? n.notification_enable) === 1,
+            notificationHour: Number(
+              n.NOTIFICATION_HOUR ?? n.notification_hour ?? 9
+            )
           };
         });
-
+  
+        //並び替え
+        normalized.sort((a, b) => {
+          const dateDiff = a.scheduledDate - b.scheduledDate;
+          if (dateDiff !== 0) return dateDiff;
+          return a.notificationHour - b.notificationHour;
+        });
+  
         setNotifications(normalized);
       } else if (res.status === 404 && data.message === "no records found") {
         setNotifications([]);
@@ -177,42 +186,51 @@ function NotificationList() {
     fetchNotifications();
   }, []);
 
-  // 通知追加
+  // 通知追加 
   const handleSave = async () => {
-    // 1. バリデーション
+    // バリデーション
     if (!productName) return setError('商品名を入力してください');
 
-    const isDuplicate = notifications.some(n => n.productName === productName);
-    if (isDuplicate) return setError('その商品はすでに登録されています');
-
-    if (isSaving) return;
-
-    setIsSaving(true); // ロック開始
-    setError("");
-
     try {
-      //  Firebaseトークン送信（失敗しても無視） 
+      //  トークン取得処理を追加 
       try {
-        const fcmToken = await getFcmToken();
-        if (fcmToken) {
-          await fetch("https://t08.mydns.jp/kakeibo/public/api/settings", {
+        // ServiceWorkerの登録 (パスが正しいか確認してください)
+        const registration = await navigator.serviceWorker.register("/combine_test/firebase-messaging-sw.js");
+        const messaging = getMessaging(app);
+
+        // VAPIDキーを使ってトークンを取得
+        const token = await getToken(messaging, {
+          vapidKey: "BH3VSel6Cdam2EREeJ9iyYLoJcOYpqGHd7JXULxSCmfsULrVMaedjv81VF7h53RhJmfcHCsq-dSoJVjHB58lxjQ",
+          serviceWorkerRegistration: registration
+        });
+
+        if (token) {
+          // 取得したトークンをバックエンドに保存
+          const settingsRes = await fetch("https://t08.mydns.jp/kakeibo/public/api/settings", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               "X-User-ID": userId
             },
             body: JSON.stringify({
-              fcm_token: fcmToken,
+              fcm_token: token,
               device_info: navigator.userAgent,
-              device_name: "PC Browser"
+              device_name: "PC/Browser (Auto)",
+              registered_date: new Date().toISOString().split("T")[0]
             })
           });
+
+          if (!settingsRes.ok) {
+            // 既に登録済みなどのエラーは無視して進む
+            console.warn("トークン登録レスポンス:", settingsRes.status);
+          }
         }
       } catch (tokenError) {
-        console.error("トークン処理エラー(無視):", tokenError);
+        console.error("トークン取得失敗（通知は届かない可能性があります）:", tokenError);
+        // ここでエラーが出ても、商品の追加自体は止めない
       }
 
-      // 3. 商品追加処理
+      // 4. 本来の商品追加処理
       const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/notification", {
         method: "POST",
         headers: {
@@ -230,7 +248,7 @@ function NotificationList() {
       const data = await res.json();
 
       if (res.ok && data.status === "success") {
-        await fetchNotifications();
+        fetchNotifications();
         setIsAdding(false);
         setProductName("");
         setIntervalDays("");
@@ -242,15 +260,11 @@ function NotificationList() {
     } catch (e) {
       console.error(e);
       setError("通信エラー");
-    } finally {
-      setIsSaving(false);
     }
   };
 
   // 通知削除
   const handleDelete = async (id) => {
-    if (!window.confirm("本当に削除しますか？")) return;
-
     try {
       const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/notification", {
         method: "DELETE",
@@ -259,9 +273,13 @@ function NotificationList() {
           "X-Notification-ID": id
         }
       });
+
       const data = await res.json();
+
       if (res.ok && data.status === 'success') {
         fetchNotifications();
+      } else {
+        console.error(data);
       }
     } catch (e) {
       console.error(e);
@@ -270,6 +288,12 @@ function NotificationList() {
 
   // 補充ボタン
   const handleRefilled = async (item) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const nextResetDay = new Date(today);
+    nextResetDay.setDate(today.getDate() + item.intervalDays);
+
     try {
       const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/notification", {
         method: "PATCH",
@@ -280,17 +304,23 @@ function NotificationList() {
         },
         body: JSON.stringify({
           notification_enable: item.enabled ? 1 : 0,
-          notification_period: item.intervalDays
+          notification_period: item.intervalDays,
+          reset_day: nextResetDay.toISOString()
         })
       });
+
       const data = await res.json();
+
       if (res.ok && data.status === "success") {
         fetchNotifications();
+      } else {
+        console.error("更新失敗:", data.message);
       }
     } catch (e) {
       console.error("通信エラー:", e);
     }
   };
+  
 
   const headerContent = (
     <TabButton
@@ -335,13 +365,8 @@ function NotificationList() {
           {error && <p style={{ color: 'red', marginTop: '4px' }}>{error}</p>}
 
           <div className={styles.buttonGroup}>
-            <button
-              className={styles.save}
-              onClick={handleSave}
-              disabled={isSaving}
-              style={{ opacity: isSaving ? 0.6 : 1, cursor: isSaving ? 'not-allowed' : 'pointer' }}
-            >
-              {isSaving ? "保存中..." : "保存"}
+            <button className={styles.save} onClick={handleSave}>
+              保存
             </button>
             <button
               className={styles.cancel}
@@ -352,7 +377,6 @@ function NotificationList() {
                 setIntervalDays('');
                 setNotificationHour(9);
               }}
-              disabled={isSaving}
             >
               キャンセル
             </button>
@@ -365,27 +389,58 @@ function NotificationList() {
           ) : (
             <ul className={styles.notificationList}>
               {notifications.map((item) => {
-                const today = getToday();
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
 
-                const scheduledDate = item.scheduledDate;
+                const scheduledDate = new Date(item.scheduledDate);
+                scheduledDate.setHours(0, 0, 0, 0);
 
-                const rawRemainingDays = Math.ceil(
+                const remainingDays = Math.ceil(
                   (scheduledDate - today) / (1000 * 60 * 60 * 24)
                 );
+                const displayRemainingDays = Math.max(0, remainingDays);
 
-                const displayRemainingDays = Math.max(0, rawRemainingDays);
-
-                const daysPassed = Math.min(
-                  item.intervalDays,
-                  Math.max(item.intervalDays - rawRemainingDays, 0)
+                const storedBaseDays = Number(
+                  localStorage.getItem(`progressBase_${item.id}`)
                 );
 
-                const progressPercent = (daysPassed / item.intervalDays) * 100;
+                let baseDays =
+                  !storedBaseDays || storedBaseDays < remainingDays
+                    ? remainingDays
+                    : storedBaseDays;
+
+                if (baseDays <= 0) {
+                  baseDays = item.intervalDays > 0 ? item.intervalDays : 1;
+                }
+
+                localStorage.setItem(`progressBase_${item.id}`, baseDays);
+
+                let progressPercent;
+                if (remainingDays <= 0) {
+                  progressPercent = 100;
+                } else {
+                  progressPercent = Math.max(
+                    0,
+                    Math.min(((baseDays - remainingDays) / baseDays) * 100, 100)
+                  );
+
+                  // console.log("Debug", {
+                  //   id: item.id,
+                  //   product: item.productName,
+                  //   today: today.toISOString().slice(0, 10),
+                  //   scheduledDate: scheduledDate.toISOString().slice(0, 10),
+                  //   remainingDays,
+                  //   storedBaseDays,
+                  //   baseDays,
+                  //   progressPercent
+                  // });
+                }
 
                 return (
                   <li key={item.id} className={styles.notificationItem}>
                     <div className={styles.notificationWrapper}>
                       <div className={styles.verticalBar}></div>
+
                       <div className={styles.notificationContent}>
                         <span className={styles.date}>
                           予定補充日:{" "}
@@ -409,17 +464,17 @@ function NotificationList() {
                           <span className={styles.slider}></span>
                         </label>
 
-                        {rawRemainingDays < 0 ? (
+                        {remainingDays < 0 ? (
                           <span className={styles.soon}>
                             <CircleAlert color="red" />
                             補充日が過ぎました！すぐに補充してください！
                           </span>
-                        ) : rawRemainingDays === 0 ? (
+                        ) : remainingDays === 0 ? (
                           <span className={styles.today}>
                             <CircleAlert color="red" />
                             補充日です！！
                           </span>
-                        ) : rawRemainingDays <= 3 ? (
+                        ) : remainingDays <= 3 ? (
                           <span className={styles.soon}>
                             <CircleAlert color="#FFC107" />
                             まもなく、補充目安日になります！！
