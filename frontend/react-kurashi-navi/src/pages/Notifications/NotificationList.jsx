@@ -4,7 +4,23 @@ import styles from '../../styles/Notifications/NotificationList.module.css';
 import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";
 import { CircleAlert } from 'lucide-react';
-// import { getFcmToken } from "../../firebase";
+
+// 1. Firebase関連のインポートを追加
+import { initializeApp } from "firebase/app";
+import { getMessaging, getToken } from "firebase/messaging";
+
+//  2. Firebase設定をここに直接書く
+const firebaseConfig = {
+  apiKey: "AIzaSyDtjnrrDg2MKCL1pWxXJ7_m3x14N8OCbts",
+  authDomain: "pushnotification-4ebe3.firebaseapp.com",
+  projectId: "pushnotification-4ebe3",
+  storageBucket: "pushnotification-4ebe3.firebasestorage.app",
+  messagingSenderId: "843469470605",
+  appId: "1:843469470605:web:94356b50ab8c7718021bc4"
+};
+
+// アプリの初期化（このファイルが読み込まれた時に実行される）
+const app = initializeApp(firebaseConfig);
 
 // 1時間ごとの選択コンポーネント
 function NotificationHourSelect({ selectedHour, setSelectedHour }) {
@@ -177,12 +193,26 @@ function NotificationList() {
     fetchNotifications();
   }, []);
 
-  // 通知追加
+  // 通知追加 
   const handleSave = async () => {
-    // 1. バリデーション
+    // バリデーション
     if (!productName) return setError('商品名を入力してください');
 
     try {
+      //  トークン取得処理を追加 
+      try {
+        // ServiceWorkerの登録 (パスが正しいか確認してください)
+        const registration = await navigator.serviceWorker.register("/combine_test/firebase-messaging-sw.js");
+        const messaging = getMessaging(app);
+        
+        // VAPIDキーを使ってトークンを取得
+        const token = await getToken(messaging, {
+          vapidKey: "BH3VSel6Cdam2EREeJ9iyYLoJcOYpqGHd7JXULxSCmfsULrVMaedjv81VF7h53RhJmfcHCsq-dSoJVjHB58lxjQ",
+          serviceWorkerRegistration: registration
+        });
+
+        if (token) {
+          // 取得したトークンをバックエンドに保存
       //  Firebaseトークン送信（失敗しても無視） 
       try {
         const fcmToken = await getFcmToken();
@@ -194,12 +224,24 @@ function NotificationList() {
               "X-User-ID": userId
             },
             body: JSON.stringify({
-              fcm_token: fcmToken,
+              fcm_token: token,
               device_info: navigator.userAgent,
-              device_name: "PC Browser"
+              device_name: "PC/Browser (Auto)",
+              registered_date: new Date().toISOString().split("T")[0]
             })
           });
 
+          if (!settingsRes.ok) {
+            // 既に登録済みなどのエラーは無視して進む
+            console.warn("トークン登録レスポンス:", settingsRes.status);
+          }
+        }
+      } catch (tokenError) {
+        console.error("トークン取得失敗（通知は届かない可能性があります）:", tokenError);
+        // ここでエラーが出ても、商品の追加自体は止めない
+      }
+
+      // 4. 本来の商品追加処理
           // 既に登録済み(400)でもOKとする
           if (!settingsRes.ok && settingsRes.status !== 400) {
             console.warn("トークン保存に失敗しましたが続行します");
@@ -267,6 +309,26 @@ function NotificationList() {
 
   // 補充ボタン
   const handleRefilled = async (item) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const nextResetDay = new Date(today);
+    nextResetDay.setDate(today.getDate() + item.intervalDays);
+
+    try {
+      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/notification", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-User-ID": userId,
+          "X-Notification-ID": item.id
+        },
+        body: JSON.stringify({
+          notification_enable: item.enabled ? 1 : 0,
+          notification_period: item.intervalDays,
+          reset_day: nextResetDay.toISOString()
+        })
+      });
 
     // 今日（0時固定）
     const today = new Date();
@@ -392,6 +454,7 @@ function NotificationList() {
                 const rawRemainingDays = Math.ceil(
                   (scheduledDate - today) / (1000 * 60 * 60 * 24)
                 );
+                const displayRemainingDays = Math.max(0, remainingDays);
 
 
                 // localStorage から取得
@@ -403,11 +466,14 @@ function NotificationList() {
                   !storedBaseDays || storedBaseDays < remainingDays
                     ? remainingDays
                     : storedBaseDays;
+
                     
                 // 0・負数防止
                 if (baseDays <= 0) {
                   baseDays = item.intervalDays > 0 ? item.intervalDays : 1;
                 }
+
+                localStorage.setItem(`progressBase_${item.id}`, baseDays);
 
                 // 補正後を保存
                 localStorage.setItem(`progressBase_${item.id}`, baseDays);
@@ -430,6 +496,7 @@ function NotificationList() {
                     Math.min(((baseDays - remainingDays) / baseDays) * 100, 100)
                   );
 
+                  // console.log("Debug", {
                   // console.log({
                   //   id: item.id,
                   //   product: item.productName,
@@ -510,6 +577,7 @@ function NotificationList() {
                         </div>
 
                         <span className={styles.remaining}>
+                          あと <strong>{displayRemainingDays}</strong> 日（1回 / {item.intervalDays} 日）
                           あと <strong>{Math.max(remainingDays, 0)}</strong> 日（1回 / {item.intervalDays} 日）
                         </span>
 
