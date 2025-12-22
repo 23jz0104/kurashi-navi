@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Layout from "../common/Layout";
 import { startTransition, useState } from "react";
 import styles from "./FixedCostEdit.module.css";
@@ -11,12 +11,14 @@ import SubmitButton from "../common/SubmitButton";
 import { useFixedCostApi } from "../../hooks/fixedCost/useFixedCostApi";
 
 const FixedCostEdit = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const [selectedFixedCostItem, setSelectedFixedCostItem] = useState(
     location.state?.fixedCostData,
   );
 
   const [message, setMessage] = useState("");
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const fixedCost = useNumberInput(selectedFixedCostItem?.cost || 0);
 
@@ -26,7 +28,7 @@ const FixedCostEdit = () => {
 
   const categories = transactionType === "expense" ? expensecategories : incomecategories;
   
-  const {isPatchLoading, patchFixedCost} = useFixedCostApi();
+  const {isPatchLoading, isDeleteLoading, patchFixedCost, deleteFixedCost} = useFixedCostApi();
 
   const handleSubmit = async () => {
     const payload = {
@@ -37,7 +39,7 @@ const FixedCostEdit = () => {
     const result = await patchFixedCost(payload);
 
     if (result?.status === "success") {
-      setMessage("変更しました。");
+      navigate("/budget-management", {state: {"initialTab": "fixedCostView"}});
     } else {
       setMessage("変更に失敗しました。");
     }
@@ -47,8 +49,23 @@ const FixedCostEdit = () => {
     }, 2000);
   }
 
+  const handleDelete = () => {
+    setShowDeleteDialog(true);
+  }
+
+  const deleteSubmit = async () => {
+    const result = await deleteFixedCost(selectedFixedCostItem.id);
+
+    if(result?.status === "success") {
+      navigate("/budget-management", {state: {"initialTab": "fixedCostView"}});
+    }
+    
+    setShowDeleteDialog(false);
+  }
+
   return (
-    <Layout 
+    <Layout
+      onDeleteButtonClick={handleDelete}
       hideNavigation={true}
       redirectPath={"/budget-management"}
       state={{"initialTab": "fixedCostView"}}
@@ -153,6 +170,35 @@ const FixedCostEdit = () => {
 
               {message && (
                 <div>{message}</div>
+              )}
+
+              {showDeleteDialog && (
+                <div className={styles["delete-dialog"]}>
+                  <div className={styles["dialog-content"]}>
+
+                    {isDeleteLoading ? (
+                      <LoadingSpinner />
+                    ) : (
+                      <>
+                        <p className={styles["confirm-text"]}>この固定費を削除しますか？</p>
+                        <div className={styles["dialog-buttons"]}>
+                          <button 
+                            className={styles["button-cancel"]}
+                            onClick={() => setShowDeleteDialog(false)}
+                          >
+                            キャンセル
+                          </button>
+                          <button 
+                            className={styles["button-delete"]}
+                            onClick={() => deleteSubmit()}
+                          >
+                            削除
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
               )}
             </div>
           )}

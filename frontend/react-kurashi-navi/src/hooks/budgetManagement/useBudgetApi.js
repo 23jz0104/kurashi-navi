@@ -4,6 +4,7 @@ export const useBudgetApi = () => {
   const [isGetLoading, setIsGetLoading] = useState(false); //ロードの状態管理
   const [isPostLoading, setIsPostLoading] = useState(false);
   const [isPatchLoading, setIsPatchLoading] = useState(false);
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
   const [budget, setBudget] = useState([]); //予算の状態管理
 
   const userId = sessionStorage.getItem("userId");
@@ -26,7 +27,6 @@ export const useBudgetApi = () => {
       }
       const data = await response.json();
       setBudget(data);
-      console.log(JSON.stringify(data, null, 1))
       return data;
     } catch (error) {
       console.log(error);
@@ -58,6 +58,7 @@ export const useBudgetApi = () => {
     }
   }
 
+  //PATCHメソッド
   const patchBudget = async (payload) => {
     setIsPatchLoading(true);
     try {
@@ -74,7 +75,6 @@ export const useBudgetApi = () => {
       })
 
       const data = await response.json();
-      JSON.stringify("PATCH通信結果:", JSON.stringify(data, null, 2));
       return data;
     } catch (error) {
       console.log(error);
@@ -83,5 +83,31 @@ export const useBudgetApi = () => {
     }
   }
 
-  return { budget, isGetLoading, isPostLoading, isPatchLoading, getBudget, postBudget, patchBudget };
+  //DELETEメソッド
+  const deleteBudget = async (id) => {
+    setIsDeleteLoading(true);
+    console.log("API通信: deleteBudget()");
+    try {
+      const response = await fetch("https://t08.mydns.jp/kakeibo/public/api/budget", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "X-ID": String(id),
+        }
+      });
+
+      if(!response.ok) {
+        throw new Error(`削除失敗: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsDeleteLoading(false);
+    }
+  }
+
+  return { budget, isGetLoading, isPostLoading, isPatchLoading, isDeleteLoading, getBudget, postBudget, patchBudget, deleteBudget };
 }
