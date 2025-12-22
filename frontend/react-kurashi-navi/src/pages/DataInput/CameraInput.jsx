@@ -16,7 +16,8 @@ const CameraInput = () => {
   useEffect(() => {
     if(!loading && ocrResult.products.length > 0) {
       console.log("ナビゲート実行");
-      navigate("/confirmInputData", { state: {ocrResult} });
+      // navigate("/confirmInputData", { state: {ocrResult} });
+      navigate("/dataInput", { state: {ocrResult} });
     }
   }, [ocrResult, loading, error]);
 
@@ -40,7 +41,8 @@ const CameraInput = () => {
         mainContent={
           <Loader text="解析中"/>
         }
-        hideDataInputButton={true}
+        // hideDataInputButton={true}
+        disableDataInputButton={true} // 「+」を無効化
       />
     )
   }
@@ -90,7 +92,8 @@ const CameraInput = () => {
           </div>
         </div>
       }
-      hideDataInputButton={true}
+      // hideDataInputButton={true}
+      disableDataInputButton={true} // 「+」を無効化
     />
   )
 }

@@ -30,6 +30,8 @@ const ConfirmInputData = () => {
     }
   }
 
+  // console.log("入力確認ページ");
+
   return (
     <Layout 
       headerContent={
@@ -110,7 +112,8 @@ const ConfirmInputData = () => {
           )}
         </div>
       }
-      hideDataInputButton={true}
+      // hideDataInputButton={true}
+      disableDataInputButton={true} // 「+」を無効化
     />
   )
 }

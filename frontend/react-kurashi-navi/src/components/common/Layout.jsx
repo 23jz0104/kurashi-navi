@@ -3,11 +3,20 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Wallet, List, Bell, User, Plus, ChevronLeft, MoreVertical, Trash2 } from "lucide-react";
 import styles from "./Layout.module.css";
 
-const Layout = ({ headerContent, mainContent, hideNavigation = false, hideDataInputButton = false, redirectPath, state = null, onDeleteButtonClick = false}) => {
+// const Layout = ({ headerContent, mainContent, hideNavigation = false, hideDataInputButton = false, redirectPath, state = null, showKebabMenu = false}) => {
+const Layout = ({ headerContent, mainContent, hideNavigation = false, disableDataInputButton = false, redirectPath, state = null, showKebabMenu = false}) => {
   const location = useLocation();
   const navigate = useNavigate();
 
   const isActive = (path) => location.pathname === path;
+
+  // 入力関連ページのチェック
+  const isDataInputPage =
+  location.pathname === "/dataInput" ||
+  location.pathname.startsWith("/dataInput/");
+
+  // 「＋」を無効化
+  const isPlusDisabled = disableDataInputButton || isDataInputPage;
 
   return (
     <div className={styles.container}>
@@ -50,9 +59,27 @@ const Layout = ({ headerContent, mainContent, hideNavigation = false, hideDataIn
                 <span className={styles["nav-label"]}>予算</span>
               </Link>
 
+              {/* 旧「＋」ボタン 
               {!hideDataInputButton && (
                 <Link to="/dataInput">
                   <button className={styles["navigate-datainput"]}><Plus size={16} /></button>
+                </Link>
+              )} */}
+              
+              {/* 「＋」ボタン: データ入力関連ページであれば無効化 */}
+              {isPlusDisabled ? (
+                <button
+                  className={`${styles["navigate-datainput"]} ${styles.disabled}`}
+                  disabled
+                  aria-disabled="true"
+                >
+                  <Plus size={16} />
+                </button>
+              ) : (
+                <Link to="/dataInput">
+                  <button className={styles["navigate-datainput"]}>
+                    <Plus size={16} />
+                  </button>
                 </Link>
               )}
 
