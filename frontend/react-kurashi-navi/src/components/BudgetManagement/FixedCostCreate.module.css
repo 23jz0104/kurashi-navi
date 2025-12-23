@@ -102,8 +102,20 @@
 
 .payment-schedule-card {
   display: flex;
+  flex-direction: column;
   padding: 1rem;
   background-color: white;
+  margin-top: 1rem;
+  box-shadow: 1px 3px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 0.25rem;
+}
+
+.payment-schedule-select {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  margin-top: 0.25rem;
+  border-color: #e5e7eb;
+  border-radius: 0.25rem;
 }
 
 .category-card {

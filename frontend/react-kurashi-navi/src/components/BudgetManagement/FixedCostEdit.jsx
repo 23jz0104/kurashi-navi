@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import Layout from "../common/Layout";
-import { startTransition, useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import styles from "./FixedCostEdit.module.css";
 import { House } from "lucide-react";
 import { useNumberInput } from "../../hooks/common/useNumberInput";
@@ -9,6 +9,8 @@ import Categories from "../common/Categories";
 import LoadingSpinner from "../common/LoadingSpinner";
 import SubmitButton from "../common/SubmitButton";
 import { useFixedCostApi } from "../../hooks/fixedCost/useFixedCostApi";
+import { getIcon } from "../../constants/categories";
+import { useBudgetRulesApi } from "../../hooks/budgetManagement/useBudgetRulesApi";
 
 const FixedCostEdit = () => {
   const navigate = useNavigate();
@@ -29,11 +31,17 @@ const FixedCostEdit = () => {
   const categories = transactionType === "expense" ? expensecategories : incomecategories;
   
   const {isPatchLoading, isDeleteLoading, patchFixedCost, deleteFixedCost} = useFixedCostApi();
+  const {isGetLoading, getBudgetRules, budgetRules} = useBudgetRulesApi();
+
+  useEffect(() => {
+    getBudgetRules();
+  }, []);
 
   const handleSubmit = async () => {
     const payload = {
       id: selectedFixedCostItem.id,
       cost: selectedFixedCostItem.cost,
+      budget_rule_id: selectedFixedCostItem.budget_rule_id,
       category_id: selectedFixedCostItem.category_id,
     }
     const result = await patchFixedCost(payload);
@@ -63,6 +71,8 @@ const FixedCostEdit = () => {
     setShowDeleteDialog(false);
   }
 
+  const IconComponent = getIcon(selectedFixedCostItem.icon_name);
+
   return (
     <Layout
       onDeleteButtonClick={handleDelete}
@@ -72,7 +82,7 @@ const FixedCostEdit = () => {
       headerContent={<p>固定費編集</p>}
       mainContent={
         <>
-          {isIncomeCategoryLoading || isExpenseCategoryLoading ? (
+          {isIncomeCategoryLoading || isExpenseCategoryLoading || isGetLoading ? (
             <LoadingSpinner />
           ) : (
             <div className={styles["main-container"]}>
@@ -122,8 +132,11 @@ const FixedCostEdit = () => {
               <div className={styles["fixed-cost-card"]}>
     
                 <div className={styles["card-header"]}>
-                  <div className={styles["category-icon"]}>
-                    <House size={16}/>
+                  <div 
+                    className={styles["category-icon"]}
+                    style={{ backgroundColor: `${selectedFixedCostItem.category_color}` }}
+                  >
+                    <IconComponent size={16} />
                   </div>
                   <span>{selectedFixedCostItem.category_name}</span>
                 </div>
@@ -144,7 +157,28 @@ const FixedCostEdit = () => {
                   />
                   <span>/ 月</span>
                 </div>
+              </div>
 
+              <div className={styles["payment-schedule-card"]}>
+                <label>{transactionType === "expense" ? "支払日" : "収入日"}</label>
+                <div>
+                  <select
+                    value={selectedFixedCostItem.budget_rule_id}
+                    onChange={(e) => {
+                      setSelectedFixedCostItem((prev) => ({
+                        ...prev,
+                        budget_rule_id: Number(e.target.value)
+                      }));
+                    }}
+                    className={styles["payment-schedule-select"]}
+                  >
+                    {budgetRules?.map((rule) => (
+                      <option key={rule.id} value={rule.id}>
+                        {rule.rule_name_jp}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div className={styles["category-card"]}>
@@ -157,6 +191,8 @@ const FixedCostEdit = () => {
                       setSelectedFixedCostItem((prev) => ({
                         ...prev,
                         category_id: id,
+                        category_color:
+                          selected?.category_color ?? prev.category_color,
                         category_name:
                           selected?.category_name ?? prev.category_name,
                     }));

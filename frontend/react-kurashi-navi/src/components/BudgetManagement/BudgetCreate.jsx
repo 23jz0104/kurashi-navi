@@ -9,6 +9,7 @@ import Categories from "../common/Categories";
 import SubmitButton from "../common/SubmitButton";
 import { useBudgetApi } from "../../hooks/budgetManagement/useBudgetApi";
 import { useNavigate } from "react-router-dom";
+import { getIcon } from "../../constants/categories";
 
 const BudgetCreate = () => {
   const navigate = useNavigate();
@@ -38,6 +39,8 @@ const BudgetCreate = () => {
     }, 2000);
   };
 
+  const IconComponent = getIcon(budgetForm.icon_name);
+
   return (
     <Layout
       hideNavigation={true}
@@ -53,8 +56,11 @@ const BudgetCreate = () => {
               <div className={styles["budget-info-card"]}>
 
                 <div className={styles["category-display"]}>
-                  <span className={styles["icon"]}>
-                    <House size={16} />
+                  <span 
+                    className={styles["icon"]}
+                    style={{ backgroundColor: `${budgetForm.category_color}`}}
+                  >
+                    <IconComponent size={16} />
                   </span>
                   <span className={styles["category-name"]}>
                     {budgetForm.category_name || ""}
@@ -93,6 +99,10 @@ const BudgetCreate = () => {
                       category_id: id,
                       category_name:
                         selected?.category_name ?? prev.category_name,
+                      icon_name:
+                        selected?.icon_name ?? prev.icon_name,
+                      category_color:
+                        selected?.category_color ?? prev.category_color,
                     }))
                   }}
                 />

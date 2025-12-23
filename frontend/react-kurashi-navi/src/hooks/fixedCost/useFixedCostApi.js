@@ -76,6 +76,7 @@ export const useFixedCostApi = () => {
         body: JSON.stringify({
           cost: payload.cost,
           category_id: payload.category_id,
+          budget_rule_id: payload.budget_rule_id,
         }),
       });
 
