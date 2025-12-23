@@ -1,13 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import styles from "./FixedCostView.module.css";
-import { ChevronRight, Home, Plus } from "lucide-react";
+import { Calendar, ChevronRight, Home, Plus } from "lucide-react";
 import { useFixedCostApi } from "../../hooks/fixedCost/useFixedCostApi";
 import LoadingSpinner from "../common/LoadingSpinner";
 import { useEffect } from "react";
+import { getIcon } from "../../constants/categories";
 
 const FixedCostView = () => {
   const navigate = useNavigate();
   const { fixedCost, isGetLoading, getFixedCost } = useFixedCostApi();
+
+  console.log("fixedCost", JSON.stringify(fixedCost, null, 2));
 
   useEffect(() => {
     getFixedCost();
@@ -35,20 +38,32 @@ const FixedCostView = () => {
 
           {fixedCost.length > 0 && (
             <div className={styles["fixed-cost-list"]}>
-              {fixedCost.map((item) => (
-                <button key={item.id}
-                  className={styles["fixed-cost-item"]}
-                  onClick={() => showFixedCostInfo({ ...item })}
-                >
-                  <div className={styles["fixed-cost-header"]}>
-                    <div className={styles["category-icon"]}>
-                      <Home size={16}/>
+              {fixedCost.map((item) => {
+                const IconComponent = getIcon(item.icon_name);
+                return (
+                  <button key={item.id}
+                    className={styles["fixed-cost-item"]}
+                    onClick={() => showFixedCostInfo({ ...item })}
+                  >
+                    <div className={styles["fixed-cost-header"]}>
+                      <div 
+                        className={styles["category-icon"]}
+                        style={{ backgroundColor: `${item.category_color}` }}
+                      >
+                        <IconComponent size={16}/>
+                      </div>
+                      <span className={styles["category-name"]}>{item.category_name}</span>
                     </div>
-                    <span className={styles["category-name"]}>{item.category_name}</span>
-                    <span className={styles["cost-price"]}>¥ {Number(item.cost).toLocaleString()} / 月 <ChevronRight size={15}/></span>
-                  </div>
-                </button>
-              ))}
+                    <div className={styles["fixed-cost-info"]}>
+                      <span className={styles["cost-price"]}>¥ {Number(item.cost).toLocaleString()} / 月</span>
+                      <div className={styles["flex"]}>
+                        <span><Calendar size={16} className={styles["calendar-icon"]}/></span>
+                        <span>{item.rule_name_jp}</span>
+                      </div>
+                    </div>
+                  </button>
+                )
+            })}
             </div>
           )}
         </div>

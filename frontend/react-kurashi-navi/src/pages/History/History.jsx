@@ -11,6 +11,9 @@ import { useState } from "react";
 import GraphView from "../../components/common/GraphView";
 import CalendarView from "../../components/common/CalendarView";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
+import { getIcon } from "../../constants/categories";
+import { color } from "chart.js/helpers";
+import { background } from "storybook/internal/theming";
 
 const History = () => {
   const { activeTab, handleTabChange } = useTab("graph");
@@ -48,6 +51,8 @@ const History = () => {
       category_name: item.category_name,
       total: item.total,
       type_id: item.type_id,
+      icon_name: item.icon_name,
+      category_color: item.category_color,
     });
 
     return acc;
@@ -175,17 +180,25 @@ const History = () => {
             <>
               {activeTab === "graph" && (
                 <div className={styles["detail"]}>
-                  {filteredMonthSummaryByType.map((r, index) => (
-                    <div className={styles["flex"]} key={index}>
-                      <span className={styles["category-icon"]}></span>
-                      <span className={styles["category-name"]}>
-                        {r.category_name}
-                      </span>
-                      <span className={styles["category-price"]}>
-                        ¥{r.total.toLocaleString()}
-                      </span>
-                    </div>
-                  ))}
+                  {filteredMonthSummaryByType.map((r, index) => {
+                    const IconComponent = getIcon(r.icon_name);
+                    return (
+                      <div className={styles["flex"]} key={index}>
+                        <span 
+                          className={styles["category-icon"]} 
+                          style={{ backgroundColor: `${r.category_color}` }}
+                        >
+                          <IconComponent size={18}/>
+                        </span>
+                        <span className={styles["category-name"]}>
+                          {r.category_name}
+                        </span>
+                        <span className={styles["category-price"]}>
+                          ¥{r.total.toLocaleString()}
+                        </span>
+                      </div>
+                    )
+                  })}
                 </div>
               )}
 
@@ -208,23 +221,31 @@ const History = () => {
                           </span>
                         </div>
                         <div className={styles["category-list"]}>
-                          {day.categories.map((category, idx) => (
-                            <div key={idx} className={styles["flex"]}>
-                              <span className={styles["category-icon"]}></span>
-                              <span className={styles["category-name"]}>
-                                {category.category_name}
-                              </span>
-                              <span
-                                className={`${styles["category-price"]} ${
-                                  category.type_id === "1"
-                                    ? styles["income"]
-                                    : styles["expense"]
-                                }`}
-                              >
-                                ¥{category.total.toLocaleString()}
-                              </span>
-                            </div>
-                          ))}
+                          {day.categories.map((category, idx) => {
+                            const IconComponent = getIcon(category.icon_name);
+                            return (
+                              <div key={idx} className={styles["flex"]}>
+                                <span 
+                                  className={styles["category-icon"]}
+                                  style={{ backgroundColor: `${category.category_color}` }}
+                                >
+                                  <IconComponent size={18} />
+                                </span>
+                                <span className={styles["category-name"]}>
+                                  {category.category_name}
+                                </span>
+                                <span
+                                  className={`${styles["category-price"]} ${
+                                    category.type_id === "1"
+                                      ? styles["income"]
+                                      : styles["expense"]
+                                  }`}
+                                >
+                                  ¥{category.total.toLocaleString()}
+                                </span>
+                              </div>
+                            )
+                          })}
                         </div>
                       </div>
                     );

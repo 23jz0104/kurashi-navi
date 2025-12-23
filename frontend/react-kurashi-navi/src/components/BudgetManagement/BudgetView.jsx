@@ -7,6 +7,7 @@ import { useGetRecordTest } from "../../hooks/history/useGetRecordTest";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useMonthPicker } from "../../hooks/common/useMonthPicker";
 import MonthPicker from "../common/MonthPicker";
+import { getIcon } from "../../constants/categories";
 
 const BudgetView = () => {
   const navigate = useNavigate();
@@ -82,6 +83,8 @@ const BudgetView = () => {
             total,
             item.budget_limit
           );
+          
+          const IconComponent = getIcon(item.icon_name);
 
           return (
             <button
@@ -90,8 +93,8 @@ const BudgetView = () => {
               onClick={() => showBudgetInfo({ ...item, total })}
             >
               <div className={styles["budget-header"]}>
-                <div className={styles["icon"]}>
-                  <House size={18} />
+                <div className={styles["icon"]} style={{ backgroundColor: `${item.category_color}` }}>
+                  <IconComponent size={18}/>
                 </div>
 
                 <div className={styles["budget-info"]}>
@@ -114,7 +117,7 @@ const BudgetView = () => {
                 <div className={styles["progress-bar"]}>
                   <div
                     className={styles["progress-fill"]}
-                    style={{ width: `${progressPercentage}%` }}
+                    style={{ width: `${progressPercentage}%`, backgroundColor: `${item.category_color}`}}
                   ></div>
                 </div>
 

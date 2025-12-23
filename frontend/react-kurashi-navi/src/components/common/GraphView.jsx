@@ -8,6 +8,8 @@ Chartjs.register(ArcElement, Tooltip, Legend);
 const GraphView = ({ summary }) => {
   const chartRef = useRef(null);
 
+  console.log(JSON.stringify(summary, null, 2)); 
+
   useEffect(() => {
     // コンポーネントがマウントされた時にチャートをリセット
     if (chartRef.current) {
@@ -21,14 +23,7 @@ const GraphView = ({ summary }) => {
     datasets: [{
       label: "合計金額",
       data: summary.map((item) => Number(item.total)),
-      backgroundColor: [
-        "#FF6384",
-        "#36A2EB",
-        "#FFCE56",
-        "#4BC0C0",
-        "#9966FF",
-        "#FF9F40",
-      ],
+      backgroundColor: summary.map((item) => item.category_color),
       borderWidth: 0,
     }],
   };

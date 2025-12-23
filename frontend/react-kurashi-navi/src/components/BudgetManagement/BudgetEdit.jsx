@@ -2,13 +2,15 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Layout from "../common/Layout";
 import styles from "./BudgetEdit.module.css";
 import { useNumberInput } from "../../hooks/common/useNumberInput";
-import { House } from "lucide-react";
+import { House, Icon } from "lucide-react";
 import Categories from "../common/Categories";
 import { useCategories } from "../../hooks/common/useCategories";
 import { useState } from "react";
 import SubmitButton from "../common/SubmitButton";
 import LoadingSpinner from "../common/LoadingSpinner";
 import { useBudgetApi } from "../../hooks/budgetManagement/useBudgetApi";
+import { getIcon } from "../../constants/categories";
+import { color } from "chart.js/helpers";
 
 const BudgetEdit = () => {
   const navigate = useNavigate();
@@ -22,7 +24,6 @@ const BudgetEdit = () => {
 
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [message, setMessage] = useState("");
-  const [deleteMessage, setDeleteMessage] = useState("");
 
   const budget_limit = useNumberInput(
     selectedBudget ? selectedBudget.budget_limit : 0
@@ -69,6 +70,8 @@ const BudgetEdit = () => {
     }
   }
 
+  const IconComponent = getIcon(selectedBudget.icon_name);
+
   return (
     <Layout
       onDeleteButtonClick={handleDelete}
@@ -85,8 +88,11 @@ const BudgetEdit = () => {
               <div className={styles["main-container"]}>
                 <div className={styles["budget-info-card"]}>
                   <div className={styles["category-display"]}>
-                    <span className={styles["icon"]}>
-                      <House size={16} />
+                    <span 
+                      className={styles["icon"]}
+                      style={{ backgroundColor: selectedBudget.category_color }}
+                    >
+                      <IconComponent size={16} />
                     </span>
                     <span className={styles["category-name"]}>
                       {selectedBudget.category_name}
@@ -126,7 +132,7 @@ const BudgetEdit = () => {
                     <div className={styles["progress-bar"]}>
                       <div
                         className={styles["progress-fill"]}
-                        style={{ width: `${progressPercentage}%` }}
+                        style={{ width: `${progressPercentage}%`, backgroundColor: `${selectedBudget.category_color}` }}
                       ></div>
                     </div>
 
@@ -156,6 +162,10 @@ const BudgetEdit = () => {
                       setSelectedBudget((prev) => ({
                         ...prev,
                         category_id: id,
+                        icon_name: 
+                          selected?.icon_name ?? prev.icon_name,
+                        category_color:
+                          selected?.category_color ?? prev.category_color,
                         category_name:
                           selected?.category_name ?? prev.category_name,
                       }));

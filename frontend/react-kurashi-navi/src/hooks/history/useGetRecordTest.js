@@ -47,6 +47,8 @@ export const useGetRecordTest = (month) => {
             type: item.type_id,
             category_name: item.category_name,
             total: parseInt(item.total, 10) || 0,
+            category_color: item.category_color,
+            icon_name: item.icon_name,
           }));
 
         const daily = dailySummary
@@ -56,6 +58,8 @@ export const useGetRecordTest = (month) => {
             category_name: item.category_name,
             total: parseInt(item.total, 10) || 0,
             type_id: item.type_id,
+            category_color: item.category_color,
+            icon_name: item.icon_name,
           }));
         setRecord({ monthly, daily });
 

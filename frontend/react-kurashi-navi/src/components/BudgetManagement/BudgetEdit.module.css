@@ -21,6 +21,7 @@
 }
 
 .icon {
+  color: white;
   display: flex;
   align-items: center;
   padding: 0.5rem;
@@ -79,7 +80,6 @@
 
 .progress-fill {
   height: 100%;
-  background-color: black;
   border-radius: 10rem;
 }
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCategories } from "../../hooks/common/useCategories";
 import Categories from "../common/Categories";
 import Layout from "../common/Layout";
@@ -8,6 +8,7 @@ import { useNumberInput } from "../../hooks/common/useNumberInput";
 import SubmitButton from "../common/SubmitButton";
 import { useFixedCostApi } from "../../hooks/fixedCost/useFixedCostApi";
 import { useNavigate } from "react-router-dom";
+import { useBudgetRulesApi } from "../../hooks/budgetManagement/useBudgetRulesApi";
 
 const FixedCostCreate = () => {
   const navigate = useNavigate();
@@ -15,12 +16,18 @@ const FixedCostCreate = () => {
   const {isLoading: isExpenseCategoryLoading, categories: expenseCategories} = useCategories(2); //支出
   const [transactionType, setTransactionType] = useState("expense");
   const { isPostLoading, postFixedCost } = useFixedCostApi();
+  const { isGetLoading, getBudgetRules, budgetRules} = useBudgetRulesApi();
   const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    getBudgetRules();
+  }, []);
 
   const fixedCost = useNumberInput(0);
   const [fixedCostForm, setFixedCostForm] = useState({
     type_id: 2, //デフォルトは支出
     category_id: null,
+    budget_rule_id: 2, //デフォルトは月末
     cost: 0,
   });
 
@@ -28,6 +35,7 @@ const FixedCostCreate = () => {
     const payload = {
       type_id: fixedCostForm.type_id,
       category_id: fixedCostForm.category_id,
+      budget_rule_id: fixedCostForm.budget_rule_id,
       cost: fixedCostForm.cost,
     }
 
@@ -53,7 +61,7 @@ const FixedCostCreate = () => {
       headerContent={<p>新規固定費</p>}
       mainContent={
         <>
-          {isIncomeCategoryLoading || isExpenseCategoryLoading ? (
+          {isIncomeCategoryLoading || isExpenseCategoryLoading || isGetLoading ? (
             <><LoadingSpinner /></>
           ) : (
             <div className={styles["main-container"]}>
@@ -120,6 +128,24 @@ const FixedCostCreate = () => {
 
               <div className={styles["payment-schedule-card"]}>
                 <label>{transactionType === "expense" ? "支払日" : "収入日"}</label>
+                <div>
+                  <select
+                    value={fixedCostForm.budget_rule_id}
+                    onChange={(e) => {
+                      setFixedCostForm((prev) => ({
+                        ...prev,
+                        budget_rule_id: Number(e.target.value),
+                      }));
+                    }}
+                    className={styles["payment-schedule-select"]}
+                  >
+                    {budgetRules?.map((rule) => (
+                      <option key={rule.id} value={rule.id}>
+                        {rule.rule_name_jp}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               <div className={styles["category-card"]}>
@@ -148,7 +174,6 @@ const FixedCostCreate = () => {
                 <p>{message}</p>
               )}
 
-              <button onClick={() => {console.log("CostForm", JSON.stringify(fixedCostForm, null, 2))}}>フォームを表示</button>
             </div>
           )}
         </>
