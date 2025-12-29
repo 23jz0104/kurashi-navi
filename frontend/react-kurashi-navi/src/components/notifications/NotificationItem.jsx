@@ -3,9 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import styles from "./Notification.module.css";
 import { useNavigate } from "react-router-dom";
 
-const NotificationItem = ({ item, onToggle, onDelete, onRefilled }) => {
+const NotificationItem = ({ item, expanded, onExpand, onToggle, onDelete, onRefilled }) => {
   const navigate = useNavigate();
-  const [isExpanded, setIsExpanded] = useState(false);
+  // const [isExpanded, setIsExpanded] = useState(null);
 
   const today = useMemo(() => {
     const d = new Date();
@@ -46,7 +46,10 @@ const NotificationItem = ({ item, onToggle, onDelete, onRefilled }) => {
       <div className={styles.notificationWrapper}>
         <div className={styles.notificationContent}>
           {/* 常時表示 */}
-          <div className={styles.notificationHeader} onClick={() => setIsExpanded(prev => !prev)} style={{ cursor: "pointer" }}>
+          <div className={styles.notificationHeader} 
+            onClick={(e) => {
+              if (e.target.tagName !== "INPUT") onExpand();
+            }}>
             <span className={styles.product}>
               <strong>「{item.productName}」</strong>
             </span>
@@ -57,14 +60,14 @@ const NotificationItem = ({ item, onToggle, onDelete, onRefilled }) => {
             </label>
           </div>
 
-          <div className={styles.dateRow} onClick={() => setIsExpanded(prev => !prev)}>
+          <div className={styles.dateRow} onClick={onExpand}>
             <span className={styles.date}>
               <strong>次回: {scheduledDate.toLocaleDateString()} | {item.notificationHour}:00</strong>
             </span>
           </div>
 
           {/* 展開部分 */}
-          {isExpanded && (
+          {expanded && (
             <div className={styles.detailSection}>
               <span className={styles.remaining}>
                 頻度: 1回 / {item.intervalDays} 日（あと <strong>{displayRemainingDays}</strong> 日）

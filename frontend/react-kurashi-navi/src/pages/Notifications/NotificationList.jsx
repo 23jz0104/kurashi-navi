@@ -74,7 +74,7 @@ function NotificationList() {
   const [error, setError] = useState('');
   const [notifications, setNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
+  const [expandedId, setExpandedId] = useState(null);
   const userId = sessionStorage.getItem("userId");
 
   const getToday = () => {
@@ -350,6 +350,8 @@ function NotificationList() {
                 <NotificationItem
                   key={item.id}
                   item={item}
+                  expanded={expandedId === item.id}
+                  onExpand={() => setExpandedId(prev => (prev === item.id ? null : item.id))}
                   onToggle={handleToggleNotification}
                   onDelete={handleDelete}
                   onRefilled={handleRefilled}
