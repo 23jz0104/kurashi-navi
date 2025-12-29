@@ -167,17 +167,17 @@ function Statistics() {
       mainContent={
         <div className={styles["flex-statistics"]}>
           <div className={styles["statistics-card"]}>
-            <div className={styles.card}>
-              <p className={styles.period}>集計期間を指定</p>
-              <div className={styles.divider}></div>
-              <div className={styles["period-grid"]}>
-                <div className={styles["period-label"]}>開始日</div>
-                <div className={styles["period-label"]}>終了日</div>
-                <CalendarComponent date={new Date(startDate)} onSelect={(d) => setStartDate(formatDate(d))}/>
-                <CalendarComponent date={new Date(endDate)} onSelect={(d) => setEndDate(formatDate(d))}/>
-              </div>
-              <button className={styles.download} onClick={handleDownload}>CSVダウンロード</button>
+            <p className={styles["section-title"]}>集計期間を指定</p>
+            <div className={styles["section-divider"]}></div>
+            <div className={styles["period-grid"]}>
+              <div className={styles["period-label"]}>開始日</div>
+              <div className={styles["period-label"]}>終了日</div>
+              <CalendarComponent date={new Date(startDate)} onSelect={(d) => setStartDate(formatDate(d))}/>
+              <CalendarComponent date={new Date(endDate)} onSelect={(d) => setEndDate(formatDate(d))}/>
             </div>
+
+            <button
+              className={styles.download} onClick={handleDownload}>CSVダウンロード</button>
           </div>
         </div>
       }

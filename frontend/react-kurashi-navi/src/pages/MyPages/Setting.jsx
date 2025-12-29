@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";
-import { Undo2 } from "lucide-react";
 import styles from "../../styles/MyPages/Setting.module.css";
 import { initializeApp } from "firebase/app";
 import { getMessaging, getToken } from "firebase/messaging";
@@ -230,55 +229,36 @@ function Setting() {
     <Layout
       headerContent={headerContent}
       mainContent={
-        <div className={styles["flex-list"]}>
-          {/* 戻るボタンをここに配置 */}
-          <button className={styles.modoru} onClick={() => navigate("/mypage")}>
-            <Undo2 />
-          </button>
-
-          <button className={styles.bt} onClick={registerDevice}>この端末を登録</button>
-          <h2>端末管理</h2>
-
-          {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
-          {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
-
-          <table className={styles.deviceTable}>
-            <thead>
-              <tr>
-                <th>端末名</th>
-                <th>登録日</th>
-                <th>通知</th>
-                <th>削除</th>
-              </tr>
-            </thead>
-            <tbody>
-              {devices.map((device, index) => (
-                <tr key={device.id ?? index}>
-                  <td>{device.device_info}</td>
-                  <td>{device.registered_date}</td>
-                  <td>
-                    <label className={styles.switch}>
-                      <input
-                        type="checkbox"
-                        // 数値の 1 は true, 0 は false として扱う
-                        checked={Number(device.device_notification_enable) === 1}
-                        onChange={() => toggleNotification(device)}
-                      />
-                      <span className={styles.slider}></span>
-                    </label>
-                  </td>
-                  <td>
-                    <button
-                      className={styles.deleteBtn}
-                      onClick={() => removeDevice(device.id)}
-                    >
-                      削除
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className={styles["main-container"]}>
+          <div className={styles.card}>
+            <p className={styles["section-title"]}>端末設定</p>
+            <div className={styles["section-divider"]}></div>
+            <button className={styles.primaryBtn} onClick={registerDevice}>端末を登録</button>
+            {errorMessage && <p className={styles.error}>{errorMessage}</p>}
+            {successMessage && <p className={styles.success}>{successMessage}</p>}
+            <table className={styles.deviceTable}>
+              <thead>
+                <tr><th>端末名</th><th>通知</th><th>削除</th></tr>
+              </thead>
+              <tbody>
+                {devices.map((device, index) => (
+                  <tr key={device.id ?? index}>
+                    <td>{device.device_info}</td>
+                    <td>
+                      <label className={styles.switch}>
+                        {/* 数値の 1 は true, 0 は false として扱う */}
+                        <input type="checkbox" checked={Number(device.device_notification_enable) === 1} onChange={() => toggleNotification(device)}/>
+                        <span className={styles.slider}></span>
+                      </label>
+                    </td>
+                    <td>
+                      <button className={styles.deleteBtn} onClick={() => removeDevice(device.id)}>削除</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       }
     />

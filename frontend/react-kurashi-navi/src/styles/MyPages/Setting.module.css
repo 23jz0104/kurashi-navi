@@ -1,6 +1,9 @@
-/* Setting.module.css (案2) */
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
 
-/* ---------- ベース ---------- */
 .flex-list {
   width: 100%;
   max-width: 900px;
@@ -10,57 +13,66 @@
   flex-direction: column;
 }
 
-/* 戻るボタン（シンプル） */
-.modoru {
-  align-self: flex-start;
-  background: none;
-  border: none;
-  color: #888;
-  cursor: pointer;
-  margin-bottom: 20px;
+.main-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
-.modoru:hover { color: #333; }
+
+.card {
+  width: 100%;
+  max-width: 900px;
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 5px 12px rgba(0,0,0,0.1);
+}
 
 /* 見出し */
-h2 {
-  font-size: 1.8rem;
-  font-weight: 300;
-  margin-bottom: 40px;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 10px;
+.section-title {
+  font-size: 1.4rem;
+  text-align: center;
+  margin-bottom: 12px;
+  font-weight: normal;
+}
+
+/* 区切り線 */
+.section-divider {
   width: 100%;
+  max-width: 100%;
+  border-bottom: 1px solid #ccc;
+  margin: 0 auto 20px;
 }
 
-/* 登録ボタン（アウトライン） */
-.flex-list > button {
-  background: white;
-  color: #333;
-  border: 2px solid #333;
-  padding: 10px 25px;
-  font-weight: 600;
+/* 登録ボタン */
+.primaryBtn {
+  display: block;
+  margin: 0 auto;
+  margin: 16px auto;
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: none;
+  background: #656ac6;
+  color: #fff;
+  font-size: 0.9rem;
   cursor: pointer;
-  margin-bottom: 40px;
-  align-self: flex-start;
-  transition: all 0.2s;
-}
-.flex-list > button:hover {
-  background: #333;
-  color: white;
+  box-shadow: 0 3px 5px rgba(0,0,0,0.2);
 }
 
-/* ---------- テーブル（ラインスタイル） ---------- */
+/* テーブル */
 .deviceTable {
   width: 100%;
+  margin: 0 auto;
   border-collapse: collapse;
   font-size: 0.95rem;
 }
+
 
 .deviceTable th {
   text-align: left;
   padding: 15px;
   color: #999;
   font-size: 0.85rem;
-  text-transform: uppercase; /* 英字なら大文字に */
   letter-spacing: 0.1em;
   border-bottom: 2px solid #eee;
 }
@@ -71,12 +83,11 @@ h2 {
   color: #333;
 }
 
-/* 行ホバー時の効果（控えめに） */
 .deviceTable tr:hover td {
   background-color: #fafafa;
 }
 
-/* 削除ボタン（テキストリンク風） */
+/* 削除ボタン */
 .deleteBtn {
   background: none;
   border: none;
@@ -89,46 +100,47 @@ h2 {
   color: #ff4c4c;
 }
 
-/* ---------- スイッチ (フラット) ---------- */
+/* スイッチ */
 .switch {
   position: relative;
   display: inline-block;
-  width: 40px;
-  height: 20px;
+  width: 42px;
+  height: 22px;
 }
-.switch input { opacity: 0; width: 0; height: 0; }
 
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* 背景 */
 .slider {
   position: absolute;
   cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
+  inset: 0;
   background-color: #ccc;
-  transition: .2s;
-  border-radius: 4px; /* 四角くする */
+  transition: 0.3s;
+  border-radius: 999px;
 }
+
 .slider:before {
   position: absolute;
   content: "";
-  height: 14px;
-  width: 14px;
-  left: 3px;
-  bottom: 3px;
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: 2px;
   background-color: white;
-  transition: .2s;
-  border-radius: 2px;
-}
-input:checked + .slider {
-  background-color: #333; /* モノトーン */
-}
-input:checked + .slider:before {
-  transform: translateX(20px);
+  transition: 0.3s;
+  border-radius: 50%;
 }
 
-/* レスポンシブ */
-@media (max-width: 600px) {
-  .deviceTable {
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-  }
+/* ON */
+input:checked + .slider {
+  background-color: #656ac6;
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
 }

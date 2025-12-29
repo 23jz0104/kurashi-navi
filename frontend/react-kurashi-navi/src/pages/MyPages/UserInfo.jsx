@@ -183,8 +183,8 @@ function UserInfo() {
   if (currentView === "userinfo") {
     content = (
       <>
-        <p className={styles.p}>基本情報</p>
-        <div className={styles.divider} />
+        <p className={styles["section-title"]}>基本情報</p>
+        <div className={styles["section-divider"]}></div>
 
         <ul className={styles.ul}>
           <li className={styles.li}>
@@ -209,8 +209,8 @@ function UserInfo() {
   if (currentView === "password") {
     content = (
       <div className={styles.passwordForm}>
-        <p className={styles.p}>パスワード変更</p>
-        <div className={styles.divider}></div>
+        <p className={styles["section-title"]}>パスワード変更</p>
+        <div className={styles["section-divider"]}></div>
         <input type="password" placeholder="現在のパスワード" value={tempCurrentPassword} className={styles.inputLarge} onChange={(e) => { setTempCurrentPassword(e.target.value); setPasswordMessage(""); }} />
         <input type="password" placeholder="新しいパスワード" value={tempNewPassword} className={styles.inputLarge} onChange={(e) => { setTempNewPassword(e.target.value); setPasswordMessage(""); }} />
         <input type="password" placeholder="新しいパスワード（確認）" value={tempNewPasswordConfirm} className={styles.inputLarge} onChange={(e) => { setTempNewPasswordConfirm(e.target.value); setPasswordMessage(""); }} />
@@ -227,8 +227,8 @@ function UserInfo() {
   if (currentView === "birthYear") {
     content = (
       <div className={styles.changeForm}>
-        <p className={styles.p}>生まれた年を変更</p>
-        <div className={styles.divider}></div>
+        <p className={styles["section-title"]}>生まれた年を変更</p>
+        <div className={styles["section-divider"]}></div>
         <YearSelect selectedYear={tempBirthYear} setSelectedYear={setTempBirthYear} />
         {birthYearError && <div className={styles.errorMessage}>{birthYearError}</div>}
         {birthYearMessage && <div className={styles.successMessage}>{birthYearMessage}</div>}
@@ -243,8 +243,8 @@ function UserInfo() {
   if (currentView === "address") {
     content = (
       <div className={styles.changeForm}>
-        <p className={styles.p}>住所を変更</p>
-        <div className={styles.divider}></div>
+        <p className={styles["section-title"]}>住所を変更</p>
+        <div className={styles["section-divider"]}></div>
         <input type="text" value={tempAddress} onChange={(e) => { const val = e.target.value; if (val.length <= 30) setTempAddress(val); if (val.length <= 30) setAddressError(""); else setAddressError("住所は30文字以内です"); }} className={styles.inputLarge} placeholder="新しい住所を入力" />
         {addressError && <div className={styles.errorMessage}>{addressError}</div>}
         {addressMessage && <div className={styles.successMessage}>{addressMessage}</div>}
