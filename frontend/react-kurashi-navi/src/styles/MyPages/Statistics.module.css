@@ -1,54 +1,68 @@
-/*全体レイアウト*/
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 全体レイアウト */
 .flex-statistics {
   display: flex;
-  align-items: center;    
-  justify-content: center; 
   flex-direction: column;
-  position: relative;
-  min-height: 100vh;
+  align-items: center;
   width: 100%;
-  overflow: visible;
+  padding: 16px 0;
 }
 
-.custom-period {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  overflow: visible; 
-}
-
-/* 戻るボタン*/
+/* 戻るボタン */
 .modoru {
-  position: absolute; 
-  top: 20px;        
-  left: 20px;       
+  position: absolute;
+  top: 20px;
+  left: 20px;
   padding: 5px 10px;
-  margin: 0;       
-  font-size: 14px;   
+  font-size: 1rem;
   border: none;
   border-radius: 5px;
   background: #656ac6;
   color: white;
   cursor: pointer;
   box-shadow: 5px 5px 5px rgb(143, 155, 188);
-  z-index: 10;     
+  z-index: 10;
 }
 
 .modoru svg {
-  width: 20px;      
+  width: 20px;
   height: 20px;
 }
 
-.time {
-  margin-top: 0;     
-  margin-bottom: 20px; 
-  font-weight: bold;
+/* 見出し */
+.period {
+  text-align: center;
+  margin-bottom: 8px;
+  font-size: 1.4rem;
 }
 
-/* カレンダー共通 */
+/* 期間指定 */
+.period-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 16px;
+  align-items: center;
+  margin-bottom: 16px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.period-label {
+  text-align: center;
+  font-size: 1rem;
+}
+
+/* カレンダー */
 .date-picker-container {
-  position: relative; 
-  width: fit-content;
+  position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .date-picker-display {
@@ -72,15 +86,16 @@
   border-radius: 6px;
   padding: 6px 10px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 1rem;
 }
 
-/*カレンードロップダウン*/
+/* カレンードロップダウン */
 .calendar-dropdown {
   position: absolute;
   top: calc(100% + 6px);
-  left: 0;
-  z-index: 9999;          
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
   background: #fff;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -88,7 +103,7 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/*カレンダーヘッダー*/
+/* カレンダーヘッダー */
 .calendar-header {
   display: flex;
   justify-content: space-between;
@@ -102,7 +117,7 @@
   cursor: pointer;
 }
 
-/* カレンダーグリッド*/
+/* カレンダーグリッド */
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
@@ -126,18 +141,29 @@
   height: 28px;
 }
 
-/* CSVダウンロードボタン*/
+/* ダウンロードボタン */
 .download {
-  margin-top: 16px;
-  padding: 10px;
+  display: block;
+  margin: 0 auto;
+  padding: 10px 24px;
   border-radius: 8px;
   border: none;
   background: #1976d2;
   color: #fff;
-  font-size: 14px;
+  font-size: 1rem;
   cursor: pointer;
 }
 
 .download:hover {
   opacity: 0.9;
+}
+
+/* 白い枠 */
+.statistics-card {
+  width: 90%;
+  max-width: 360px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px 16px 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }

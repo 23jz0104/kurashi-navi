@@ -38,7 +38,7 @@
   background: #656ac6;
   color: white;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 1rem;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -119,7 +119,7 @@
   background: #656ac6;
   color: white;
   cursor: pointer;
-  font-size: 13px; /* ← 固定 */
+  font-size: 1rem;
   white-space: nowrap;
 }
 
@@ -134,7 +134,7 @@
   background: red;
   color: white;
   border: none;
-  font-size: 14px;
+  font-size: 1rem;
   cursor: pointer;
 }
 
@@ -149,7 +149,7 @@
 .inputLarge {
   width: 100%;
   padding: 10px;
-  font-size: 14px;
+  font-size: 1rem;
   border-radius: 5px;
   border: 1px solid #ccc;
 }
@@ -166,7 +166,7 @@
   padding: 10px;
   border-radius: 6px;
   border: none;
-  font-size: 13px;
+  font-size: 1rem;
   cursor: pointer;
 }
 
@@ -183,12 +183,12 @@
 /* メッセージ */
 .errorMessage {
   color: #d9534f;
-  font-size: 13px;
+  font-size: 1rem;
 }
 
 .successMessage {
   color: green;
-  font-size: 13px;
+  font-size: 1rem;
   font-weight: bold;
 }
 
@@ -207,11 +207,11 @@
   cursor: pointer;
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
+  font-size: 1rem;
 }
 
 .arrow {
-  font-size: 12px;
+  font-size: 1rem;
   color: #666;
 }
 
@@ -230,7 +230,7 @@
 
 .dropdownItem {
   padding: 8px 10px;
-  font-size: 14px;
+  font-size: 1rem;
   cursor: pointer;
 }
 

@@ -1,17 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { Undo2, ChevronLeft, ChevronRight } from "lucide-react";
 import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import styles from "../../styles/MyPages/Statistics.module.css";
 
 function Statistics() {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("statistics");
-
   const userId = sessionStorage.getItem("userId");
 
-  // 日付フォーマット
+  /* ---------- 日付フォーマット ---------- */
   const formatDate = (date) => {
     const y = date.getFullYear();
     const m = String(date.getMonth() + 1).padStart(2, "0");
@@ -27,13 +24,14 @@ function Statistics() {
 
   const [endDate, setEndDate] = useState(formatDate(new Date()));
 
+  /* ---------- カレンダー ---------- */
   const CalendarComponent = ({ date, onSelect }) => {
     const [selectedDate, setSelectedDate] = useState(date);
     const [showCalendar, setShowCalendar] = useState(false);
     const [currentMonth, setCurrentMonth] = useState(
       new Date(date.getFullYear(), date.getMonth(), 1)
     );
-    const pickerRef = useRef();
+    const pickerRef = useRef(null);
 
     useEffect(() => {
       setSelectedDate(date);
@@ -47,12 +45,13 @@ function Statistics() {
         }
       };
       document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    const formatDate = (d) => {
-      const weekdays = ["日", "月", "火", "水", "木", "金", "土"];
-      return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} (${weekdays[d.getDay()]})`;
+    const displayDate = (d) => {
+      const w = ["日", "月", "火", "水", "木", "金", "土"];
+      return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} (${w[d.getDay()]})`;
     };
 
     const changeMonth = (delta) => {
@@ -64,12 +63,11 @@ function Statistics() {
     const selectDate = (d) => {
       const newDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
       setSelectedDate(newDate);
-      setCurrentMonth(new Date(newDate.getFullYear(), newDate.getMonth(), 1));
       setShowCalendar(false);
-      onSelect && onSelect(newDate);
+      onSelect(newDate);
     };
 
-    const generateCalendarDays = () => {
+    const days = (() => {
       const year = currentMonth.getFullYear();
       const month = currentMonth.getMonth();
       const firstDay = new Date(year, month, 1).getDay();
@@ -79,50 +77,16 @@ function Statistics() {
         arr.push(new Date(year, month, i));
       }
       return arr;
-    };
-
-    const days = generateCalendarDays();
+    })();
 
     return (
       <div ref={pickerRef} className={styles["date-picker-container"]}>
-        <div className={styles["date-picker-display"]}>
-          <button
-            className={styles["date-nav-button"]}
-            onClick={() =>
-              selectDate(
-                new Date(
-                  selectedDate.getFullYear(),
-                  selectedDate.getMonth(),
-                  selectedDate.getDate() - 1
-                )
-              )
-            }
-          >
-            <ChevronLeft />
-          </button>
-
-          <button
-            className={styles["date-display-button"]}
-            onClick={() => setShowCalendar(!showCalendar)}
-          >
-            {formatDate(selectedDate)}
-          </button>
-
-          <button
-            className={styles["date-nav-button"]}
-            onClick={() =>
-              selectDate(
-                new Date(
-                  selectedDate.getFullYear(),
-                  selectedDate.getMonth(),
-                  selectedDate.getDate() + 1
-                )
-              )
-            }
-          >
-            <ChevronRight />
-          </button>
-        </div>
+        <button
+          className={styles["date-display-button"]}
+          onClick={() => setShowCalendar(!showCalendar)}
+        >
+          {displayDate(selectedDate)}
+        </button>
 
         {showCalendar && (
           <div className={styles["calendar-dropdown"]}>
@@ -155,7 +119,7 @@ function Statistics() {
     );
   };
 
-  /* CSVダウンロード */
+  /* ---------- CSVダウンロード ---------- */
   const handleDownload = async () => {
     if (!userId) {
       alert("ユーザー情報が取得できていません");
@@ -202,29 +166,19 @@ function Statistics() {
       }
       mainContent={
         <div className={styles["flex-statistics"]}>
-          <button className={styles.modoru} onClick={() => navigate("/mypage")}>
-            <Undo2 />
-          </button>
-
-          <p className={styles.time}>期間を選択</p>
-
-          <div className={styles["custom-period"]}>
-            <p>開始日</p>
-            <CalendarComponent
-              date={new Date(startDate)}
-              onSelect={(d) => setStartDate(formatDate(d))}
-            />
-
-            <p>終了日</p>
-            <CalendarComponent
-              date={new Date(endDate)}
-              onSelect={(d) => setEndDate(formatDate(d))}
-            />
+          <div className={styles["statistics-card"]}>
+            <div className={styles.card}>
+              <p className={styles.period}>集計期間を指定</p>
+              <div className={styles.divider}></div>
+              <div className={styles["period-grid"]}>
+                <div className={styles["period-label"]}>開始日</div>
+                <div className={styles["period-label"]}>終了日</div>
+                <CalendarComponent date={new Date(startDate)} onSelect={(d) => setStartDate(formatDate(d))}/>
+                <CalendarComponent date={new Date(endDate)} onSelect={(d) => setEndDate(formatDate(d))}/>
+              </div>
+              <button className={styles.download} onClick={handleDownload}>CSVダウンロード</button>
+            </div>
           </div>
-
-          <button className={styles.download} onClick={handleDownload}>
-            CSVダウンロード
-          </button>
         </div>
       }
     />
