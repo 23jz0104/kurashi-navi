@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import styles from "../../styles/MyPages/UserInfo.module.css";
 import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";
-import { Undo2 } from "lucide-react";
 
+// 年選択
 function YearSelect({ selectedYear, setSelectedYear }) {
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef(null);
@@ -15,11 +15,6 @@ function YearSelect({ selectedYear, setSelectedYear }) {
   });
 
   const selected = options.find(opt => opt.value === selectedYear);
-
-  const handleSelect = (val) => {
-    setSelectedYear(val);
-    setIsOpen(false);
-  };
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -37,18 +32,26 @@ function YearSelect({ selectedYear, setSelectedYear }) {
         className={styles.selectedCategory}
         onClick={() => setIsOpen(prev => !prev)}
       >
-        <span className={`${styles.selectedText} ${!selected ? styles.unselected : ""}`}>
+        <span
+          className={`${styles.selectedText} ${
+            !selected ? styles.unselected : ""
+          }`}
+        >
           {selected ? selected.label : "生まれた年を選択"}
         </span>
         <span className={styles.arrow}>▾</span>
       </div>
+
       {isOpen && (
         <div className={styles.dropdownList}>
           {options.map(opt => (
             <div
               key={opt.value}
               className={styles.dropdownItem}
-              onClick={() => handleSelect(opt.value)}
+              onClick={() => {
+                setSelectedYear(opt.value);
+                setIsOpen(false);
+              }}
             >
               {opt.label}
             </div>
@@ -59,11 +62,13 @@ function YearSelect({ selectedYear, setSelectedYear }) {
   );
 }
 
+// メインページ
 function UserInfo() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("userinfo");
-  const [currentView, setCurrentView] = useState("userinfo");
   const userId = sessionStorage.getItem("userId");
+
+  const [activeTab] = useState("userinfo");
+  const [currentView, setCurrentView] = useState("userinfo");
 
   const [userData, setUserData] = useState({
     birthYear: null,
@@ -84,45 +89,31 @@ function UserInfo() {
   const [addressError, setAddressError] = useState("");
   const [addressMessage, setAddressMessage] = useState("");
 
+  /* ユーザー取得 */
   useEffect(() => {
-    const fetchUser = async () => {
-      if (!userId) return;
-      try {
-        const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/user", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "X-User-ID": userId
-          }
+    if (!userId) return;
+
+    fetch("https://t08.mydns.jp/kakeibo/public/api/user", {
+      headers: {
+        "Content-Type": "application/json",
+        "X-User-ID": userId,
+      },
+    })
+      .then(res => res.json())
+      .then(data => {
+        setUserData({
+          birthYear: data.year_of_born,
+          address: data.address,
         });
-        const data = await res.json();
-        if (res.ok) {
-          setUserData({
-            birthYear: data.year_of_born,
-            address: data.address
-          });
-        } else {
-          console.error("ユーザー情報取得エラー:", data);
-        }
-      } catch (error) {
-        console.error("通信エラー:", error);
-      }
-    };
-    fetchUser();
+      })
+      .catch(console.error);
   }, [userId]);
 
-  const goBack = () => navigate("/mypage");
-
-  const tabs = [{ id: "userinfo", label: "登録情報", icon: null }];
+  const tabs = [{ id: "userinfo", label: "登録情報" }];
   const headerContent = (
-    <TabButton
-      tabs={tabs}
-      activeTab={activeTab}
-      onTabChange={setActiveTab}
-    />
+    <TabButton tabs={tabs} activeTab={activeTab} onTabChange={() => {}} />
   );
 
-  // 戻るボタンでメッセージリセット
   const handleBack = () => {
     setPasswordMessage("");
     setBirthYearMessage("");
@@ -130,149 +121,87 @@ function UserInfo() {
     setCurrentView("userinfo");
   };
 
-  // パスワード更新
+  // 更新処理
   const updatePassword = async () => {
-    if (!tempCurrentPassword) { setPasswordError("現在のパスワードを入力してください"); return; }
-    if (!tempNewPassword) { setPasswordError("新しいパスワードを入力してください"); return; }
-    if (tempNewPassword !== tempNewPasswordConfirm) { setPasswordError("新しいパスワードが一致しません"); return; }
-    const passwordRegex = /^.{8,16}$/;
-    if (!passwordRegex.test(tempNewPassword)) { setPasswordError("パスワードは8文字以上16文字以内で入力してください"); return; }
+    if (!tempNewPassword || tempNewPassword !== tempNewPasswordConfirm) {
+      setPasswordError("パスワードが一致しません");
+      return;
+    }
 
-    setPasswordError("");
+    const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/user", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-User-ID": userId,
+      },
+      body: JSON.stringify({ password: tempNewPassword }),
+    });
 
-    try {
-      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/user", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", "X-User-ID": userId },
-        body: JSON.stringify({ password: tempNewPassword })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setPasswordMessage("パスワードを更新しました!");
-        setTempCurrentPassword("");
-        setTempNewPassword("");
-        setTempNewPasswordConfirm("");
-      } else {
-        setPasswordError(data.message || "更新に失敗しました");
-      }
-    } catch (error) {
-      console.error(error);
-      setPasswordError("通信エラーが発生しました");
+    if (res.ok) {
+      setPasswordMessage("パスワードを更新しました");
+      setTempCurrentPassword("");
+      setTempNewPassword("");
+      setTempNewPasswordConfirm("");
     }
   };
 
-  // 生まれた年更新
   const updateBirthYear = async () => {
-    if (!tempBirthYear) { setBirthYearError("生まれた年を選択してください"); return; }
-    setBirthYearError("");
-    try {
-      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/user", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", "X-User-ID": userId },
-        body: JSON.stringify({ year_of_born: tempBirthYear })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setUserData({ ...userData, birthYear: tempBirthYear });
-        setBirthYearMessage("生まれた年を更新しました");
-      } else {
-        setBirthYearError(data.message || "更新に失敗しました");
-      }
-    } catch (error) {
-      console.error(error);
-      setBirthYearError("通信エラーが発生しました");
+    const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/user", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-User-ID": userId,
+      },
+      body: JSON.stringify({ year_of_born: tempBirthYear }),
+    });
+
+    if (res.ok) {
+      setUserData({ ...userData, birthYear: tempBirthYear });
+      setBirthYearMessage("更新しました");
     }
   };
 
-  // 住所更新
   const updateAddress = async () => {
-    if (!tempAddress) { setAddressError("住所を入力してください"); return; }
-    if (tempAddress.length > 40) { setAddressError("住所は40文字以内で入力してください"); return; }
-    setAddressError("");
-    try {
-      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/user", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json", "X-User-ID": userId },
-        body: JSON.stringify({ address: tempAddress })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setUserData({ ...userData, address: tempAddress });
-        setAddressMessage("住所を更新しました");
-      } else {
-        setAddressError(data.message || "更新に失敗しました");
-      }
-    } catch (error) {
-      console.error(error);
-      setAddressError("通信エラーが発生しました");
+    const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/user", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-User-ID": userId,
+      },
+      body: JSON.stringify({ address: tempAddress }),
+    });
+
+    if (res.ok) {
+      setUserData({ ...userData, address: tempAddress });
+      setAddressMessage("更新しました");
     }
   };
 
+  // 表示切り替え
   let content;
+
   if (currentView === "userinfo") {
     content = (
       <>
         <p className={styles.p}>基本情報</p>
-        <div className={styles.divider}></div>
+        <div className={styles.divider} />
+
         <ul className={styles.ul}>
-          <li className={`${styles.li} ${styles.singleRow}`}>
+          <li className={styles.li}>
             <span>パスワード</span>
-            <button className={styles.button} onClick={() => { setTempCurrentPassword(""); setTempNewPassword(""); setTempNewPasswordConfirm(""); setPasswordError(""); setCurrentView("password"); }}>変更</button>
+            <button className={styles.button} onClick={() => setCurrentView("password")}>変更</button>
           </li>
+
           <li className={styles.li}>
             <span>生まれた年</span>
-            <div className={styles.valueRow}>
-              {userData.birthYear ? (<input type="text" value={`${userData.birthYear}年`} className={styles.input} readOnly />) : (<span className={styles.emptyText}>未入力</span>)}
-              <button className={styles.button} onClick={() => { setTempBirthYear(userData.birthYear || ""); setBirthYearError(""); setCurrentView("birthYear"); }}>変更</button>
-            </div>
+            <button className={styles.button} onClick={() => setCurrentView("birthYear")}>変更</button>
           </li>
+
           <li className={styles.li}>
             <span>住所</span>
-            <div className={styles.valueRow}>
-              {userData.address ? (<input type="text" value={userData.address} className={styles.input} readOnly />) : (<span className={styles.emptyText}>未入力</span>)}
-              <button className={styles.button} onClick={() => { setTempAddress(userData.address || ""); setAddressError(""); setCurrentView("address"); }}>変更</button>
-            </div>
+            <button className={styles.button} onClick={() => setCurrentView("address")}>変更</button>
           </li>
         </ul>
-
-        <button
-          className={styles.withdrawButton}
-          onClick={async () => {
-            if (!window.confirm("本当に退会しますか？ この操作は取り消せません。")) return;
-
-            if (!userId) {
-              alert("ユーザーIDが取得できませんでした");
-              return;
-            }
-
-            try {
-              console.log("DEBUG userId:", userId);
-              const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/user", {
-                method: "DELETE",
-                headers: {
-                  "Content-Type": "application/json",
-                  "X-User-ID": userId,
-                }
-              });
-
-              const data = await res.json().catch(() => ({}));
-
-              if (res.ok) {
-                alert("退会が完了しました");
-                sessionStorage.clear();
-                navigate("/");
-              } else {
-                alert("退会に失敗しました：" + (data.message || "不明なエラー"));
-              }
-            } catch (error) {
-              console.error(error);
-              alert("通信エラーが発生しました");
-            }
-          }}
-        >
-          退会する
-        </button>
-
       </>
     );
   }
@@ -280,13 +209,13 @@ function UserInfo() {
   if (currentView === "password") {
     content = (
       <div className={styles.passwordForm}>
-        <h2 className={styles.p}>パスワード変更</h2>
+        <p className={styles.p}>パスワード変更</p>
         <div className={styles.divider}></div>
         <input type="password" placeholder="現在のパスワード" value={tempCurrentPassword} className={styles.inputLarge} onChange={(e) => { setTempCurrentPassword(e.target.value); setPasswordMessage(""); }} />
         <input type="password" placeholder="新しいパスワード" value={tempNewPassword} className={styles.inputLarge} onChange={(e) => { setTempNewPassword(e.target.value); setPasswordMessage(""); }} />
         <input type="password" placeholder="新しいパスワード（確認）" value={tempNewPasswordConfirm} className={styles.inputLarge} onChange={(e) => { setTempNewPasswordConfirm(e.target.value); setPasswordMessage(""); }} />
-        {passwordError && <div className={styles.errorMessage}>{passwordError}</div>}
-        {passwordMessage && <div className={styles.successMessage}>{passwordMessage}</div>}
+        {passwordError && <p>{passwordError}</p>}
+        {passwordMessage && <p>{passwordMessage}</p>}
         <div className={styles.passwordButtons}>
           <button className={styles.updateButton} onClick={updatePassword}>更新する</button>
           <button className={styles.passwordBack} onClick={handleBack}>戻る</button>
@@ -332,12 +261,7 @@ function UserInfo() {
       headerContent={headerContent}
       mainContent={
         <div className={styles["flex-list"]}>
-          {currentView === "userinfo" && (
-            <button className={styles.modoru} onClick={goBack}><Undo2 /></button>
-          )}
-          <div className={`${styles["flex-userinfo"]} ${currentView === "userinfo" ? styles.userinfoMode : styles.passwordMode}`}>
-            {content}
-          </div>
+          <div className={styles["flex-userinfo"]}>{content}</div>
         </div>
       }
     />

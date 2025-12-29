@@ -6,40 +6,39 @@
 
 .flex-list {
   width: 100%;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 20px 0;
+  padding: 16px 0;
 }
 
-/* ユーザー情報のカード枠 */
+/* ユーザー情報 */
 .flex-userinfo {
-  width: 80%;
-  min-height: 500px;
+  width: 100%;
+  max-width: 600px;
+  /* min-height: 500px; */
   background-color: white;
   border-radius: 10px;
   border: 1px solid #ccc;
   box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-  padding: 20px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  position: relative; /* 退会ボタン用 */
+  position: relative;
 }
 
 /* 戻るボタン */
 .modoru {
-  padding: 5px 10px;
+  padding: 6px 10px;
   margin-bottom: 10px;
-  margin-left: 2em;
   border: none;
   border-radius: 5px;
   background: #656ac6;
   color: white;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 13px;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -48,21 +47,21 @@
 
 /* 見出し */
 .p {
-  font-size: 1.5rem;
-  margin-bottom: 10px;
+  font-size: 1.4rem;
+  margin-bottom: 8px;
   text-align: center;
 }
 
 /* 区切り線 */
 .divider {
-  width: 90%;
+  width: 100%;
   border-bottom: 1px solid #ccc;
-  margin: 5px auto 15px auto;
+  margin: 8px 0 12px;
 }
 
 /* ユーザー情報リスト */
 .ul {
-  width: 90%;
+  width: 100%;
   list-style: none;
   display: flex;
   flex-direction: column;
@@ -72,25 +71,24 @@
 .li {
   display: flex;
   flex-direction: column;
-  gap: 5px;
-  padding: 10px 15px;
+  gap: 6px;
+  padding: 10px 12px;
   border-radius: 8px;
   background-color: #f9f9f9;
   border: 1px solid #ccc;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
+/* パスワード */
 .singleRow {
-  flex-direction: row; /* パスワード用 */
+  flex-direction: row;
   justify-content: space-between;
   align-items: center;
 }
 
 .valueRow {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .li input,
@@ -99,103 +97,77 @@
   min-width: 0;
 }
 
-.li .button {
-  flex: 0 0 auto;
-  white-space: nowrap;
-}
-
-/* スマホ対応 */
-@media (max-width: 400px) {
-  .li input,
-  .li .emptyText {
-    flex: 0.7;
-  }
-
-  .li .button {
-    padding: 5px 8px;
-    font-size: 0.75rem;
-  }
-}
-
 /* 入力欄 */
 .input {
   border: none;
   background: transparent;
-  text-align: center;
-  flex: 1;
+  font-size: 1rem;
+  text-align: left;
 }
 
-/* 未入力テキスト */
+/* 未入力表示 */
 .emptyText {
-  text-align: center;
+  font-size: 1rem;
   color: #888;
-  flex: 1;
 }
 
 /* 一般ボタン */
 .button {
-  padding: 5px 10px;
+  padding: 6px 10px;
   border: none;
   border-radius: 5px;
   background: #656ac6;
   color: white;
   cursor: pointer;
-  font-size: 0.8rem;
-  box-shadow: 0px 3px 5px rgba(0,0,0,0.2);
+  font-size: 13px; /* ← 固定 */
+  white-space: nowrap;
 }
 
 /* 退会ボタン */
 .withdrawButton {
   position: absolute;
-  bottom: 20px;
+  bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 10px 20px;
+  padding: 10px 24px;
   border-radius: 50px;
   background: red;
   color: white;
-  text-align: center;
+  border: none;
+  font-size: 14px;
   cursor: pointer;
-  border: 0;
-  box-shadow: 0px 3px 5px rgba(0,0,0,0.2);
 }
 
-/* パスワード・変更フォーム */
+/* パスワード変更 */
 .changeForm {
-  width: 90%; 
+  width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: stretch; 
-  margin: 0 auto;
+  gap: 8px;
 }
 
 .inputLarge {
   width: 100%;
   padding: 10px;
-  margin: 5px 0;
+  font-size: 14px;
   border-radius: 5px;
   border: 1px solid #ccc;
-  box-sizing: border-box;
 }
 
-/* パスワード更新・戻るボタン */
+/* パスワードボタン */
 .passwordButtons {
   display: flex;
-  gap: 15px;
-  margin-top: 10px;
-  width: 100%; 
+  gap: 10px;
 }
-
 
 .updateButton,
 .passwordBack {
   flex: 1;
-  padding: 10px 20px;
+  padding: 10px;
   border-radius: 6px;
   border: none;
-  font-size: 0.8rem;
+  font-size: 13px;
   cursor: pointer;
-  box-shadow: 0px 3px 5px rgba(0,0,0,0.2);
 }
 
 .updateButton {
@@ -208,85 +180,60 @@
   color: white;
 }
 
-/* エラーメッセージ用 */
+/* メッセージ */
 .errorMessage {
-  color: #d9534f;          
-  font-size: 0.875rem;    
-  margin-top: 4px;         
+  color: #d9534f;
+  font-size: 13px;
 }
 
 .successMessage {
-  color: green;  
-  font-weight: bold; 
-  margin-top: 8px;    
+  color: green;
+  font-size: 13px;
+  font-weight: bold;
 }
 
-/* カスタムセレクト全体のラッパー */
+/* カスタムセレクト */
 .categorySelectWrapper {
   position: relative;
   width: 100%;
 }
 
-/* 選択中の表示部分 */
 .selectedCategory {
   width: 100%;
-  padding: 8px 12px;
+  padding: 8px 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
   background-color: white;
   cursor: pointer;
   display: flex;
   justify-content: space-between;
-  align-items: center;
   font-size: 14px;
 }
 
-/* 選択テキスト */
-.selectedText {
-  color: #333;
-}
-
-.unselected {
-  color: #aaa;
-}
-
-/* ▼矢印 */
 .arrow {
   font-size: 12px;
   color: #666;
 }
 
-/* ドロップダウンリスト */
 .dropdownList {
   position: absolute;
   top: calc(100% + 4px);
   left: 0;
   width: 100%;
-  max-height: 200px; 
+  max-height: 180px;
   overflow-y: auto;
   border: 1px solid #ccc;
   border-radius: 5px;
   background-color: white;
   z-index: 100;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
-/* ドロップダウンの各項目 */
 .dropdownItem {
-  padding: 8px 12px;
-  cursor: pointer;
+  padding: 8px 10px;
   font-size: 14px;
+  cursor: pointer;
 }
 
 .dropdownItem:hover {
   background-color: #f0f0f0;
-}
-
-.dropdownList::-webkit-scrollbar {
-  width: 6px;
-}
-
-.dropdownList::-webkit-scrollbar-thumb {
-  background-color: rgba(0,0,0,0.2);
-  border-radius: 3px;
 }
