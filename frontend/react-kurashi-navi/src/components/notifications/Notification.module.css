@@ -1,0 +1,152 @@
+.notificationItem {
+  border: 1px solid #ddd;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  background-color: #fff;
+}
+
+.productName {
+  font-weight: bold;
+}
+
+.date {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.switch {
+  display: inline-block;
+}
+
+/* 追加部分 */
+
+/* 通知ヘッダー */
+.notificationHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+/* 商品名(左寄せ) */
+.notificationHeader .product {
+  flex: 1;
+}
+
+/* スイッチ(右寄せ) */
+.notificationHeader .switch {
+  margin-left: auto;
+}
+
+.dateRow {
+  margin-bottom: 6px;
+}
+
+/* 進捗バー(いらない) */
+.progressBar {
+  width: 100%;
+  height: 10px;
+  background-color: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #6a5acd, #00bfff);
+  transition: width 0.5s ease-in-out;
+}
+
+/* スイッチ */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 42px;
+  height: 22px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* スライダー背景 */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #ccc;
+  transition: 0.3s;
+  border-radius: 999px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+/* ON */
+input:checked + .slider {
+  background-color: #656ac6;
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+/* 補充・削除ボタン */
+.notificationContent svg {
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+  height: 25px;
+  width: 25px;
+  margin-right: 6px;
+}
+
+.refilledDelete {
+  display: flex;
+  margin-top: 10px;
+  width: 100%;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.refilledDelete button {
+  flex: 1;
+  padding: 8px 0;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.refilled {
+  background-color: #37d265;
+  color: white;
+}
+
+.delete {
+  background-color: red;
+  color: white;
+  cursor: pointer;
+}
+
+/* 相場価格 */
+.syosai{
+  color: #00bfff;
+  border: none;
+  background: none;
+  text-decoration: underline;
+  margin-left: 2%;
+}

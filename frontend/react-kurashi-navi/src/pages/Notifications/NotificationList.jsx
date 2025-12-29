@@ -4,23 +4,9 @@ import styles from '../../styles/Notifications/NotificationList.module.css';
 import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";
 import { CircleAlert } from 'lucide-react';
+import LoadingSpinner from "../../components/common/LoadingSpinner";
+import NotificationItem from "../../components/notifications/NotificationItem";
 
-// 1. Firebase関連のインポートを追加
-import { initializeApp } from "firebase/app";
-import { getMessaging, getToken } from "firebase/messaging";
-
-//  2. Firebase設定をここに直接書く
-const firebaseConfig = {
-  apiKey: "AIzaSyDtjnrrDg2MKCL1pWxXJ7_m3x14N8OCbts",
-  authDomain: "pushnotification-4ebe3.firebaseapp.com",
-  projectId: "pushnotification-4ebe3",
-  storageBucket: "pushnotification-4ebe3.firebasestorage.app",
-  messagingSenderId: "843469470605",
-  appId: "1:843469470605:web:94356b50ab8c7718021bc4"
-};
-
-// アプリの初期化（このファイルが読み込まれた時に実行される）
-const app = initializeApp(firebaseConfig);
 
 // 1時間ごとの選択コンポーネント
 function NotificationHourSelect({ selectedHour, setSelectedHour }) {
@@ -87,6 +73,7 @@ function NotificationList() {
   const [notificationHour, setNotificationHour] = useState(9);
   const [error, setError] = useState('');
   const [notifications, setNotifications] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const userId = sessionStorage.getItem("userId");
 
@@ -128,6 +115,7 @@ function NotificationList() {
 
   // 通知取得
   const fetchNotifications = async () => {
+    setIsLoading(true);
     try {
       const res = await fetch(
         "https://t08.mydns.jp/kakeibo/public/api/notification",
@@ -172,13 +160,19 @@ function NotificationList() {
         });
   
         setNotifications(normalized);
-      } else if (res.status === 404 && data.message === "no records found") {
+      } 
+      else if (res.status === 404 && data.message === "no records found") {
         setNotifications([]);
-      } else {
+      } 
+      else {
         setError(data.message || "通知取得エラー");
       }
-    } catch (e) {
+    } 
+    catch (e) {
       setError("通信エラーが発生しました");
+    }
+    finally {
+      setIsLoading(false);
     }
   };
 
@@ -190,47 +184,8 @@ function NotificationList() {
   const handleSave = async () => {
     // バリデーション
     if (!productName) return setError('商品名を入力してください');
-
     try {
-      //  トークン取得処理を追加 
-      try {
-        // ServiceWorkerの登録 (パスが正しいか確認してください)
-        const registration = await navigator.serviceWorker.register("/combine_test/firebase-messaging-sw.js");
-        const messaging = getMessaging(app);
-
-        // VAPIDキーを使ってトークンを取得
-        const token = await getToken(messaging, {
-          vapidKey: "BH3VSel6Cdam2EREeJ9iyYLoJcOYpqGHd7JXULxSCmfsULrVMaedjv81VF7h53RhJmfcHCsq-dSoJVjHB58lxjQ",
-          serviceWorkerRegistration: registration
-        });
-
-        if (token) {
-          // 取得したトークンをバックエンドに保存
-          const settingsRes = await fetch("https://t08.mydns.jp/kakeibo/public/api/settings", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "X-User-ID": userId
-            },
-            body: JSON.stringify({
-              fcm_token: token,
-              device_info: navigator.userAgent,
-              device_name: "PC/Browser (Auto)",
-              registered_date: new Date().toISOString().split("T")[0]
-            })
-          });
-
-          if (!settingsRes.ok) {
-            // 既に登録済みなどのエラーは無視して進む
-            console.warn("トークン登録レスポンス:", settingsRes.status);
-          }
-        }
-      } catch (tokenError) {
-        console.error("トークン取得失敗（通知は届かない可能性があります）:", tokenError);
-        // ここでエラーが出ても、商品の追加自体は止めない
-      }
-
-      // 4. 本来の商品追加処理
+      // 商品追加処理
       const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/notification", {
         method: "POST",
         headers: {
@@ -278,7 +233,8 @@ function NotificationList() {
 
       if (res.ok && data.status === 'success') {
         fetchNotifications();
-      } else {
+      }
+      else {
         console.error(data);
       }
     } catch (e) {
@@ -313,26 +269,26 @@ function NotificationList() {
 
       if (res.ok && data.status === "success") {
         fetchNotifications();
-      } else {
+      } 
+      else {
         console.error("更新失敗:", data.message);
       }
-    } catch (e) {
+    } 
+    catch (e) {
       console.error("通信エラー:", e);
     }
   };
   
 
   const headerContent = (
-    <TabButton
-      tabs={[{ id: "userinfo", label: "通知", icon: null }]}
-      activeTab={activeTab}
-      onTabChange={setActiveTab}
-    />
+    <TabButton tabs={[{ id: "userinfo", label: "通知", icon: null }]} activeTab={activeTab} onTabChange={setActiveTab}/>
   );
 
   const mainContent = (
-    <div className={styles['notification-list']}>
-      {isAdding ? (
+    <div className={styles["notification-list"]}>
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : isAdding ? (
         <div className={styles.addForm}>
           <label className={styles.label}>
             商品名:
@@ -349,20 +305,22 @@ function NotificationList() {
             <input
               type="text"
               value={intervalDays}
-              onChange={(e) => setIntervalDays(e.target.value.replace(/\D/g, ''))}
+              onChange={(e) =>
+                setIntervalDays(e.target.value.replace(/\D/g, ""))
+              }
               placeholder="数字を入力"
             />
           </label>
 
           <label className={styles.label}>
-            通知する時間帯指定:
+            通知する時間帯:
             <NotificationHourSelect
               selectedHour={notificationHour}
               setSelectedHour={setNotificationHour}
             />
           </label>
 
-          {error && <p style={{ color: 'red', marginTop: '4px' }}>{error}</p>}
+          {error && <p className={styles.error}>{error}</p>}
 
           <div className={styles.buttonGroup}>
             <button className={styles.save} onClick={handleSave}>
@@ -372,9 +330,9 @@ function NotificationList() {
               className={styles.cancel}
               onClick={() => {
                 setIsAdding(false);
-                setError('');
-                setProductName('');
-                setIntervalDays('');
+                setError("");
+                setProductName("");
+                setIntervalDays("");
                 setNotificationHour(9);
               }}
             >
@@ -388,156 +346,30 @@ function NotificationList() {
             <p className={styles.p}>まだ通知はありません。追加しましょう！</p>
           ) : (
             <ul className={styles.notificationList}>
-              {notifications.map((item) => {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-
-                const scheduledDate = new Date(item.scheduledDate);
-                scheduledDate.setHours(0, 0, 0, 0);
-
-                const remainingDays = Math.ceil(
-                  (scheduledDate - today) / (1000 * 60 * 60 * 24)
-                );
-                const displayRemainingDays = Math.max(0, remainingDays);
-
-                const storedBaseDays = Number(
-                  localStorage.getItem(`progressBase_${item.id}`)
-                );
-
-                let baseDays =
-                  !storedBaseDays || storedBaseDays < remainingDays
-                    ? remainingDays
-                    : storedBaseDays;
-
-                if (baseDays <= 0) {
-                  baseDays = item.intervalDays > 0 ? item.intervalDays : 1;
-                }
-
-                localStorage.setItem(`progressBase_${item.id}`, baseDays);
-
-                let progressPercent;
-                if (remainingDays <= 0) {
-                  progressPercent = 100;
-                } else {
-                  progressPercent = Math.max(
-                    0,
-                    Math.min(((baseDays - remainingDays) / baseDays) * 100, 100)
-                  );
-
-                  // console.log("Debug", {
-                  //   id: item.id,
-                  //   product: item.productName,
-                  //   today: today.toISOString().slice(0, 10),
-                  //   scheduledDate: scheduledDate.toISOString().slice(0, 10),
-                  //   remainingDays,
-                  //   storedBaseDays,
-                  //   baseDays,
-                  //   progressPercent
-                  // });
-                }
-
-                return (
-                  <li key={item.id} className={styles.notificationItem}>
-                    <div className={styles.notificationWrapper}>
-                      <div className={styles.verticalBar}></div>
-
-                      <div className={styles.notificationContent}>
-                        <span className={styles.date}>
-                          予定補充日:{" "}
-                          <strong>{scheduledDate.toLocaleDateString()}</strong>
-                          {"　"}時間帯指定:
-                          <strong>{item.notificationHour}:00</strong>
-                        </span>
-                        <br />
-
-                        <span className={styles.product}>
-                          <strong>「{item.productName}」</strong>
-                        </span>
-                        <br />
-
-                        <label className={styles.switch}>
-                          <input
-                            type="checkbox"
-                            checked={item.enabled}
-                            onChange={() => handleToggleNotification(item)}
-                          />
-                          <span className={styles.slider}></span>
-                        </label>
-
-                        {remainingDays < 0 ? (
-                          <span className={styles.soon}>
-                            <CircleAlert color="red" />
-                            補充日が過ぎました！すぐに補充してください！
-                          </span>
-                        ) : remainingDays === 0 ? (
-                          <span className={styles.today}>
-                            <CircleAlert color="red" />
-                            補充日です！！
-                          </span>
-                        ) : remainingDays <= 3 ? (
-                          <span className={styles.soon}>
-                            <CircleAlert color="#FFC107" />
-                            まもなく、補充目安日になります！！
-                          </span>
-                        ) : (
-                          <span className={styles.normal}>
-                            補充目安日の候補期間に入ります。
-                          </span>
-                        )}
-
-                        <div className={styles.progressBar}>
-                          <div
-                            className={styles.progressFill}
-                            style={{ width: `${progressPercent}%` }}
-                          ></div>
-                        </div>
-
-                        <div>
-                          <p>【相場価格】</p>
-                          <button
-                            className={styles.syosai}
-                            onClick={() =>
-                              navigate(`/priceInfo/${encodeURIComponent(item.productName)}`)
-                            }
-                          >
-                            ➡詳しく見る
-                          </button>
-                        </div>
-
-                        <span className={styles.remaining}>
-                          あと <strong>{displayRemainingDays}</strong> 日（1回 / {item.intervalDays} 日）
-                        </span>
-
-                        <div className={styles.refilledDelete}>
-                          <button
-                            className={styles.refilled}
-                            onClick={() => handleRefilled(item)}
-                          >
-                            補充した
-                          </button>
-                          <button
-                            className={styles.delete}
-                            onClick={() => handleDelete(item.id)}
-                          >
-                            削除
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
+              {notifications.map((item) => (
+                <NotificationItem
+                  key={item.id}
+                  item={item}
+                  onToggle={handleToggleNotification}
+                  onDelete={handleDelete}
+                  onRefilled={handleRefilled}
+                />
+              ))}
             </ul>
           )}
 
-          <button className={styles.tsuika} onClick={() => setIsAdding(true)}>
-            追加
-          </button>
+          {!isAdding && (
+            <button
+              className={styles.tsuika}
+              onClick={() => setIsAdding(true)}
+            >
+              追加
+            </button>
+          )}
         </>
       )}
     </div>
   );
-
   return <Layout headerContent={headerContent} mainContent={mainContent} />;
 }
 
