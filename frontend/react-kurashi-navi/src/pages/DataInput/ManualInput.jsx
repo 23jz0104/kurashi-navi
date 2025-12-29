@@ -1,4 +1,3 @@
-// pages/DataInput/ConfirmInputData.jsx
 import { useState } from "react";
 import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";

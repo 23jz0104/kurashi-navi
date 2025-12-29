@@ -1,56 +1,50 @@
-*{
+* {
   padding: 0;
   margin: 0;
+  box-sizing: border-box;
 }
 
-
-.main{
-  width: 100%;
-  height: 100vh;
-}
-
+/* MyPage */
 .flex-list {
   width: 100%;
-  height: 70%;
-  display: flex;          
-  flex-direction: column;  
-  align-items: center;
-  gap: 1em;
-  margin-bottom: 15em;
+  display: flex;
+  justify-content: center;
 }
 
+/* リスト */
+.ul {
+  width: 100%;
+  max-width: 500px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0 auto;
+}
 
+.li {
+  width: 100%;
+}
+
+/* ボタン */
 .button {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;      
-  max-width: 500px; /* タブレット以上では広がりすぎないように制限 */
-  margin: 10%;
-  padding: 12px 16px;
+
+  width: 100%;
+  padding: 14px 16px;
+
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   background: #f5f5f5;
   cursor: pointer;
-  gap: 8px;
+
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
-
+/* 矢印 */
 .button::after {
-  content: ">";   /* ボタンの右に矢印を追加 */
-  margin-left: 120px;
+  content: ">";
   color: #666;
-}
-
-  
-.ul{
-  height: 100%;
-  margin:auto 0;
-  list-style: none;
-  max-width: auto;
-}
-
-.li{
-  box-shadow: 30px 5px 5px rgb(134, 129, 129);
-  margin: 30% 0;
 }

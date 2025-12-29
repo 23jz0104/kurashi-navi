@@ -4,6 +4,8 @@ import styles from "../../styles/MyPages/MyPage.module.css";
 import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";
 import { Settings, LogOut, ChartBar, UserPen } from "lucide-react";
+import historyStyles from "../../styles/History/History.module.css";
+
 
 function MyPage() {
   const navigate = useNavigate();
@@ -54,32 +56,62 @@ function MyPage() {
   const tabs = [{ id: "mypage", label: "マイページ", icon: null }];
   const headerContent = <TabButton tabs={tabs} activeTab={activeTab} onTabChange={setActiveTab} />;
 
+  // const mainContent = (
+  //   <div className={styles["flex-list"]}>
+  //     <ul className={styles.ul}>
+  //       <li className={styles.li}>
+  //         <button className={styles.button} onClick={goToUserInfo}>
+  //           <UserPen />登録情報
+  //         </button>
+  //       </li>
+  //       <li className={styles.li}>
+  //         <button className={styles.button} onClick={goToStatistics}>
+  //           <ChartBar />統計データ
+  //         </button>
+  //       </li>
+  //       <li className={styles.li}>
+  //         <button className={styles.button} onClick={goSetting}>
+  //           <Settings />設定
+  //         </button>
+  //       </li>
+  //       <li className={styles.li}>
+  //         <button className={styles.button} onClick={handleLogout}>
+  //           <LogOut />ログアウト
+  //         </button>
+  //       </li>
+  //     </ul>
+  //   </div>
+  // );
+
   const mainContent = (
-    <div className={styles["flex-list"]}>
-      <ul className={styles.ul}>
-        <li className={styles.li}>
-          <button className={styles.button} onClick={goToUserInfo}>
-            <UserPen />登録情報
-          </button>
-        </li>
-        <li className={styles.li}>
-          <button className={styles.button} onClick={goToStatistics}>
-            <ChartBar />統計データ
-          </button>
-        </li>
-        <li className={styles.li}>
-          <button className={styles.button} onClick={goSetting}>
-            <Settings />設定
-          </button>
-        </li>
-        <li className={styles.li}>
-          <button className={styles.button} onClick={handleLogout}>
-            <LogOut />ログアウト
-          </button>
-        </li>
-      </ul>
+    <div className={historyStyles["main-container"]}>
+      <div className={styles["flex-list"]}>
+        <ul className={styles.ul}>
+          <li className={styles.li}>
+            <button className={styles.button} onClick={goToUserInfo}>
+              <UserPen />登録情報
+            </button>
+          </li>
+          <li className={styles.li}>
+            <button className={styles.button} onClick={goToStatistics}>
+              <ChartBar />統計データ
+            </button>
+          </li>
+          <li className={styles.li}>
+            <button className={styles.button} onClick={goSetting}>
+              <Settings />設定
+            </button>
+          </li>
+          <li className={styles.li}>
+            <button className={styles.button} onClick={handleLogout}>
+              <LogOut />ログアウト
+            </button>
+          </li>
+        </ul>
+      </div>
     </div>
   );
+
 
   return <Layout headerContent={headerContent} mainContent={mainContent} />;
 }
