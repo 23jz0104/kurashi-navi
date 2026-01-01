@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Layout from "../../components/common/Layout";
 import TabButton from "../../components/common/TabButton";
 import ExpenseManualInput from "../../components/DataInput/ExpenseManualInput";
@@ -7,6 +8,7 @@ import { Wallet, TrendingUp } from "lucide-react";
 import { useCategories } from "../../hooks/common/useCategories";
 
 const ManualInputData = () => {
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState("expense");
   const {categories: incomeCategories} = useCategories(1) //収入用
   const {categories: expenseCategories} = useCategories(2) //支出用
@@ -15,6 +17,12 @@ const ManualInputData = () => {
     { id: "expense", label: "支出", icon: <Wallet size={20} /> },
     { id: "income", label: "収入", icon: <TrendingUp size={20} /> },
   ];
+
+  useEffect(() => {
+    if (location.state && location.state.activeTab) {
+      setActiveTab(location.state.activeTab);
+    }
+  }, [location.state]);
 
   return (
     <Layout
@@ -32,7 +40,7 @@ const ManualInputData = () => {
         </>
       }
       // hideDataInputButton={true}
-      disableDataInputButton={true} // 「+」を無効化
+      // disableDataInputButton={true} // 「+」を無効化
     />
   );
 };

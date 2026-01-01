@@ -1,177 +1,146 @@
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import styles from "./ExpenseManualInput.module.css";
-import ReceiptHeader from "./ReceiptHeader";
-import ReceiptSummry from "./ReceiptSummry";
-import DropdownModal from "../common/DropdonwModal";
-import ReceiptItemPreview from "./ReceiptItemPreview";
-import ReceiptItemModal from "./ReceiptItemModal";
-import SubmitButton from "../common/SubmitButton";
+import { Upload, Camera } from "lucide-react";
+
+// 新しく作った子コンポーネント
+import ReceiptForm from "./ReceiptForm";
 import CompleteModal from "../common/CompleteModal";
-import { useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { useReceiptForm } from "../../hooks/dataInput/useReceiptForm";
-import { useReceiptUploader } from "../../hooks/dataInput/useReceiptUploader";
-import { Plus, Upload, Camera, CircleAlert, X } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
-console.log("手動入力ページ");
-
-const ExpenseInput = ({ categories }) => {
+const ExpenseManualInput = ({ categories = [] }) => {
   const navigate = useNavigate();
-  const { isUploading, uploadReceipt } = useReceiptUploader();
   const location = useLocation();
+  
+  // 複数のレシートを管理する配列
+  const [receiptList, setReceiptList] = useState([]);
+  const [showComplete, setShowComplete] = useState(false);
 
-  const {
-    receipt,
-    setReceipt,
-    priceMode,
-    setPriceMode,
-    calculated,
-    addItem,
-    updateItem,
-    deleteItem,
-    updateReceiptInfo,
-  } = useReceiptForm();
+  // OCRデータの受け取りと初期化
+  useEffect(() => {
+    const rawData = location.state?.receiptData || location.state?.ocrResult;
 
-  const [validationError, setValidationError] = useState(null);
-  const [message, setMessage] = useState(false);
+    if (rawData) {
+      console.log("OCRデータ受信(親):", rawData);
+      
+      let newReceipts = [];
 
-  const validateForm = () => {
-    if (!receipt.products || receipt.products.length === 0) {
-      return "データを入力してください。";
+      // ★日付を安全に取り出すヘルパー関数
+      const getSafeDate = (source) => {
+        // 候補となるキーを全てチェック (OCRエンジンによって名前が違う場合への対策)
+        const dateVal = source.purchase_day || source.date || source.payment_date;
+        
+        // 値があればDateオブジェクト化、なければ今日の日付
+        if (dateVal) {
+          const d = new Date(dateVal);
+          return isNaN(d.getTime()) ? new Date() : d;
+        }
+        return new Date();
+      };
+
+      // パターンA: 複数枚のレシート
+      if (rawData.receipts && Array.isArray(rawData.receipts) && rawData.receipts.length > 0) {
+        newReceipts = rawData.receipts.map(r => ({
+          shop_name: r.shop_name || r.store || r.store_name || "",
+          shop_address: r.shop_address || r.address || "",
+          
+          // ★修正: ここで確実にDateオブジェクトを作る
+          purchase_day: getSafeDate(r),
+
+          tel: r.tel || "",
+          products: (r.products || []).map(p => ({
+            product_name: p.product_name || p.name || "", 
+            product_price: p.product_price || p.price || 0,
+            quantity: p.quantity || 1,
+            category_id: p.category_id || null,
+            tax_rate: p.tax_rate || 8,
+            discount: p.discount || 0
+          }))
+        }));
+      } 
+      // パターンB: 単一データ
+      else {
+        newReceipts = [{
+          shop_name: rawData.shop_name || rawData.store || "",
+          shop_address: rawData.shop_address || "",
+          
+          // ★修正: ここでも確実にDateオブジェクトを作る
+          purchase_day: getSafeDate(rawData),
+
+          products: (rawData.products || []).map(p => ({
+            product_name: p.product_name || p.name || "",
+            product_price: p.product_price || p.price || 0,
+            quantity: p.quantity || 1,
+            category_id: p.category_id || null
+          }))
+        }];
+      }
+
+      setReceiptList(newReceipts);
+      window.history.replaceState({}, document.title);
+    } else {
+      // 初期値
+      setReceiptList([{ shop_name: "", purchase_day: new Date(), products: [] }]);
     }
-    return null;
+  }, [location.state]);
+
+  // すべて完了したかチェック（必要に応じて）
+  const handleChildComplete = () => {
+    // 完了時の演出など（オプション）
+    setShowComplete(true);
+    setTimeout(() => setShowComplete(false), 1500);
   };
 
-  // OCR 結果が location.state にある場合、receipt に反映
-  useEffect(() => {
-    if (!location.state?.ocrResult) return;
-    setReceipt((prev) => ({
-      ...prev,
-      ...location.state.ocrResult,
-    }));
-  }, [location.state, setReceipt]);
-
-  const handleSubmit = async () => {
-    const error = validateForm();
-    if (error) {
-      setValidationError(error);
-      setTimeout(() => setValidationError(null), 5000);
-      return;
-    }
-
-    const result = await uploadReceipt(receipt, calculated.taxByRate);
-
-    if (result) {
-      setMessage(true);
-      setTimeout(() => setMessage(false), 1000);
-    }
+  // 手動でレシートを追加する機能（オプション）
+  const handleAddReceipt = () => {
+    setReceiptList([...receiptList, { store: "", date: new Date(), products: [] }]);
   };
 
   return (
     <div className={styles["form-container"]}>
-      {/* OCR ボタン */}
+      {/* 上部ボタンエリア */}
       <div className={styles["ocr-container"]}>
         <div className={styles["ocr-buttons"]}>
-          <button className={styles["ocr-button"]}>
+          {/* <button className={styles["ocr-button"]}>
             <Upload size={20} />
             <span className={styles["ocr-button-text"]}>アップロード</span>
-          </button>
-
-          <button
-            className={styles["ocr-button"]}
-            onClick={() => navigate("/camera")}
-          >
-            <Camera size={20} />
-            <span className={styles["ocr-button-text"]}>読み取り</span>
+          </button> */}
+          
+          {/* 追加ボタンに流用 */}
+          <button className={styles["ocr-button"]} onClick={handleAddReceipt} style={{width: "100%"}}>
+            <PlusIcon />
+            <span className={styles["ocr-button-text"]}>レシート入力枠を追加</span>
           </button>
         </div>
       </div>
 
-      {/* レシート情報 */}
-      <ReceiptHeader receipt={receipt} updateReceiptInfo={updateReceiptInfo} />
+      {/* <div style={{ marginBottom: "10px", color: "#666", fontSize: "0.9rem", textAlign: "center" }}>
+        レシート{receiptList.length}
+      </div> */}
 
-      {/* 税率切替ボタン */}
-      <div className={styles["price-mode-container"]}>
-        <span className={styles["price-mode-label"]}>レシートタイプ：</span>
-        <button
-          className={styles["price-mode-text-toggle"]}
-          onClick={() =>
-            setPriceMode(priceMode === "exclusive" ? "inclusive" : "exclusive")
-          }
-        >
-          {priceMode === "inclusive" ? "税込" : "税抜"}
-        </button>
+      <div className={styles["receipts-wrapper"]}>
+        {receiptList.map((receiptData, index) => (
+          <ReceiptForm
+            key={index}
+            index={index}
+            initialData={receiptData}
+            categories={categories}
+            onComplete={handleChildComplete}
+          />
+        ))}
       </div>
 
-      {/* 集計 */}
-      <ReceiptSummry totalAmount={calculated.subTotal} tax={calculated.taxByRate} />
-
-      {/* 項目リスト */}
-      <div className={styles["item-container"]}>
-        <div className={styles["item-list"]}>
-          {receipt.products.map((item, index) => (
-            <DropdownModal key={index} title={<ReceiptItemPreview item={item} />}>
-              {(closeModal) => (
-                <ReceiptItemModal
-                  mode="edit"
-                  item={item}
-                  index={index}
-                  onSubmit={updateItem}
-                  onDelete={deleteItem}
-                  closeModal={closeModal}
-                  categories={categories}
-                />
-              )}
-            </DropdownModal>
-          ))}
-
-          <DropdownModal
-            title={
-              <>
-                <span
-                  className={styles["category-icon"]}
-                  style={{ backgroundColor: "#c0c0c0" }}
-                >
-                  <Plus />
-                </span>
-                <span className={styles["product-name"]}>項目を追加する</span>
-              </>
-            }
-          >
-            {(closeModal) => (
-              <ReceiptItemModal
-                mode="add"
-                onSubmit={addItem}
-                closeModal={closeModal}
-                categories={categories}
-              />
-            )}
-          </DropdownModal>
-        </div>
-      </div>
-
-      {/* 送信ボタン */}
-      <SubmitButton
-        text={isUploading ? "送信中..." : "送信"}
-        onClick={handleSubmit}
-        disabled={isUploading}
-      />
-
-      {/* エラーメッセージ */}
-      {validationError && (
-        <div className={styles["error-container"]}>
-          <CircleAlert size={16} />
-          <span className={styles["error-message"]}>{validationError}</span>
-          <button onClick={() => setValidationError(null)}>
-            <X size={16} />
-          </button>
-        </div>
-      )}
-
-      {/* 完了モーダル */}
-      {message && <CompleteModal />}
+      {/* 完了モーダル（保存時に一瞬出す） */}
+      {showComplete && <CompleteModal />}
     </div>
   );
 };
 
-export default ExpenseInput;
+// アイコン用（簡易）
+const PlusIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <line x1="12" y1="5" x2="12" y2="19"></line>
+    <line x1="5" y1="12" x2="19" y2="12"></line>
+  </svg>
+);
+
+export default ExpenseManualInput;

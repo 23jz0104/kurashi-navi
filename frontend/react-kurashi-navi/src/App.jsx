@@ -11,7 +11,6 @@ import BudgetManagement from "./pages/Budget/BudgetManagement.jsx";
 // import Ninsyo from "./components/common/Ninsyo";
 import History from "./pages/History/History";
 import ManualInputData from "./pages/DataInput/ManualInput.jsx";
-import CameraInput from "./pages/DataInput/CameraInput.jsx";
 import BudgetEdit from "./components/BudgetManagement/BudgetEdit.jsx";
 import BudgetCreate from "./components/BudgetManagement/BudgetCreate.jsx";
 import FixedCostCreate from "./components/BudgetManagement/FixedCostCreate.jsx";  
@@ -27,7 +26,6 @@ function App() {
         <Route path="/newlog" element={<NewLog />} />
         <Route path="/mypage" element={<MyPage />} />
         <Route path="/dataInput" element={<ManualInputData />} />
-        <Route path="/camera" element={<CameraInput />} />
         <Route path="/userinfo" element={<UserInfo />} />
         <Route path="/statistics" element={<Statistics />} />
         <Route path="/notificationlist" element={<NotificationList />} />

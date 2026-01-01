@@ -2,10 +2,14 @@ import DayPicker from "../common/DayPicker";
 import styles from "./ReceiptHeader.module.css";
 
 const ReceiptHeader = ({ receipt, updateReceiptInfo}) => {
+  const dateValue = receipt.purchase_day 
+    ? new Date(receipt.purchase_day) 
+    : new Date();
+
   return (
     <div className={styles["header-container"]}>
       <DayPicker
-        date={receipt.purchase_day ?? ""}
+        date={dateValue ?? ""}
         onChange={(newDate) =>
           updateReceiptInfo("purchase_day", newDate)
         }

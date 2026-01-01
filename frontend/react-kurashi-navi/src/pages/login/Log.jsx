@@ -6,26 +6,11 @@ import { EyeOff, Eye, CircleAlert, Mail, Lock } from "lucide-react";
 import Layout from "../../components/common/Layout";
 import SubmitButton from "../../components/common/SubmitButton";
 
-// Firebase 関連のインポート 
-import { initializeApp } from "firebase/app";
-import { getMessaging, getToken } from "firebase/messaging";
-
-//  Firebase 設定
-const firebaseConfig = {
-  apiKey: "AIzaSyDtjnrrDg2MKCL1pWxXJ7_m3x14N8OCbts",
-  authDomain: "pushnotification-4ebe3.firebaseapp.com",
-  projectId: "pushnotification-4ebe3",
-  storageBucket: "pushnotification-4ebe3.firebasestorage.app",
-  messagingSenderId: "843469470605",
-  appId: "1:843469470605:web:94356b50ab8c7718021bc4"
-};
-const app = initializeApp(firebaseConfig);
-
 function Log() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // メールアドレスを localStorage から取得 (ログアウト後も保持するため)
+  // メールアドレスを localStorage から取得
   const [email, setEmail] = useState(() => {
     return localStorage.getItem("lastEmail") || "";
   });
@@ -33,10 +18,8 @@ function Log() {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  
   const [isLoading, setIsLoading] = useState(false);
-  const [isCheckingAutoLogin, setIsCheckingAutoLogin] = useState(true);
-
+  
   const tabs = [
     { id: "login", label: "ログイン", icon: null },
     { id: "signup", label: "新規登録", icon: null },
@@ -52,83 +35,14 @@ function Log() {
     }
   };
 
-  //  自動ログイン処理 
-  const autoLoginByDevice = async () => {
-    try {
-      const registration = await navigator.serviceWorker.register(
-        "/combine_test/firebase-messaging-sw.js"
-      );
-
-      const messaging = getMessaging(app);
-      const token = await getToken(messaging, {
-        vapidKey: "BH3VSel6Cdam2EREeJ9iyYLoJcOYpqGHd7JXULxSCmfsULrVMaedjv81VF7h53RhJmfcHCsq-dSoJVjHB58lxjQ",
-        serviceWorkerRegistration: registration
-      });
-
-      if (token) {
-        localStorage.setItem("fcm_token", token);
-      }
-
-      if (!token) {
-        setIsCheckingAutoLogin(false);
-        return;
-      }
-
-      const res = await fetch(
-        "https://t08.mydns.jp/kakeibo/public/api/settings", 
-        {
-          headers: { "X-FCM-TOKEN": token }
-        }
-      );
-
-      if (!res.ok) {
-        setIsCheckingAutoLogin(false);
-        return;
-      }
-
-      const data = await res.json();
-
-      if (data.mode === "device_login") {
-        console.log("自動ログイン成功");
-        
-        sessionStorage.setItem("isLoggedIn", "true");
-        sessionStorage.setItem("userId", data.user_id); 
-        sessionStorage.setItem("user_id", data.user_id); 
-        
-        const devId = data.device_id || data.currentDeviceId;
-        sessionStorage.setItem("device_id", devId);
-        sessionStorage.setItem("currentDeviceId", devId);
-
-        navigate("/history");
-        return;
-      }
-
-    } catch (err) {
-      console.error("自動ログインチェック失敗:", err);
-    } finally {
-      setIsCheckingAutoLogin(false);
-    }
-  };
-
-  //  初回レンダリング時の処理
   useEffect(() => {
-    const isJustLoggedOut = sessionStorage.getItem("just_logged_out");
-
-    if (isJustLoggedOut === "true") {
-      // console.log("ログアウト直後のため、自動ログイン処理をスキップします。");
-      // ここではフラグを消さない(Reactの2回レンダリング対策)
-      setIsCheckingAutoLogin(false);
-      return; 
-    }
-
+    // 既にログイン済み(sessionStorage)なら遷移
     if (sessionStorage.getItem("isLoggedIn") === "true") {
       navigate("/history");
-    } else {
-      autoLoginByDevice();
     }
-  }, []); 
+  }, [navigate]); 
 
-  //  手動ログイン処理 
+  // 手動ログイン処理 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
       setErrorMessage("メールアドレスまたはパスワードが未入力です。");
@@ -151,60 +65,48 @@ function Log() {
         return;
       }
 
-      // console.log("手動ログイン成功:", data);
-
       sessionStorage.removeItem("just_logged_out");
-
       sessionStorage.setItem("isLoggedIn", "true");
       
-      // メールアドレスを localStorage に保存
+      // メールアドレスをlocalStorageに保存
       localStorage.setItem("lastEmail", data.user.email);
       
       const uId = data.user.id || data.user_id;
+      // 念のため古い形式も残しておきますが、基本はトークン認証を使います
       sessionStorage.setItem("userId", uId);
       sessionStorage.setItem("user_id", uId);
       
       if (data.token) {
-        sessionStorage.setItem("token", data.token);
+        sessionStorage.setItem("auth_token", data.token);
+      }
+      else {
+        console.warn("トークンが取得できませんでした。");
       }
 
       if (data.device_id) {
         sessionStorage.setItem("device_id", data.device_id);
-      } else if (data.user && data.user.device_id) {
+      }
+      else if (data.user && data.user.device_id) {
         sessionStorage.setItem("device_id", data.user.device_id);
       }
 
       navigate("/history");
-    } catch (error) {
+    }
+    catch (error) {
       console.error("通信エラー:", error);
       setErrorMessage("通信エラーが発生しました");
-    } finally {
+    }
+    finally {
       setIsLoading(false);
     }
   };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {
-      e.preventDefault(); // フォームのデフォルト送信を防ぐ
+      e.preventDefault(); 
       handleLogin();
     }
   };
-
-  if (isCheckingAutoLogin) {
-    return (
-      <Layout
-        headerContent={<div style={{height: "50px"}}></div>} 
-        mainContent={
-          <div className={styles["main-container"]}>
-             <div style={{ textAlign: "center", marginTop: "50px", color: "#666" }}>
-                <p>ログインを確認中...</p>
-             </div>
-          </div>
-        }
-        hideNavigation={true}
-      />
-    );
-  }
 
   return (
     <Layout 
@@ -219,7 +121,7 @@ function Log() {
         <div className={styles["main-container"]}>
           <div className={styles["main-inner"]}>
             <div className={styles["main-header"]}>
-              <h1>くらしナビ(仮)</h1>
+              <h1>23JZ - T08</h1>
             </div>
             <form 
               onSubmit={(e) => { 

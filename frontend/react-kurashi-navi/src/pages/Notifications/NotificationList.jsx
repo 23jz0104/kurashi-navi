@@ -75,6 +75,7 @@ function NotificationList() {
   const [notifications, setNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedId, setExpandedId] = useState(null);
+  const [editingId, setEditingId] = useState(null);
   const userId = sessionStorage.getItem("userId");
 
   const getToday = () => {
@@ -106,7 +107,7 @@ function NotificationList() {
 
       const data = await res.json();
       if (!res.ok || data.status !== "success") {
-        console.error("更新失敗:", data.message);
+        console.error("変更失敗:", data.message);
       }
     } catch (e) {
       console.error("通信エラー:", e);
@@ -184,39 +185,53 @@ function NotificationList() {
   const handleSave = async () => {
     // バリデーション
     if (!productName) return setError('商品名を入力してください');
+    
     try {
-      // 商品追加処理
-      const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/notification", {
-        method: "POST",
+    const isEdit = editingId !== null;
+
+    const res = await fetch("https://t08.mydns.jp/kakeibo/public/api/notification", {
+        method: isEdit ? "PATCH" : "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-User-ID": userId
+          "X-User-ID": userId,
+          ...(isEdit && { "X-Notification-ID": editingId })
         },
-        body: JSON.stringify({
-          product_name: productName,
-          notification_period: Number(intervalDays),
-          notification_hour: notificationHour,
-          notification_min: 0
-        })
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.status === "success") {
-        fetchNotifications();
-        setIsAdding(false);
-        setProductName("");
-        setIntervalDays("");
-        setNotificationHour(9);
-        setError("");
-      } else {
-        setError(data.message || "追加失敗");
+        body: JSON.stringify(
+          isEdit
+            ? {
+                notification_enable: 1,
+                notification_period: Number(intervalDays),
+                notification_hour: notificationHour,
+                notification_min: 0
+              }
+            : {
+                product_name: productName,
+                notification_period: Number(intervalDays),
+                notification_hour: notificationHour,
+                notification_min: 0
+              }
+        )
       }
-    } catch (e) {
-      console.error(e);
-      setError("通信エラー");
+    );
+
+    const data = await res.json();
+
+    if (res.ok && data.status === "success") {
+      fetchNotifications();
+      setIsAdding(false);
+      setEditingId(null);   // ← リセット
+      setProductName("");
+      setIntervalDays("");
+      setNotificationHour(9);
+      setError("");
+    } else {
+      setError(data.message || "保存失敗");
     }
-  };
+  } catch (e) {
+    console.error(e);
+    setError("通信エラー");
+  }
+};
 
   // 通知削除
   const handleDelete = async (id) => {
@@ -238,7 +253,7 @@ function NotificationList() {
         console.error(data);
       }
     } catch (e) {
-      console.error(e);
+      console.error("削除エラー", e);
     }
   };
 
@@ -275,7 +290,26 @@ function NotificationList() {
       }
     } 
     catch (e) {
-      console.error("通信エラー:", e);
+      console.error("補充エラー", e);
+    }
+  };
+
+  // 編集
+  const handleEdit = async (id) => {
+    try {
+      const target = notifications.find(n => n.id === id);
+      if (!target) return;
+
+      setIsAdding(true);
+      setEditingId(id);
+
+      setProductName(target.productName);
+      setIntervalDays(String(target.intervalDays));
+      setNotificationHour(target.notificationHour);
+      setError("");
+    }
+    catch (e) {
+      console.error("編集エラー:", e);
     }
   };
   
@@ -330,6 +364,7 @@ function NotificationList() {
               className={styles.cancel}
               onClick={() => {
                 setIsAdding(false);
+                setEditingId(null);
                 setError("");
                 setProductName("");
                 setIntervalDays("");
@@ -354,6 +389,7 @@ function NotificationList() {
                   onExpand={() => setExpandedId(prev => (prev === item.id ? null : item.id))}
                   onToggle={handleToggleNotification}
                   onDelete={handleDelete}
+                  onEdit={handleEdit}
                   onRefilled={handleRefilled}
                 />
               ))}

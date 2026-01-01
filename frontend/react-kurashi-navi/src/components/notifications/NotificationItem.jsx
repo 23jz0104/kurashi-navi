@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import styles from "./Notification.module.css";
 import { useNavigate } from "react-router-dom";
 
-const NotificationItem = ({ item, expanded, onExpand, onToggle, onDelete, onRefilled }) => {
+const NotificationItem = ({ item, expanded, onExpand, onToggle, onDelete, onRefilled, onEdit }) => {
   const navigate = useNavigate();
   // const [isExpanded, setIsExpanded] = useState(null);
 
@@ -93,6 +93,7 @@ const NotificationItem = ({ item, expanded, onExpand, onToggle, onDelete, onRefi
               {/* ボタン類 */}
               <div className={styles.refilledDelete}>
                 <button className={styles.refilled} onClick={() => onRefilled(item)}>補充</button>
+                <button className={styles.edit} onClick={(e) => {onEdit(item.id); e.stopPropagation();}}>編集</button>
                 <button className={styles.delete} onClick={() => onDelete(item.id)}>削除</button>
               </div>
             </div>

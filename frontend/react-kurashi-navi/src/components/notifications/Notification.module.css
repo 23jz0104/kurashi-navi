@@ -142,6 +142,11 @@ input:checked + .slider:before {
   cursor: pointer;
 }
 
+.edit {
+  background-color: #4f7cff;
+  color: #fff;
+}
+
 /* 相場価格 */
 .syosai{
   color: #00bfff;

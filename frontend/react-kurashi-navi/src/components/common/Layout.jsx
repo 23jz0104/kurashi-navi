@@ -1,13 +1,14 @@
-import React from "react";
+import React, { useState } from "react"; // useStateを追加
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Wallet, List, Bell, User, Plus, ChevronLeft, MoreVertical, Trash2 } from "lucide-react";
+import { Wallet, List, Bell, User, Plus, ChevronLeft, Trash2 } from "lucide-react";
 import styles from "./Layout.module.css";
+// 作成したメニューコンポーネントをインポート
+import DataInputMenu from "../DataInput/DataInputMenu";
 
-// const Layout = ({ headerContent, mainContent, hideNavigation = false, hideDataInputButton = false, redirectPath, state = null, showKebabMenu = false}) => {
-const Layout = ({ headerContent, mainContent, hideNavigation = false, disableDataInputButton = false, redirectPath, state = null, showKebabMenu = false, onDeleteButtonClick}) => {
+const Layout = ({ headerContent, mainContent, hideNavigation = false, disableDataInputButton = false, redirectPath, state = null, onDeleteButtonClick}) => {
   const location = useLocation();
   const navigate = useNavigate();
-
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isActive = (path) => location.pathname === path;
 
   // 入力関連ページのチェック
@@ -15,7 +16,7 @@ const Layout = ({ headerContent, mainContent, hideNavigation = false, disableDat
   location.pathname === "/dataInput" ||
   location.pathname.startsWith("/dataInput/");
 
-  // 「＋」を無効化
+  // 「＋」を無効化するかどうか
   const isPlusDisabled = disableDataInputButton || isDataInputPage;
 
   return (
@@ -25,7 +26,7 @@ const Layout = ({ headerContent, mainContent, hideNavigation = false, disableDat
           <div className={styles["back-button"]}>
             <ChevronLeft size={20}
              className={styles["icon"]}
-              onClick={() => navigate(redirectPath, {state})}
+             onClick={() => navigate(redirectPath, {state})}
             />
           </div>
         )}
@@ -36,9 +37,11 @@ const Layout = ({ headerContent, mainContent, hideNavigation = false, disableDat
           </button>
         )}
       </header>
+
       <main className={styles.main}>
         {mainContent}
       </main>
+
       <footer className={styles.footer}>
         <nav className={styles["footer-nav"]}>
           {hideNavigation ? (<></>) : (
@@ -58,13 +61,6 @@ const Layout = ({ headerContent, mainContent, hideNavigation = false, disableDat
                 <Wallet className={styles["nav-icon"]} size={20} />
                 <span className={styles["nav-label"]}>予算</span>
               </Link>
-
-              {/* 旧「＋」ボタン 
-              {!hideDataInputButton && (
-                <Link to="/dataInput">
-                  <button className={styles["navigate-datainput"]}><Plus size={16} /></button>
-                </Link>
-              )} */}
               
               {/* 「＋」ボタン: データ入力関連ページであれば無効化 */}
               {isPlusDisabled ? (
@@ -76,11 +72,13 @@ const Layout = ({ headerContent, mainContent, hideNavigation = false, disableDat
                   <Plus size={16} />
                 </button>
               ) : (
-                <Link to="/dataInput">
-                  <button className={styles["navigate-datainput"]}>
-                    <Plus size={16} />
-                  </button>
-                </Link>
+                // ★ここを修正：LinkではなくonClickでメニューを開くように変更
+                <button 
+                  className={styles["navigate-datainput"]}
+                  onClick={() => setIsMenuOpen(true)}
+                >
+                  <Plus size={16} />
+                </button>
               )}
 
               <Link
@@ -102,6 +100,11 @@ const Layout = ({ headerContent, mainContent, hideNavigation = false, disableDat
           )}
         </nav>
       </footer>
+
+      {/* ★メニューコンポーネントを配置 */}
+      {isMenuOpen && (
+        <DataInputMenu onClose={() => setIsMenuOpen(false)} />
+      )}
     </div>
   );
 };
